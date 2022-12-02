@@ -54,9 +54,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class)]
     private Collection $pets;
 
+    #[ORM\ManyToOne(inversedBy: 'vet')]
+    private ?HealthRecord $healthRecord = null;
+
+    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
+    private Collection $healthRecords;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
+        $this->healthRecords = new ArrayCollection();
     }
 
 
@@ -238,6 +245,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($pet->getOwner() === $this) {
                 $pet->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getHealthRecord(): ?HealthRecord
+    {
+        return $this->healthRecord;
+    }
+
+    public function setHealthRecord(?HealthRecord $healthRecord): self
+    {
+        $this->healthRecord = $healthRecord;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HealthRecord>
+     */
+    public function getHealthRecords(): Collection
+    {
+        return $this->healthRecords;
+    }
+
+    public function addHealthRecord(HealthRecord $healthRecord): self
+    {
+        if (!$this->healthRecords->contains($healthRecord)) {
+            $this->healthRecords->add($healthRecord);
+            $healthRecord->setVet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHealthRecord(HealthRecord $healthRecord): self
+    {
+        if ($this->healthRecords->removeElement($healthRecord)) {
+            // set the owning side to null (unless already changed)
+            if ($healthRecord->getVet() === $this) {
+                $healthRecord->setVet(null);
             }
         }
 

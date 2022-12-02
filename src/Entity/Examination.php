@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ExaminationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
@@ -28,6 +30,14 @@ class Examination
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'examination', targetEntity: HealthRecord::class)]
+    private Collection $healthRecords;
+
+    public function __construct()
+    {
+        $this->healthRecords = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +100,36 @@ class Examination
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HealthRecord>
+     */
+    public function getHealthRecords(): Collection
+    {
+        return $this->healthRecords;
+    }
+
+    public function addHealthRecord(HealthRecord $healthRecord): self
+    {
+        if (!$this->healthRecords->contains($healthRecord)) {
+            $this->healthRecords->add($healthRecord);
+            $healthRecord->setExamination($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHealthRecord(HealthRecord $healthRecord): self
+    {
+        if ($this->healthRecords->removeElement($healthRecord)) {
+            // set the owning side to null (unless already changed)
+            if ($healthRecord->getExamination() === $this) {
+                $healthRecord->setExamination(null);
+            }
+        }
 
         return $this;
     }

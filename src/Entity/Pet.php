@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -38,6 +40,14 @@ class Pet
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class)]
+    private Collection $healthRecords;
+
+    public function __construct()
+    {
+        $this->healthRecords = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -136,6 +146,36 @@ class Pet
     public function setImage(?string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HealthRecord>
+     */
+    public function getHealthRecords(): Collection
+    {
+        return $this->healthRecords;
+    }
+
+    public function addHealthRecord(HealthRecord $healthRecord): self
+    {
+        if (!$this->healthRecords->contains($healthRecord)) {
+            $this->healthRecords->add($healthRecord);
+            $healthRecord->setPet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHealthRecord(HealthRecord $healthRecord): self
+    {
+        if ($this->healthRecords->removeElement($healthRecord)) {
+            // set the owning side to null (unless already changed)
+            if ($healthRecord->getPet() === $this) {
+                $healthRecord->setPet(null);
+            }
+        }
 
         return $this;
     }
