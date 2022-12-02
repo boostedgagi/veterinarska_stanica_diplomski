@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mysql:
+    image: percona:8.0
+    restart: always
+    ports:
+      - '3326:3306' # 'local_port:port_in_container'
+    environment:
+      - MYSQL_ROOT_PASSWORD=MYSQL_RANDOM_ROOT_PASSWORD
+#      - DB_HOST=127.0.0.1
+      - MYSQL_DATABASE=vet_shop
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+#  mailer:
+#    image: schickling/mailcatcher
+#    ports: [ 1025, 1080 ]
