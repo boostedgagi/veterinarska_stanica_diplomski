@@ -174,6 +174,18 @@ class Pet
         return $this;
     }
 
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function getImage(): ?string
     {
         return $this->image;
