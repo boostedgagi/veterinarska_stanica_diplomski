@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,6 +46,19 @@ class UserController extends AbstractController
         return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
 
+    #[Route('/users/{id}',methods: 'PUT')]
+    public function updateUser(Request $request,int $id,UserRepository $repo): Response
+    {
+        $user = $repo->find($id);
 
+        $this->handleJSONForm($request,$user,UserType::class);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
+    }
+
+    //image upload method here
 
 }
