@@ -54,8 +54,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class)]
     private Collection $pets;
 
-    #[ORM\ManyToOne(inversedBy: 'vet')]
-    private ?HealthRecord $healthRecord = null;
+//    #[ORM\ManyToOne(inversedBy: 'vet')]
+//    private ?HealthRecord $healthRecord = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;

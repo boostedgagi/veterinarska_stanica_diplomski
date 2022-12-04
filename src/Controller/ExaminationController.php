@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Examination;
+use App\Form\ExaminationType;
+use Doctrine\ORM\EntityManagerInterface;
+use Nebkam\SymfonyTraits\FormTrait;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ExaminationController extends AbstractController
+{
+    use FormTrait;
+
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->em = $entityManager;
+    }
+
+    #[Route('/examination', methods: 'POST')]
+    public function createExamination(Request $request): Response
+    {
+        $examination = new Examination();
+        $this->handleJSONForm($request, $examination, ExaminationType::class);
+
+        $this->em->persist($examination);
+        $this->em->flush();
+
+        return $this->json($examination, Response::HTTP_CREATED, [], ['groups' => 'examination_created']);
+    }
+}
