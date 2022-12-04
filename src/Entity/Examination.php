@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ExaminationRepository::class)]
 class Examination
@@ -91,6 +92,19 @@ class Examination
 
         return $this;
     }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
