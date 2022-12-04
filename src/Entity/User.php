@@ -20,7 +20,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(
         [
-            'user_created'
+            'user_created',
+            'user_showAll'
         ]
     )]
     private ?int $id = null;
@@ -28,7 +29,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(
         [
-            'user_created'
+            'user_created',
+            'user_showAll'
         ]
     )]
     private ?string $email = null;
@@ -40,17 +42,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(
-        [
-            'user_created'
-        ]
-    )]
+//    #[Groups(
+//        [
+//            'user_created'
+//        ]
+//    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(
         [
-            'user_created'
+            'user_created',
+            'user_showAll'
         ]
     )]
     private ?string $firstName = null;
@@ -58,7 +61,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     #[Groups(
         [
-            'user_created'
+            'user_created',
+            'user_showAll'
         ]
     )]
     private ?string $lastName = null;
@@ -69,18 +73,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(
         [
-            'user_created'
+            'user_created',
+            'user_showAll'
         ]
     )]
     private ?int $typeOfUser = null;
 
     #[ORM\Column]
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class)]

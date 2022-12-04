@@ -70,6 +70,22 @@ class UserController extends AbstractController
         return $this->json("",Response::HTTP_NO_CONTENT);
     }
 
+    #[Route('/users',methods: 'GET')]
+    public function showAllUsers(Request $request,UserRepository $repo): Response
+    {
+        $allUsers = $repo->findAll();
+
+        return $this->json($allUsers,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+    }
+
+    #[Route('/users/{id}',methods: 'GET')]
+    public function showOneUser(Request $request,int $id,UserRepository $repo): Response
+    {
+        $user = $repo->find($id);
+
+        return $this->json($user,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+    }
+
 
 
     //image upload method here
