@@ -59,6 +59,19 @@ class UserController extends AbstractController
         return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
 
+    #[Route('/users/{id}',methods: 'DELETE')]
+    public function deleteUser(Request $request,int $id,UserRepository $repo): Response
+    {
+        $user = $repo->find($id);
+
+        $this->em->remove($user);
+        $this->em->flush();
+
+        return $this->json("",Response::HTTP_NO_CONTENT);
+    }
+
+
+
     //image upload method here
 
 }
