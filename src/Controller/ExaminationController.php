@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Examination;
 use App\Form\ExaminationType;
+use App\Repository\ExaminationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +23,7 @@ class ExaminationController extends AbstractController
         $this->em = $entityManager;
     }
 
-    #[Route('/examination', methods: 'POST')]
+    #[Route('/examinations', methods: 'POST')]
     public function createExamination(Request $request): Response
     {
         $examination = new Examination();
@@ -32,5 +33,28 @@ class ExaminationController extends AbstractController
         $this->em->flush();
 
         return $this->json($examination, Response::HTTP_CREATED, [], ['groups' => 'examination_created']);
+    }
+
+    #[Route('/examinations/{id}', methods: 'PUT')]
+    public function updateExamination(Request $request,int $id,ExaminationRepository $repo): Response
+    {
+        $examination = $repo->find($id);
+        $this->handleJSONForm($request, $examination, ExaminationType::class);
+
+        $this->em->persist($examination);
+        $this->em->flush();
+
+        return $this->json($examination, Response::HTTP_CREATED, [], ['groups' => 'examination_updated']);
+    }
+
+    #[Route('/examinations/{id}', methods: 'DELETE')]
+    public function deleteExamination(int $id,ExaminationRepository $repo):Response
+    {
+        $examination = $repo->find($id);
+
+        $this->em->remove($examination);
+        $this->em->flush();
+
+        return $this->json("", Response::HTTP_NO_CONTENT);
     }
 }
