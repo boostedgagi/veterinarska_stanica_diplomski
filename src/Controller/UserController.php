@@ -9,6 +9,7 @@ use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
@@ -23,15 +24,27 @@ class UserController extends AbstractController
     }
 
     #[Route('/users',methods: 'POST')]
-    public function register(Request $request): Response
+    public function register(Request $request,UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
+        $plainTextPassword = json_decode($request->getContent(),false);
 
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $plainTextPassword->password
+        );
         $this->handleJSONForm($request,$user,UserType::class);
+
+        $user->setPassword($hashedPassword);
+        $user->setAllowed(false);
+        $user->setTypeOfUser(3);
 
         $this->em->persist($user);
         $this->em->flush();
 
         return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
+
+
+
 }
