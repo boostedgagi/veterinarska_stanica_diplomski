@@ -16,8 +16,6 @@ class PetType extends AbstractType
             ->add('dateOfBirth')
             ->add('animal')
             ->add('breed')
-            ->add('createdAt')
-            ->add('updatedAt')
             ->add('image')
             ->add('owner')
         ;

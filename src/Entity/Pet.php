@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
@@ -17,28 +18,63 @@ class Pet
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?\DateTimeImmutable $dateOfBirth = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?string $animal = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?string $breed = null;
 
     #[ORM\ManyToOne(inversedBy: 'pets')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?User $owner = null;
 
     #[ORM\Column]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(
+        [
+            'pet_created'
+        ]
+    )]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class)]
