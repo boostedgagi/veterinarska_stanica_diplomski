@@ -63,8 +63,8 @@ class Examination
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(
         [
-            'examination_updated',
-//            'examination_showAll'
+//            'examination_created',
+            'examination_showAll'
         ]
     )]
     private ?\DateTimeInterface $updatedAt = null;

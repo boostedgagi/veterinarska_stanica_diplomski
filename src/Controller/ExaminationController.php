@@ -31,6 +31,14 @@ class ExaminationController extends AbstractController
         return $this->json($allExaminations,Response::HTTP_OK,[],['groups'=>'examination_showAll']);
     }
 
+    #[Route('/examinations/{id}',methods: 'GET')]
+    public function showOneExamination(int $id,ExaminationRepository $repo):Response
+    {
+        $examination = $repo->find($id);
+
+        return $this->json($examination,Response::HTTP_OK,[],['groups'=>'examination_showAll']);
+    }
+
     #[Route('/examinations', methods: 'POST')]
     public function createExamination(Request $request): Response
     {
@@ -52,7 +60,7 @@ class ExaminationController extends AbstractController
         $this->em->persist($examination);
         $this->em->flush();
 
-        return $this->json($examination, Response::HTTP_CREATED, [], ['groups' => 'examination_updated']);
+        return $this->json($examination, Response::HTTP_CREATED, [], ['groups' => 'examination_created']);
     }
 
     #[Route('/examinations/{id}', methods: 'DELETE')]
