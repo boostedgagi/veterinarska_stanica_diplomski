@@ -2,17 +2,36 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\UserType;
+use Doctrine\ORM\EntityManagerInterface;
+use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
-    #[Route('/user', name: 'app_user')]
-    public function index(): Response
+    use FormTrait;
+
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
+        $this->em = $entityManager;
+    }
+
+    #[Route('/users',methods: 'POST')]
+    public function register(Request $request): Response
+    {
+        $user = new User();
+
+        $this->handleJSONForm($request,$user,UserType::class);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
 }
