@@ -18,7 +18,8 @@ class Examination
     #[ORM\Column]
     #[Groups(
         [
-        'examination_created'
+            'examination_created',
+            'examination_showAll'
         ]
     )]
     private ?int $id = null;
@@ -27,7 +28,7 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_updated'
+            'examination_showAll'
         ]
     )]
     private ?string $name = null;
@@ -36,7 +37,7 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_updated'
+            'examination_showAll'
         ]
     )]
     private ?int $duration = null;
@@ -45,7 +46,7 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_updated'
+            'examination_showAll'
         ]
     )]
     private ?int $price = null;
@@ -53,7 +54,8 @@ class Examination
     #[ORM\Column]
     #[Groups(
         [
-            'examination_created'
+            'examination_created',
+            'examination_showAll'
         ]
     )]
     private ?\DateTimeImmutable $createdAt = null;
@@ -61,7 +63,8 @@ class Examination
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(
         [
-            'examination_updated'
+            'examination_updated',
+//            'examination_showAll'
         ]
     )]
     private ?\DateTimeInterface $updatedAt = null;

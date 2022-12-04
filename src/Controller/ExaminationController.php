@@ -23,6 +23,14 @@ class ExaminationController extends AbstractController
         $this->em = $entityManager;
     }
 
+    #[Route('/examinations',methods: 'GET')]
+    public function showAllExaminations(ExaminationRepository $repo):Response
+    {
+        $allExaminations = $repo->findAll();
+
+        return $this->json($allExaminations,Response::HTTP_OK,[],['groups'=>'examination_showAll']);
+    }
+
     #[Route('/examinations', methods: 'POST')]
     public function createExamination(Request $request): Response
     {
@@ -57,4 +65,6 @@ class ExaminationController extends AbstractController
 
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
+
+
 }
