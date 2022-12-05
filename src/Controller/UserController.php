@@ -31,7 +31,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher,MailerInterface $mailer): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $user = new User();
         $plainTextPassword = json_decode($request->getContent(), false);
@@ -57,25 +57,25 @@ class UserController extends AbstractController
         $this->em->persist($token);
         $this->em->flush();
 
-        $email->sendWelcomeEmail($user,$mailer,$token);
+        $email->sendWelcomeEmail($user, $mailer, $token);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/verify_account',methods: 'GET')]
-    public function verifyAccount(Request $request,VerifyAccountRepository $verifyRepo,UserRepository $userRepo):Response
+    #[Route('/verify_account', methods: 'GET')]
+    public function verifyAccount(Request $request, VerifyAccountRepository $verifyRepo, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
-        $user = $userRepo->find($queryParams->id);
 
         $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
-        if($savedToken && ($savedToken->expires < strtotime(date('Y-m-d h:i:s'))) ) {
-            $user->setAllowed(true);
+        if ($savedToken[0]['token'] && ($savedToken[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
+            $user = $userRepo->find($queryParams->id);
 
+            $user->setAllowed(true);
             $this->em->persist($user);
             $this->em->flush();
         }
-        return $this->json("",Response::HTTP_NO_CONTENT);
+        return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/users/{id}', methods: 'PUT')]

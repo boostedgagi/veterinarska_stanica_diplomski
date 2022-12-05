@@ -39,13 +39,15 @@ class VerifyAccountRepository extends ServiceEntityRepository
         }
     }
 
-    public function findTokenByTokenValue(string $token):object
+    public function findTokenByTokenValue(string $token):array
     {
         $qb = $this->createQueryBuilder('va');
-        $qb->andWhere('va.token = :token')
+        $qb->addSelect('va.token as token')
+            ->addSelect('va.expires as expires')
+            ->andWhere('va.token = :token')
             ->setParameter('token',$token);
 
-        return (object)$qb->getQuery()->getResult();
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
