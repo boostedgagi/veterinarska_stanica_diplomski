@@ -86,6 +86,21 @@ class UserController extends AbstractController
         return $this->json($user,Response::HTTP_OK,[],['groups'=>'user_showAll']);
     }
 
+    //this method will have its place here for some time until i made a better one
+    //for now it will be here just to make sure password verify the symfony hashed password
+    #[Route('/password_verify/{id}',methods:'POST')]
+    public function passwordVerify(int $id,UserRepository $repo,Request $request,):Response
+    {
+        //this method work for some reason.
+        //nice!
+        $user = $repo->find($id);
+
+        $data = json_decode($request->getContent(),false);
+
+        $okay = password_verify($data->password,$user->getPassword());
+        return $this->json($okay,Response::HTTP_OK,[],['groups'=>'user_ok']);
+    }
+
 
 
     //image upload method here
