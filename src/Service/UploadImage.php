@@ -17,25 +17,24 @@ class UploadImage
 
     /**
      * @param Request $request
-     * @param int $id
      * @param object $entity
      * @param EntityManagerInterface $em
      */
-    public function __construct(Request $request, int $id, object $entity, EntityManagerInterface $em)
+    public function __construct(Request $request, object $entity, EntityManagerInterface $em)
     {
         $this->request = $request;
-        $this->id = $id;
         $this->entity = $entity;
         $this->em = $em;
     }
 
-    public function upload(): bool
+    public function upload(): void
     {
         $uploadPath = 'images';
 
         $image = $this->request->files->get('image');
-        $entity = $this->em->getRepository($this->entity::class)->find($this->id);
-
+        if($this->entity->getImage()!==null){
+            unlink($this->entity->getImage());
+        }
         if ($image) {
             $extension = $image->guessExtension();
 
@@ -44,18 +43,17 @@ class UploadImage
             try {
                 $uploadedFile = $image->move($uploadPath, $newFileName);
                 $imagePath = $uploadedFile->getPathName();
-                $entity->setImage($imagePath);
-
-                $this->em->persist($entity);
+                $this->entity->setImage($imagePath);
+                $this->em->persist($this->entity);
                 $this->em->flush();
 
                 unset($uploadedFile);
-                return true;
+//                return true;
             } catch (\Exception $e) {
                 error_log($e->getMessage());
             }
 
         }
-        return false;
+//        return false;
     }
 }

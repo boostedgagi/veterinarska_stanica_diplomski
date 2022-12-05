@@ -119,15 +119,16 @@ class UserController extends AbstractController
         return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
     }
 
-    #[Route('/upload_image/{id}',methods:'POST')]
-    public function uploadProfileImage(Request $request,UserRepository $repo,int $id,):Response
+    #[Route('/user_upload_image/{id}',methods:'POST')]
+    public function uploadProfileImage(Request $request,UserRepository $repo,int $id):Response
     {
         $user = $repo->find($id);
 
-        $uploadImage = new UploadImage($request,$id,$user,$this->em);
+        $uploadImage = new UploadImage($request,$user,$this->em);
 
         $uploadImage->upload();
-        return $this->json("good",Response::HTTP_CREATED,[],['groups'=>'user_created']);
+
+        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
 
 }
