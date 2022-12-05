@@ -24,9 +24,10 @@ class EmailRepository
                 <a 
                     type='button' 
                     href='http://localhost:8000/verify_account?
+                        token_id={$token->getId()}&
                         token={$token->getToken()}&
                         expires={$token->getExpires()}&
-                        id={$user->getId()}'
+                        user_id={$user->getId()}'
                 >
                     Verify
                 </a>");

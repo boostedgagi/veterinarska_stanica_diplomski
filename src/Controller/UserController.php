@@ -8,6 +8,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
 use App\Service\RegistrationRepository;
+use App\Service\uploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,28 +55,13 @@ class UserController extends AbstractController
 
         $this->em->persist($user);
         $this->em->flush();
+
         $this->em->persist($token);
         $this->em->flush();
 
         $email->sendWelcomeEmail($user, $mailer, $token);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
-    }
-
-    #[Route('/verify_account', methods: 'GET')]
-    public function verifyAccount(Request $request, VerifyAccountRepository $verifyRepo, UserRepository $userRepo): Response
-    {
-        $queryParams = (object)$request->query->all();
-
-        $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
-        if ($savedToken[0]['token'] && ($savedToken[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
-            $user = $userRepo->find($queryParams->id);
-
-            $user->setAllowed(true);
-            $this->em->persist($user);
-            $this->em->flush();
-        }
-        return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/users/{id}', methods: 'PUT')]
@@ -118,8 +104,8 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    //this method will have its place here for some time until i made a better one
-    //for now it will be here just to make sure password verify the symfony hashed password
+    //this method will have its place here for some time until I made a better one
+    //for now it will be here just to make sure password_verify verify the symfony hashed password
     #[Route('/password_verify/{id}', methods: 'POST')]
     public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
     {
@@ -133,7 +119,15 @@ class UserController extends AbstractController
         return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
     }
 
+    #[Route('/upload_image/{id}',methods:'POST')]
+    public function uploadProfileImage(Request $request,UserRepository $repo,int $id,):Response
+    {
+        $user = $repo->find($id);
 
-    //image upload method here
+        $uploadImage = new UploadImage($request,$id,$user,$this->em);
+
+        $uploadImage->upload();
+        return $this->json("good",Response::HTTP_CREATED,[],['groups'=>'user_created']);
+    }
 
 }
