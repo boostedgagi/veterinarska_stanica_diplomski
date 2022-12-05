@@ -102,7 +102,7 @@ class Pet
         return $this;
     }
 
-    public function getDateOfBirth(): ?\DateTimeImmutable
+    public function getDateOfBirth(): ?\DateTime
     {
         return $this->dateOfBirth;
     }
