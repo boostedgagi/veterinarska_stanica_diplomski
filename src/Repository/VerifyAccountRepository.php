@@ -39,6 +39,15 @@ class VerifyAccountRepository extends ServiceEntityRepository
         }
     }
 
+    public function findTokenByTokenValue(string $token):object
+    {
+        $qb = $this->createQueryBuilder('va');
+        $qb->andWhere('va.token = :token')
+            ->setParameter('token',$token);
+
+        return (object)$qb->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return VerifyAccount[] Returns an array of VerifyAccount objects
 //     */

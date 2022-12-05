@@ -19,6 +19,16 @@ class VerifyAccount
     #[ORM\Column(length: 255)]
     private ?string $expires = null;
 
+    /**
+     * @param string|null $token
+     * @param string|null $expires
+     */
+    public function __construct(object $token)
+    {
+        $this->token = $token->tokenItself;
+        $this->expires = $token->expires;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -9,10 +9,9 @@ class RegistrationRepository
 {
     public function handleToken():object
     {
-        $hashedToken = md5(date().mt_rand(10,100));
+        $hashedToken = md5(uniqid('', true).mt_rand(10,100));
 
-        $rawExpires = new DateTime('+30 minutes');
-        $expires = strtotime($rawExpires);
+        $expires = strtotime(date('Y-m-d h:i:s'))+(60*30);
 
         return (object)[
             'tokenItself' => $hashedToken,

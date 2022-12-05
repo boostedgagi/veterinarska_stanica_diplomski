@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\VerifyAccount;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\VerifyAccountRepository;
 use App\Service\RegistrationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -48,21 +50,31 @@ class UserController extends AbstractController
         $email = new EmailRepository();
         $registrationRepo = new RegistrationRepository();
 
-        $email->sendWelcomeEmail($user,$mailer,$registrationRepo->handleToken());
+        $token = new VerifyAccount($registrationRepo->handleToken());
 
         $this->em->persist($user);
         $this->em->flush();
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $email->sendWelcomeEmail($user,$mailer,$token);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
     #[Route('/verify_account',methods: 'GET')]
-    public function verifyAccount(Request $request):Response
+    public function verifyAccount(Request $request,VerifyAccountRepository $verifyRepo,UserRepository $userRepo):Response
     {
         $queryParams = (object)$request->query->all();
-        dd($queryParams->token);
+        $user = $userRepo->find($queryParams->id);
 
-        //temporary method just to check if everything works
+        $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
+        if($savedToken && ($savedToken->expires < strtotime(date('Y-m-d h:i:s'))) ) {
+            $user->setAllowed(true);
+
+            $this->em->persist($user);
+            $this->em->flush();
+        }
         return $this->json("",Response::HTTP_NO_CONTENT);
     }
 
