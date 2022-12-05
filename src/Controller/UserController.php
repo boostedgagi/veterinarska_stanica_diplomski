@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\RegistrationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +46,9 @@ class UserController extends AbstractController
         $user->setTypeOfUser(3);
 
         $email = new EmailRepository();
-        $email->sendWelcomeEmail($user,$mailer);
+        $registrationRepo = new RegistrationRepository();
+
+        $email->sendWelcomeEmail($user,$mailer,$registrationRepo->handleToken());
 
         $this->em->persist($user);
         $this->em->flush();
