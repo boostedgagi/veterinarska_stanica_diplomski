@@ -10,8 +10,11 @@ use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\EmailRepository;
 
 class UserController extends AbstractController
 {
@@ -24,83 +27,96 @@ class UserController extends AbstractController
         $this->em = $entityManager;
     }
 
-    #[Route('/users',methods: 'POST')]
-    public function register(Request $request,UserPasswordHasherInterface $passwordHasher): Response
+    #[Route('/users', methods: 'POST')]
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher,MailerInterface $mailer): Response
     {
         $user = new User();
-        $plainTextPassword = json_decode($request->getContent(),false);
+        $plainTextPassword = json_decode($request->getContent(), false);
 
         $hashedPassword = $passwordHasher->hashPassword(
             $user,
             $plainTextPassword->password
         );
-        $this->handleJSONForm($request,$user,UserType::class);
+        //password hasher configured to hash in BCRYPT algorithm
+        $this->handleJSONForm($request, $user, UserType::class);
 
         $user->setPassword($hashedPassword);
         $user->setAllowed(false);
         $user->setTypeOfUser(3);
 
+        $email = new EmailRepository();
+        $email->sendWelcomeEmail($user,$mailer);
+
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/users/{id}',methods: 'PUT')]
-    public function updateUser(Request $request,int $id,UserRepository $repo): Response
+    #[Route('/verify_account',methods: 'GET')]
+    public function verifyAccount(Request $request):Response
+    {
+        $queryParams = (object)$request->query->all();
+        dd($queryParams->token);
+
+        //temporary method just to check if everything works
+        return $this->json("",Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/users/{id}', methods: 'PUT')]
+    public function updateUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
 
-        $this->handleJSONForm($request,$user,UserType::class);
+        $this->handleJSONForm($request, $user, UserType::class);
 
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/users/{id}',methods: 'DELETE')]
-    public function deleteUser(Request $request,int $id,UserRepository $repo): Response
+    #[Route('/users/{id}', methods: 'DELETE')]
+    public function deleteUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
 
         $this->em->remove($user);
         $this->em->flush();
 
-        return $this->json("",Response::HTTP_NO_CONTENT);
+        return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/users',methods: 'GET')]
-    public function showAllUsers(Request $request,UserRepository $repo): Response
+    #[Route('/users', methods: 'GET')]
+    public function showAllUsers(Request $request, UserRepository $repo): Response
     {
         $allUsers = $repo->findAll();
 
-        return $this->json($allUsers,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/users/{id}',methods: 'GET')]
-    public function showOneUser(Request $request,int $id,UserRepository $repo): Response
+    #[Route('/users/{id}', methods: 'GET')]
+    public function showOneUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
 
-        return $this->json($user,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
     //this method will have its place here for some time until i made a better one
     //for now it will be here just to make sure password verify the symfony hashed password
-    #[Route('/password_verify/{id}',methods:'POST')]
-    public function passwordVerify(int $id,UserRepository $repo,Request $request,):Response
+    #[Route('/password_verify/{id}', methods: 'POST')]
+    public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
     {
         //this method work for some reason.
         //nice!
         $user = $repo->find($id);
 
-        $data = json_decode($request->getContent(),false);
+        $data = json_decode($request->getContent(), false);
 
-        $okay = password_verify($data->password,$user->getPassword());
-        return $this->json($okay,Response::HTTP_OK,[],['groups'=>'user_ok']);
+        $okay = password_verify($data->password, $user->getPassword());
+        return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
     }
-
 
 
     //image upload method here
