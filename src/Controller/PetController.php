@@ -76,4 +76,12 @@ class PetController extends AbstractController
 
         return $this->json($pet,Response::HTTP_OK,[],['groups'=>'pet_showAll']);
     }
+
+    #[Route('/pets',methods:'GET')]
+    public function showAllPets(Request $request,PetRepository $repo):Response
+    {
+        $pets = $repo->findAll();
+
+        return $this->json($pets,Response::HTTP_OK,[],['groups'=>'pet_showAll']);
+    }
 }

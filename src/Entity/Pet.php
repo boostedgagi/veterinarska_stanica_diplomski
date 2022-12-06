@@ -82,7 +82,8 @@ class Pet
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?string $image = null;
