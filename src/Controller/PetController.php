@@ -44,4 +44,28 @@ class PetController extends AbstractController
         $uploadImage->upload();
         return $this->json($pet,Response::HTTP_CREATED,[],['groups'=>'pet_created']);
     }
+
+    #[Route('/pets/{id}',methods:'PUT')]
+    public function updatePet(Request $request,PetRepository $repo,int $id):Response
+    {
+        $pet = $repo->find($id);
+
+        $this->handleJSONForm($request,$pet,PetType::class);
+
+        $this->em->persist($pet);
+        $this->em->flush();
+
+        return $this->json($pet,Response::HTTP_CREATED,[],['groups'=>'pet_created']);
+    }
+
+    #[Route('/pets/{id}',methods:'DELETE')]
+    public function deletePet(Request $request,PetRepository $repo,int $id):Response
+    {
+        $pet = $repo->find($id);
+
+        $this->em->remove($pet);
+        $this->em->flush();
+
+        return $this->json("",Response::HTTP_NO_CONTENT);
+    }
 }
