@@ -11,7 +11,6 @@ class UploadImage
 {
 
     private Request $request;
-    private int $id;
     private object $entity;
     private EntityManagerInterface $em;
 

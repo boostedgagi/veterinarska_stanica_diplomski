@@ -36,10 +36,9 @@ class PetController extends AbstractController
     }
 
     #[Route('/pet_upload_image/{id}',methods:'POST')]
-    public function uploadProfileImage(Request $request,PetRepository $repo,int $id,):Response
+    public function uploadProfileImage(Request $request,PetRepository $repo,int $id):Response
     {
         $pet = $repo->find($id);
-
         $uploadImage = new UploadImage($request,$pet,$this->em);
 
         $uploadImage->upload();
