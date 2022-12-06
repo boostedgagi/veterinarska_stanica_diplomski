@@ -24,7 +24,8 @@ class Pet
     #[ORM\Column(length: 255)]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?string $name = null;
@@ -32,7 +33,8 @@ class Pet
     #[ORM\Column]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?\DateTimeImmutable $dateOfBirth = null;
@@ -40,7 +42,8 @@ class Pet
     #[ORM\Column(length: 255)]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?string $animal = null;
@@ -48,7 +51,8 @@ class Pet
     #[ORM\Column(length: 255)]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?string $breed = null;
@@ -57,7 +61,8 @@ class Pet
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?User $owner = null;
@@ -65,7 +70,8 @@ class Pet
     #[ORM\Column]
     #[Groups(
         [
-            'pet_created'
+            'pet_created',
+            'pet_showAll'
         ]
     )]
     private ?\DateTimeImmutable $createdAt = null;

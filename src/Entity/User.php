@@ -30,7 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             'user_created',
-            'user_showAll'
+            'user_showAll',
+            'pet_showAll'
         ]
     )]
     private ?string $email = null;
@@ -53,7 +54,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             'user_created',
-            'user_showAll'
+            'user_showAll',
+            'pet_showAll'
         ]
     )]
     private ?string $firstName = null;
@@ -62,7 +64,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             'user_created',
-            'user_showAll'
+            'user_showAll',
+            'pet_showAll'
         ]
     )]
     private ?string $lastName = null;
