@@ -31,7 +31,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             'user_created',
             'user_showAll',
-            'pet_showAll'
+            'pet_showAll',
+            'pet_foundPet'
         ]
     )]
     private ?string $email = null;

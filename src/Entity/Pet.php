@@ -25,7 +25,8 @@ class Pet
     #[Groups(
         [
             'pet_created',
-            'pet_showAll'
+            'pet_showAll',
+            'pet_foundPet'
         ]
     )]
     private ?string $name = null;
@@ -34,7 +35,8 @@ class Pet
     #[Groups(
         [
             'pet_created',
-            'pet_showAll'
+            'pet_showAll',
+            'pet_foundPet'
         ]
     )]
     private ?\DateTimeImmutable $dateOfBirth = null;
@@ -62,7 +64,8 @@ class Pet
     #[Groups(
         [
             'pet_created',
-            'pet_showAll'
+            'pet_showAll',
+            'pet_foundPet'
         ]
     )]
     private ?User $owner = null;
