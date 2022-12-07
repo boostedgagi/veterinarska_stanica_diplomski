@@ -14,6 +14,7 @@ use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PetController extends AbstractController
@@ -27,7 +28,7 @@ class PetController extends AbstractController
         $this->em = $entityManager;
     }
 
-    #[Route('/pets', methods: 'GET')]
+    #[Route('/pets', methods: 'POST')]
     public function createPet(Request $request): Response
     {
         $pet = new Pet();
@@ -89,14 +90,20 @@ class PetController extends AbstractController
     }
 
     #[Route('/qr-code', methods: 'POST')]
-    public function generateQRAndSendByMail(Request $request, PetRepository $repo, BuilderInterface $builder): Response
+    public function generateQRAndSendByMail(Request $request, PetRepository $repo, MailerInterface $mailer ,BuilderInterface $builder): Response
     {
         $data = json_decode($request->getContent(), false);
+        $pet = $repo->find($data->id);
 
-        $possibleQRCode = $builder->data($data->url)->build();
-        $possibleQRCode->saveToFile(uniqid('', true) . '.png');
-        dd($possibleQRCode);
-        return $this->json($possibleQRCode->getDataUri(), Response::HTTP_OK);
+        $possibleQRCode = $builder->data($data->url.$data->id)->build();
+        $qrCodePath = 'qr-codes/'.uniqid('', true) . '.png';
+
+        $possibleQRCode->saveToFile($qrCodePath);
+
+        $email = new EmailRepository($mailer);
+        $email->sendQrCodeWithMail($pet,$qrCodePath);
+
+        return $this->json($qrCodePath, Response::HTTP_OK);
     }
 
     #[Route('/found_pet', methods: 'GET')]
@@ -106,6 +113,8 @@ class PetController extends AbstractController
         $queryParams = (object)$request->query->all();
 
         $pet = $repo->find($queryParams->id);
+
+//        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
     }
 }

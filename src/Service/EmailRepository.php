@@ -13,7 +13,14 @@ use Symfony\Component\Mime\Email;
 
 class EmailRepository
 {
-    public function sendWelcomeEmail(User $user, MailerInterface $mailer, VerifyAccount $token): void
+    private MailerInterface $mailer;
+
+    public function __construct($mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
+    public function sendWelcomeEmail(User $user, VerifyAccount $token): void
     {
         $email = (new Email())
             ->from('welcome@vetshop.com')
@@ -36,27 +43,25 @@ class EmailRepository
                     Verify
                 </a>");
 
-        $mailer->send($email);
+        $this->mailer->send($email);
     }
 
-    public function sendQRCodeToOwner(User $user, MailerInterface $mailer,Pet $pet): void
+    public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
     {
         $email = (new Email())
             ->from('yourqrcode@vetshop.com')
-            ->to($user->getEmail())
+            ->to($pet->getOwner()->getEmail())
             ->subject('We made qr code just for your pet!')
             ->html("
-                <p>here goes image yes..</p>
+                <h4 style='font-weight: 500;'>This qr code is supposed to be located in your pet's necklace
+                    and also to be scanned if your pet is lost and been found after.</h4>
+                <img 
+                    src='http://5877-79-101-104-174.ngrok.io/".$qrCodePath."' 
+                    height='140px' 
+                    width='140px' 
+                    alt='qr-code'>
             ");
 
-        $mailer->send($email);
+        $this->mailer->send($email);
     }
-
-
-//    public function generatePetQRCode(Pet $pet): QrCodeResponse
-//    {
-//        $url = 'http://localhost:8000/found_pet?id='.$pet->getId();
-//        $qrCode = new QrCode($url);
-//        return new QrCodeResponse($qrCode);
-//    }
 }
