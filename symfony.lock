@@ -189,6 +189,9 @@
             "config/routes/web_profiler.yaml"
         ]
     },
+    "tattali/mobile-detect-bundle": {
+        "version": "v2.2.6"
+    },
     "zenstruck/foundry": {
         "version": "1.24",
         "recipe": {
