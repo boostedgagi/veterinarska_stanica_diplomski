@@ -19,6 +19,7 @@ class UserType extends AbstractType
 //            ->add('allowed')
 //            ->add('typeOfUser')
             ->add('image')
+            ->add('phone')
         ;
     }
 

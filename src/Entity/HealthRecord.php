@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\HealthRecordRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: HealthRecordRepository::class)]
 class HealthRecord
 {
@@ -18,26 +20,62 @@ class HealthRecord
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?User $vet = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?Pet $pet = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?Examination $examination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?\DateTimeInterface $startedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?\DateTimeInterface $finishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?string $comment = null;
 
     #[ORM\Column(length: 64)]
+    #[Groups(
+        [
+            'healthRecord_created'
+        ]
+    )]
     private ?string $status = null;
 
     #[ORM\Column]
@@ -161,5 +199,11 @@ class HealthRecord
         $this->finishedAt = $finishedAt;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }

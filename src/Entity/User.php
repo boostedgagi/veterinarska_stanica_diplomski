@@ -32,7 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_created',
             'user_showAll',
             'pet_showAll',
-            'pet_foundPet'
+            'pet_foundPet',
+            'healthRecord_created'
         ]
     )]
     private ?string $email = null;
@@ -56,7 +57,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             'user_created',
             'user_showAll',
-            'pet_showAll'
+            'pet_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?string $firstName = null;
@@ -66,7 +68,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             'user_created',
             'user_showAll',
-            'pet_showAll'
+            'pet_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?string $lastName = null;

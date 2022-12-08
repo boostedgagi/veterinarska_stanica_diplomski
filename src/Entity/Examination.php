@@ -28,7 +28,8 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_showAll'
+            'examination_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?string $name = null;
@@ -37,7 +38,8 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_showAll'
+            'examination_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?int $duration = null;
@@ -46,7 +48,8 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_showAll'
+            'examination_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?int $price = null;

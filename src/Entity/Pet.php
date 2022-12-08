@@ -26,7 +26,8 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
-            'pet_foundPet'
+            'pet_foundPet',
+            'healthRecord_created'
         ]
     )]
     private ?string $name = null;
@@ -36,7 +37,8 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
-            'pet_foundPet'
+            'pet_foundPet',
+            'healthRecord_created'
         ]
     )]
     private ?\DateTimeImmutable $dateOfBirth = null;
@@ -45,7 +47,8 @@ class Pet
     #[Groups(
         [
             'pet_created',
-            'pet_showAll'
+            'pet_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?string $animal = null;
@@ -54,7 +57,8 @@ class Pet
     #[Groups(
         [
             'pet_created',
-            'pet_showAll'
+            'pet_showAll',
+            'healthRecord_created'
         ]
     )]
     private ?string $breed = null;
