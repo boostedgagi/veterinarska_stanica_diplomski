@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LogRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 class Log
 {
@@ -21,6 +21,22 @@ class Log
 
     #[ORM\Column(length: 64)]
     private ?string $ipAddress = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    /**
+     * @param string|null $device
+     * @param string|null $country
+     * @param string|null $ipAddress
+     */
+    public function __construct(?string $device, ?string $country, ?string $ipAddress)
+    {
+        $this->device = $device;
+        $this->country = $country;
+        $this->ipAddress = $ipAddress;
+    }
+
 
     public function getId(): ?int
     {
@@ -61,5 +77,23 @@ class Log
         $this->ipAddress = $ipAddress;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }
