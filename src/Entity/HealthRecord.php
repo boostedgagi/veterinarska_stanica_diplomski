@@ -16,9 +16,6 @@ class HealthRecord
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $examDateTime = null;
-
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $vet = null;
@@ -30,6 +27,12 @@ class HealthRecord
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Examination $examination = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $startedAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $finishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -50,18 +53,6 @@ class HealthRecord
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getExamDateTime(): ?\DateTimeInterface
-    {
-        return $this->examDateTime;
-    }
-
-    public function setExamDateTime(\DateTimeInterface $examDateTime): self
-    {
-        $this->examDateTime = $examDateTime;
-
-        return $this;
     }
 
     public function getPet(): ?Pet
@@ -144,6 +135,30 @@ class HealthRecord
     public function setVet(?User $vet): self
     {
         $this->vet = $vet;
+
+        return $this;
+    }
+
+    public function getStartedAt(): ?\DateTimeInterface
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(\DateTimeInterface $startedAt): self
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
+
+    public function getFinishedAt(): ?\DateTimeInterface
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(\DateTimeInterface $finishedAt): self
+    {
+        $this->finishedAt = $finishedAt;
 
         return $this;
     }
