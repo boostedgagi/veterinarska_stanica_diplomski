@@ -7,9 +7,11 @@ use App\Entity\VerifyAccount;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
+use App\Service\MobileDetectRepository;
 use App\Service\RegistrationRepository;
 use App\Service\uploadImage;
 use Doctrine\ORM\EntityManagerInterface;
+use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +50,7 @@ class UserController extends AbstractController
         $user->setAllowed(false);
         $user->setTypeOfUser(3);
 
-        $email = new EmailRepository();
+        $email = new EmailRepository($mailer);
         $registrationRepo = new RegistrationRepository();
 
         $token = new VerifyAccount($registrationRepo->handleToken());
@@ -59,7 +61,7 @@ class UserController extends AbstractController
         $this->em->persist($token);
         $this->em->flush();
 
-        $email->sendWelcomeEmail($user, $mailer, $token);
+        $email->sendWelcomeEmail($user, $token);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
@@ -130,5 +132,4 @@ class UserController extends AbstractController
 
         return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
-
 }

@@ -113,6 +113,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;
 
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $phone = null;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
@@ -354,6 +357,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $healthRecord->setVet(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

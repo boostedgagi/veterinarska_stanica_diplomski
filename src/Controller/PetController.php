@@ -109,12 +109,9 @@ class PetController extends AbstractController
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $repo): Response
     {
-        //here i will have get method for scanned qr with route and its get params
         $queryParams = (object)$request->query->all();
-
         $pet = $repo->find($queryParams->id);
 
-//        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
     }
 }
