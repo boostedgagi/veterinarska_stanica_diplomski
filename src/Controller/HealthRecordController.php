@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\HealthRecord;
 use App\Form\HealthRecordType;
+use App\Repository\PetRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -39,5 +40,15 @@ class HealthRecordController extends AbstractController
         $this->em->flush();
 
         return $this->json($healthRecord,Response::HTTP_CREATED,[],['groups'=>'healthRecord_created']);
+    }
+
+    #[Route('/health_record/{id}',methods: 'GET')]
+    public function getHealthRecord(Request $request,int $id,PetRepository $petRepo): Response
+    {
+        $pet = $petRepo->find($id);
+
+        $exactPetHealthRecords = $pet->getHealthRecords();
+
+        return $this->json($exactPetHealthRecords,Response::HTTP_OK,[],['groups'=>'healthRecord_created']);
     }
 }
