@@ -39,6 +39,11 @@ class PetRepository extends ServiceEntityRepository
         }
     }
 
+    public function getNumberOfAllExaminationsInActualYear():array
+    {
+        return [];
+    }
+
 //    /**
 //     * @return Pet[] Returns an array of Pet objects
 //     */
