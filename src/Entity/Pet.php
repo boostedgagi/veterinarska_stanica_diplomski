@@ -26,6 +26,7 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
+            'pet_showByUser',
             'pet_foundPet',
             'healthRecord_created'
         ]
@@ -37,6 +38,7 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
+            'pet_showByUser',
             'pet_foundPet',
             'healthRecord_created'
         ]
@@ -48,6 +50,7 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
+            'pet_showByUser',
             'healthRecord_created'
         ]
     )]
@@ -58,6 +61,7 @@ class Pet
         [
             'pet_created',
             'pet_showAll',
+            'pet_showByUser',
             'healthRecord_created'
         ]
     )]
@@ -78,6 +82,7 @@ class Pet
     #[Groups(
         [
             'pet_created',
+            'pet_showByUser',
             'pet_showAll'
         ]
     )]

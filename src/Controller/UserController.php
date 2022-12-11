@@ -106,6 +106,14 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
+    #[Route('/users/{id}/pets', methods: 'GET')]
+    public function showOneUserPets(Request $request, int $id, UserRepository $repo): Response
+    {
+        $user = $repo->find($id);
+        $pets = $user->getPets();
+        return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
+    }
+
     //this method will have its place here for some time until I made a better one
     //for now it will be here just to make sure password_verify verify the symfony hashed password
     #[Route('/password_verify/{id}', methods: 'POST')]
