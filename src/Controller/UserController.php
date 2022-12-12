@@ -140,4 +140,14 @@ class UserController extends AbstractController
 
         return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
     }
+
+//    #[Route('/vet_pets',methods:'GET')]
+//    public function getVetPetsData(Request $request,UserRepository $repo,int $id):Response
+//    {
+//        $user = $repo->find($id);
+//
+//        $pets = $user->get
+//
+//        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
+//    }
 }

@@ -128,10 +128,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'users')]
+    private ?self $vet = null;
+
+    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]
+    private Collection $users;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
         $this->healthRecords = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
 
@@ -405,6 +412,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLongitude(?string $longitude): self
     {
         $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function getVet(): ?self
+    {
+        return $this->vet;
+    }
+
+    public function setVet(?self $vet): self
+    {
+        $this->vet = $vet;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+//    public function addUser(self $user): self
+//    {
+//        if (!$this->users->contains($user)) {
+//            $this->users->add($user);
+//            $user->setVet($this);
+//        }
+//
+//        return $this;
+//    }
+
+    public function removeUser(self $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getVet() === $this) {
+                $user->setVet(null);
+            }
+        }
 
         return $this;
     }
