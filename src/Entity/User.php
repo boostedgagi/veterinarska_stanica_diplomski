@@ -124,13 +124,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'vet')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?self $user = null;
+    private ?self $vet = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $latitude = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $longitude = null;
 
     public function __construct()
     {
         $this->pets = new ArrayCollection();
         $this->healthRecords = new ArrayCollection();
-        $this->user = new ArrayCollection();
+        $this->vet = new ArrayCollection();
     }
 
 
@@ -386,20 +392,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUser(): ?self
     {
-        return $this->user;
+        return $this->vet;
     }
 
     public function setUser(?self $user): self
     {
-        $this->user = $user;
+        $this->vet = $user;
 
         return $this;
     }
 
     public function addVet(self $vet): self
     {
-        if (!$this->user->contains($vet)) {
-            $this->user->add($vet);
+        if (!$this->vet->contains($vet)) {
+            $this->vet->add($vet);
             $vet->setUser($this);
         }
 
@@ -408,12 +414,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeVet(self $vet): self
     {
-        if ($this->user->removeElement($vet)) {
+        if ($this->vet->removeElement($vet)) {
             // set the owning side to null (unless already changed)
             if ($vet->getUser() === $this) {
                 $vet->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): self
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
