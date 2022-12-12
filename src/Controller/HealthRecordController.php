@@ -60,7 +60,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}', methods: 'DELETE')]
-    public function delete(Request $request,int $id,HealthRecordRepository $repo): Response
+    public function deleteHealthRecord(Request $request,int $id,HealthRecordRepository $repo): Response
     {
         $healthRecord = $repo->find($id);
 
@@ -71,7 +71,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/pets/{id}/health_record', methods: 'GET')]
-    public function getHealthRecord(Request $request, int $id, PetRepository $petRepo): Response
+    public function getHealthRecordsForOnePet(Request $request, int $id, PetRepository $petRepo): Response
     {
         $pet = $petRepo->find($id);
 
@@ -80,4 +80,11 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
+    #[Route('/health_record/vet_stats',methods: 'GET')]
+    public function getVetPopularity(HealthRecordRepository $healthRepo):Response
+    {
+        $popularity = $healthRepo->getVetPercentage();
+
+        return $this->json($popularity,Response::HTTP_OK);
+    }
 }

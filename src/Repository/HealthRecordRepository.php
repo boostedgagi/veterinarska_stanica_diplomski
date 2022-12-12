@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\HealthRecord;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,6 +41,46 @@ class HealthRecordRepository extends ServiceEntityRepository
         }
     }
 
+    public function getVetPercentage(): array
+    {
+        $qb = $this->createQueryBuilder('hr');
+        $qb->select(
+              'vet.id',
+              'vet.firstName',
+              'vet.lastName',
+              'count(hr.vet) examinations'
+            )
+            ->join('hr.vet', 'vet')
+            ->groupBy('hr.vet')
+            ->orderBy('hr.vet', 'desc');
+
+        $count = $this->examinationsCount();
+        $vetsWithPercentage = [];
+
+        foreach ($qb->getQuery()->getResult() as $vet) {
+
+            $percentage = 100*$vet['examinations'] / $count;
+            //upper row is multiplying result of dividing number of examinations
+            //by count of all examinations
+
+            $vet += ['percentage' => number_format((float)$percentage, 2, '.', '')];
+            //this, last item in assoc array object of each vet must be concatenated
+            //on its end with '%' while displaying on the front end
+
+            $vetsWithPercentage[] = $vet;
+        }
+
+        return $vetsWithPercentage;
+    }
+
+    public function examinationsCount(): int
+    {
+        $qb = $this->createQueryBuilder('hr');
+        $qb->select('count(hr.id) numberOfExaminations');
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return HealthRecord[] Returns an array of HealthRecord objects
 //     */
@@ -51,16 +93,6 @@ class HealthRecordRepository extends ServiceEntityRepository
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?HealthRecord
-//    {
-//        return $this->createQueryBuilder('h')
-//            ->andWhere('h.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
 //        ;
 //    }
 }

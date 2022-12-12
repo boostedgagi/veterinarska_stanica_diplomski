@@ -122,10 +122,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'vet')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?self $vet = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $latitude = null;
 
@@ -136,7 +132,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->pets = new ArrayCollection();
         $this->healthRecords = new ArrayCollection();
-        $this->vet = new ArrayCollection();
     }
 
 
@@ -386,40 +381,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getUser(): ?self
-    {
-        return $this->vet;
-    }
-
-    public function setUser(?self $user): self
-    {
-        $this->vet = $user;
-
-        return $this;
-    }
-
-    public function addVet(self $vet): self
-    {
-        if (!$this->vet->contains($vet)) {
-            $this->vet->add($vet);
-            $vet->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVet(self $vet): self
-    {
-        if ($this->vet->removeElement($vet)) {
-            // set the owning side to null (unless already changed)
-            if ($vet->getUser() === $this) {
-                $vet->setUser(null);
-            }
-        }
 
         return $this;
     }
