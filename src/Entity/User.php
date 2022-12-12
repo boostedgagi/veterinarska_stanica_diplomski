@@ -33,7 +33,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_showAll',
             'pet_showAll',
             'pet_foundPet',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $email = null;
@@ -58,7 +59,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_created',
             'user_showAll',
             'pet_showAll',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $firstName = null;
@@ -69,7 +71,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_created',
             'user_showAll',
             'pet_showAll',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $lastName = null;
@@ -119,10 +122,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $phone = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'vet')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?self $user = null;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
         $this->healthRecords = new ArrayCollection();
+        $this->user = new ArrayCollection();
     }
 
 
@@ -372,6 +380,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getUser(): ?self
+    {
+        return $this->user;
+    }
+
+    public function setUser(?self $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function addVet(self $vet): self
+    {
+        if (!$this->user->contains($vet)) {
+            $this->user->add($vet);
+            $vet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVet(self $vet): self
+    {
+        if ($this->user->removeElement($vet)) {
+            // set the owning side to null (unless already changed)
+            if ($vet->getUser() === $this) {
+                $vet->setUser(null);
+            }
+        }
 
         return $this;
     }
