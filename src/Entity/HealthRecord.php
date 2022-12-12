@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: HealthRecordRepository::class)]
 class HealthRecord
@@ -22,7 +23,8 @@ class HealthRecord
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?User $vet = null;
@@ -32,7 +34,8 @@ class HealthRecord
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?Pet $pet = null;
@@ -41,7 +44,8 @@ class HealthRecord
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?Examination $examination = null;
@@ -49,7 +53,8 @@ class HealthRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?\DateTimeInterface $startedAt = null;
@@ -57,7 +62,8 @@ class HealthRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?\DateTimeInterface $finishedAt = null;
@@ -65,7 +71,8 @@ class HealthRecord
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $comment = null;
@@ -73,12 +80,18 @@ class HealthRecord
     #[ORM\Column(length: 64)]
     #[Groups(
         [
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $status = null;
 
     #[ORM\Column]
+    #[Groups(
+        [
+            'healthRecord_showAll'
+        ]
+    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

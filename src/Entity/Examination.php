@@ -29,7 +29,8 @@ class Examination
         [
             'examination_created',
             'examination_showAll',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $name = null;
@@ -39,7 +40,8 @@ class Examination
         [
             'examination_created',
             'examination_showAll',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?int $duration = null;
@@ -49,7 +51,8 @@ class Examination
         [
             'examination_created',
             'examination_showAll',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?int $price = null;

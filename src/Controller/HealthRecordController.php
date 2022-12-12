@@ -30,7 +30,7 @@ class HealthRecordController extends AbstractController
     }
 
 
-    #[Route('/health_records', methods: 'POST')]
+    #[Route('/health_record', methods: 'POST')]
     public function insertHealthRecord(Request $request): Response
     {
         $healthRecord = new HealthRecord();
@@ -43,7 +43,7 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
-    #[Route('/health_records/{id}', methods: 'PUT')]
+    #[Route('/health_record/{id}', methods: 'PUT')]
     public function editHealthRecord(Request $request,int $id,HealthRecordRepository $repo): Response
     {
 //        $form = new HealthRecordType();
@@ -59,7 +59,7 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
-    #[Route('/health_records/{id}', methods: 'DELETE')]
+    #[Route('/health_record/{id}', methods: 'DELETE')]
     public function delete(Request $request,int $id,HealthRecordRepository $repo): Response
     {
         $healthRecord = $repo->find($id);
@@ -70,14 +70,14 @@ class HealthRecordController extends AbstractController
         return $this->json("",Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}/health_records', methods: 'GET')]
+    #[Route('/pets/{id}/health_record', methods: 'GET')]
     public function getHealthRecord(Request $request, int $id, PetRepository $petRepo): Response
     {
         $pet = $petRepo->find($id);
 
         $petHealthRecords = $pet->getHealthRecords();
 
-        return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_created']);
+        return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
 }

@@ -28,7 +28,8 @@ class Pet
             'pet_showAll',
             'pet_showByUser',
             'pet_foundPet',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $name = null;
@@ -40,7 +41,8 @@ class Pet
             'pet_showAll',
             'pet_showByUser',
             'pet_foundPet',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?\DateTimeImmutable $dateOfBirth = null;
@@ -51,7 +53,8 @@ class Pet
             'pet_created',
             'pet_showAll',
             'pet_showByUser',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $animal = null;
@@ -62,7 +65,8 @@ class Pet
             'pet_created',
             'pet_showAll',
             'pet_showByUser',
-            'healthRecord_created'
+            'healthRecord_created',
+            'healthRecord_showAll'
         ]
     )]
     private ?string $breed = null;
