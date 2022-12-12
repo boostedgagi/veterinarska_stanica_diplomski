@@ -421,7 +421,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->vet;
     }
 
-    public function setVet(?self $vet): self
+    public function setVet(User $vet): self
     {
         $this->vet = $vet;
 

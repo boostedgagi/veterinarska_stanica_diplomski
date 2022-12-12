@@ -129,25 +129,65 @@ class UserController extends AbstractController
         return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
     }
 
-    #[Route('/user_upload_image/{id}',methods:'POST')]
-    public function uploadProfileImage(Request $request,UserRepository $repo,int $id):Response
+    #[Route('/user_upload_image/{id}', methods: 'POST')]
+    public function uploadProfileImage(Request $request, UserRepository $repo, int $id): Response
     {
         $user = $repo->find($id);
 
-        $uploadImage = new UploadImage($request,$user,$this->em);
+        $uploadImage = new UploadImage($request, $user, $this->em);
 
         $uploadImage->upload();
 
-        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-//    #[Route('/vet_pets',methods:'GET')]
-//    public function getVetPetsData(Request $request,UserRepository $repo,int $id):Response
-//    {
-//        $user = $repo->find($id);
-//
-//        $pets = $user->get
-//
-//        return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_created']);
-//    }
+    #[Route('/vet/{id}/pets', methods: 'GET')]
+    public function getVetPetsData(UserRepository $repo, int $id): Response
+    {
+        $vet = $repo->find($id);
+
+        $vetUsers = $vet->getUsers();
+        $pets = [];
+        foreach ($vetUsers as $vetUser) {
+            if($vetUser->getPets()!==null)
+                $pets[] = $vetUser->getPets();
+        }
+        return $this->json($pets, Response::HTTP_OK,[],['groups'=>'pet_showAll']);
+    }
+
+    #[Route('/user/engage', methods: 'POST')]
+    public function engageVet(Request $request, UserRepository $repo): Response
+    {
+        $data = json_decode($request->getContent(), false);
+
+        $user = $repo->find($data->user_id);
+        $vet = $repo->find($data->vet_id);
+        if ($vet->getTypeOfUser() === 2 && $user->getTypeOfUser() === 3) {
+
+            $user->setVet($vet);
+
+            $this->em->persist($user);
+            $this->em->flush();
+            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+        }
+        return $this->json(['error' => 'he ain\'t vet'], Response::HTTP_OK);
+    }
+
+    #[Route('/users/{id}/change_type', methods: 'PATCH')]
+    public function changeTypeOfUser(Request $request, int $id, UserRepository $repo): Response
+    {
+        $data = json_decode($request->getContent(), false);
+
+        $user = $repo->find($id);
+        if ($data->typeOfUser) {
+
+            $user->setTypeOfUser($data->typeOfUser);
+
+            $this->em->persist($user);
+            $this->em->flush();
+            return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
+        }
+        return $this->json(['error' => 'type of user not valid'], Response::HTTP_NO_CONTENT);
+
+    }
 }
