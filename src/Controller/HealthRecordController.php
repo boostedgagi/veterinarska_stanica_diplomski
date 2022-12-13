@@ -80,12 +80,6 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
-//    #[Route('/pet/{id}/vet',methods: 'GET')]
-//    public function getHealthRecordForPetByVet():Response
-//    {
-//
-//    }
-
     #[Route('/health_record/vet_stats',methods: 'GET')]
     public function getVetPopularity(HealthRecordRepository $healthRepo):Response
     {
@@ -93,5 +87,23 @@ class HealthRecordController extends AbstractController
 
         return $this->json($popularity,Response::HTTP_OK);
     }
+
+    #[Route('/health_record/{id}/cancel',methods: 'POST')]
+    public function cancelHealthRecord(HealthRecordRepository $healthRepo,int $id):Response
+    {
+        $healthRecord = $healthRepo->find($id);
+        $now = new DateTime();
+        $timeDiff = $healthRecord->getStartedAt()->diff($now);
+//        dd($timeDiff->h);
+        if($timeDiff->h == 0){
+            return $this->json(['error' => 'Examination is impossible to cancel less than hour before of its start'],Response::HTTP_OK);
+        }
+        $healthRecord->setStatus('canceled');
+        $this->em->persist($healthRecord);
+        $this->em->flush();
+
+        return $this->json(['status'=>'successfully canceled'],Response::HTTP_OK);
+    }
+
 
 }

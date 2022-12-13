@@ -80,7 +80,6 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
-
 //    /**
 //     * @return HealthRecord[] Returns an array of HealthRecord objects
 //     */

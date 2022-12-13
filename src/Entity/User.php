@@ -33,6 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_showAll',
             'pet_showAll',
             'pet_foundPet',
+            'pet_created',
             'healthRecord_created',
             'healthRecord_showAll'
         ]
@@ -59,6 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_created',
             'user_showAll',
             'pet_showAll',
+            'pet_created',
             'healthRecord_created',
             'healthRecord_showAll'
         ]
@@ -71,6 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_created',
             'user_showAll',
             'pet_showAll',
+            'pet_created',
             'healthRecord_created',
             'healthRecord_showAll'
         ]
@@ -113,7 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $image = null;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class,cascade: ['persist','remove'])]
     private Collection $pets;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
@@ -129,6 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $longitude = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]

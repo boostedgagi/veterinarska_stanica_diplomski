@@ -90,6 +90,12 @@ class UserController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
+    #[Route('/base',name: 'base')]
+    public function sendMe():Response
+    {
+        return $this->render('base.html.twig');
+    }
+
     #[Route('/users', methods: 'GET')]
     public function showAllUsers(Request $request, UserRepository $repo): Response
     {

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PetRepository;
+
 //use DateTime;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -72,7 +73,6 @@ class Pet
     private ?string $breed = null;
 
     #[ORM\ManyToOne(inversedBy: 'pets')]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
             'pet_created',
@@ -80,6 +80,7 @@ class Pet
             'pet_foundPet'
         ]
     )]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'SET NULL')]
     private ?User $owner = null;
 
     #[ORM\Column]
@@ -104,7 +105,7 @@ class Pet
     )]
     private ?string $image = null;
 
-    #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class)]
+    #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class,cascade: ['persist','remove'])]
     private Collection $healthRecords;
 
     public function __construct()

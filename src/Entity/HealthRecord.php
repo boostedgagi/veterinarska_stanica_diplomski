@@ -31,13 +31,13 @@ class HealthRecord
 
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
             'healthRecord_created',
             'healthRecord_showAll'
         ]
     )]
+    #[ORM\JoinColumn(nullable: false,onDelete: 'CASCADE')]
     private ?Pet $pet = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
