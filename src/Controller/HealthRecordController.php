@@ -80,6 +80,12 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
+//    #[Route('/pet/{id}/vet',methods: 'GET')]
+//    public function getHealthRecordForPetByVet():Response
+//    {
+//
+//    }
+
     #[Route('/health_record/vet_stats',methods: 'GET')]
     public function getVetPopularity(HealthRecordRepository $healthRepo):Response
     {
@@ -87,4 +93,5 @@ class HealthRecordController extends AbstractController
 
         return $this->json($popularity,Response::HTTP_OK);
     }
+
 }

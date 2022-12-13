@@ -179,7 +179,8 @@ class UserController extends AbstractController
         $data = json_decode($request->getContent(), false);
 
         $user = $repo->find($id);
-        if ($data->typeOfUser) {
+        $allowedTypes = [1,2,3];
+        if ($data->typeOfUser && in_array($data->typeOfUser,$allowedTypes)) {
 
             $user->setTypeOfUser($data->typeOfUser);
 
@@ -187,7 +188,6 @@ class UserController extends AbstractController
             $this->em->flush();
             return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
         }
-        return $this->json(['error' => 'type of user not valid'], Response::HTTP_NO_CONTENT);
-
+        return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
     }
 }
