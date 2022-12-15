@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -48,7 +49,6 @@ class UserController extends AbstractController
 
         $user->setPassword($hashedPassword);
         $user->setAllowed(false);
-        $user->setTypeOfUser(3);
 
         $email = new EmailRepository($mailer);
         $registrationRepo = new RegistrationRepository();
@@ -186,7 +186,7 @@ class UserController extends AbstractController
 
         $user = $repo->find($id);
         $allowedTypes = [1,2,3];
-        if ($data->typeOfUser && in_array($data->typeOfUser,$allowedTypes)) {
+        if ($data->typeOfUser) {
 
             $user->setTypeOfUser($data->typeOfUser);
 
@@ -195,5 +195,14 @@ class UserController extends AbstractController
             return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
         }
         return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
+    }
+
+    #[Route('/login_check', methods: 'POST')]
+    public function apikey(UserRepository $userRepo): JsonResponse
+    {
+
+        $user = $userRepo->findAll();
+
+        return $this->json($user, Response::HTTP_OK);
     }
 }

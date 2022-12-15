@@ -17,7 +17,7 @@ class UserType extends AbstractType
             ->add('firstName')
             ->add('lastName')
 //            ->add('allowed')
-//            ->add('typeOfUser')
+            ->add('typeOfUser')
             ->add('image')
             ->add('phone')
         ;

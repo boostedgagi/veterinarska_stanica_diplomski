@@ -17,43 +17,41 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class AppAuthenticator extends AbstractLoginFormAuthenticator
 {
-    use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
-
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    public function supports(Request $request): bool
     {
+//        die('our auth is alive.');
+        return $request->headers->has('x-api-token');
     }
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->request->get('email', '');
-
-        $request->getSession()->set(Security::LAST_USERNAME, $email);
-
-        return new Passport(
-            new UserBadge($email),
-            new PasswordCredentials($request->request->get('password', ''))
-//            ,
-//            [
-//                new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
-//            ]
-        );
+//        $apiToken = $request->headers->get('x-api-token');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
-
-        // For example:
-         return new RedirectResponse($this->urlGenerator->generate('base'));
-//        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        // TODO: Implement onAuthenticationSuccess() method.
     }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
+    {
+        // TODO: Implement onAuthenticationFailure() method.
+    }
+
+//    public function start(Request $request, AuthenticationException $authException = null): Response
+//    {
+//        /*
+//         * If you would like this class to control what happens when an anonymous user accesses a
+//         * protected page (e.g. redirect to /login), uncomment this method and make this class
+//         * implement Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface.
+//         *
+//         * For more details, see https://symfony.com/doc/current/security/experimental_authenticators.html#configuring-the-authentication-entry-point
+//         */
+//    }
 
     protected function getLoginUrl(Request $request): string
     {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        // TODO: Implement getLoginUrl() method.
     }
 }
