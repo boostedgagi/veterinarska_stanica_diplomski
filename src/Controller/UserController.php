@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Log;
 use App\Entity\User;
 use App\Entity\VerifyAccount;
 use App\Form\UserType;
@@ -198,8 +199,24 @@ class UserController extends AbstractController
     }
 
     #[Route('/login_check', methods: 'POST')]
-    public function apikey(UserRepository $userRepo): JsonResponse
+    public function login(UserRepository $userRepo,MobileDetectorInterface $detector): JsonResponse
     {
+
+        $deviceDetect = new MobileDetectRepository($detector);
+//
+        $ip = getenv('HTTP_X_FORWARDED_FOR');
+        $export = (object)(unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$ip)));
+
+        $newLog = (object)[
+            'device'=>$deviceDetect->getDeviceInfo(),
+            'country'=>$export->geoplugin_countryName,
+            'ip'=>$export->geoplugin_request
+        ];
+
+        $log = new Log($newLog->device,$newLog->country,$newLog->ip);
+        dd($log);
+        $this->em->persist($log);
+        $this->em->flush();
 
         $user = $userRepo->findAll();
 
