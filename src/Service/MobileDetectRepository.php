@@ -23,7 +23,6 @@ class MobileDetectRepository
         $deviceType = ($this->mobileDetector->isMobile() ? ($this->mobileDetector->isTablet() ? 'Tablet' : 'Phone') : 'Computer');
 
         if ($deviceType === "Phone" OR $deviceType === "Tablet") {
-//            echo "You are mobile! ";
 
             if ($this->mobileDetector->isiOS()) {
                 return $deviceType.' iOS';
@@ -32,8 +31,8 @@ class MobileDetectRepository
             if ($this->mobileDetector->isAndroidOS()) {
                 return $deviceType.' Android';
             }
-
-        } else {
+        }
+        else {
             return 'Computer';
         }
         return "Error";

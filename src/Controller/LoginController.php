@@ -19,25 +19,4 @@ class LoginController extends AbstractController
     {
         $this->em = $entityManager;
     }
-
-    #[Route('/login',methods:'GET')]
-    public function login(MobileDetectorInterface $detector):Response
-    {
-        $deviceDetect = new MobileDetectRepository($detector);
-
-        $ip = getenv('HTTP_X_FORWARDED_FOR');
-        $export = (object)(unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$ip)));
-
-        $newLog = (object)[
-            'device'=>$deviceDetect->getDeviceInfo(),
-            'country'=>$export->geoplugin_countryName,
-            'ip'=>$export->geoplugin_request
-        ];
-
-        $log = new Log($newLog->device,$newLog->country,$newLog->ip);
-        $this->em->persist($log);
-        $this->em->flush();
-
-        return $this->json($log,Response::HTTP_OK);
-    }
 }

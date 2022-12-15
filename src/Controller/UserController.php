@@ -8,6 +8,7 @@ use App\Entity\VerifyAccount;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
+use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use App\Service\RegistrationRepository;
 use App\Service\uploadImage;
@@ -89,12 +90,6 @@ class UserController extends AbstractController
         $this->em->flush();
 
         return $this->json("", Response::HTTP_NO_CONTENT);
-    }
-
-    #[Route('/base',name: 'base')]
-    public function sendMe():Response
-    {
-        return $this->render('base.html.twig');
     }
 
     #[Route('/users', methods: 'GET')]
@@ -201,23 +196,14 @@ class UserController extends AbstractController
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo,MobileDetectorInterface $detector): JsonResponse
     {
-
-        $deviceDetect = new MobileDetectRepository($detector);
+//        $logHandler = new LogHandler();
 //
-        $ip = getenv('HTTP_X_FORWARDED_FOR');
-        $export = (object)(unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$ip)));
-
-        $newLog = (object)[
-            'device'=>$deviceDetect->getDeviceInfo(),
-            'country'=>$export->geoplugin_countryName,
-            'ip'=>$export->geoplugin_request
-        ];
-
-        $log = new Log($newLog->device,$newLog->country,$newLog->ip);
-        dd($log);
-        $this->em->persist($log);
-        $this->em->flush();
-
+//        $log = $logHandler->getMyLocation($detector);
+//
+//        $this->em->persist($log);
+//        $this->em->flush();
+        //maybe i should retrieve coordinates from
+        //method from above and patch user object with them in case he will need nearest vet, who knows.
         $user = $userRepo->findAll();
 
         return $this->json($user, Response::HTTP_OK);
