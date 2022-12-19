@@ -3,14 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\HealthRecord;
+use App\Entity\User;
 use App\Form\HealthRecordType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\PetRepository;
+use App\Repository\UserRepository;
+use App\Service\EmailRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Date;
@@ -89,14 +93,23 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}/cancel',methods: 'POST')]
-    public function cancelHealthRecord(HealthRecordRepository $healthRepo,int $id):Response
+    public function cancelHealthRecord(Request $request,HealthRecordRepository $healthRepo,UserRepository $userRepo,MailerInterface $mailer,int $id):Response
     {
         $healthRecord = $healthRepo->find($id);
+
+        $data = json_decode($request->getContent(), false);
+        $cancelText = $data->cancelText;
+        $personWhoCancel = $userRepo->find($data->cancelerId);
+
         $now = new DateTime();
         $timeDiff = $healthRecord->getStartedAt()->diff($now);
-//        dd($timeDiff->h);
+
         if($timeDiff->h == 0){
             return $this->json(['error' => 'Examination is impossible to cancel less than hour before of its start'],Response::HTTP_OK);
+        }
+        if($personWhoCancel->getTypeOfUser()===2){
+            $email = new EmailRepository($mailer);
+            $email->sendCancelMailByVet($healthRecord->getPet(),$cancelText);
         }
         $healthRecord->setStatus('canceled');
         $this->em->persist($healthRecord);

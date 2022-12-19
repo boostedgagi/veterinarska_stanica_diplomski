@@ -151,8 +151,9 @@ class UserController extends AbstractController
         $vetUsers = $vet->getUsers();
         $pets = [];
         foreach ($vetUsers as $vetUser) {
-            if($vetUser->getPets()!==null)
+            if($vetUser->getPets()!==null) {
                 $pets[] = $vetUser->getPets();
+            }
         }
         return $this->json($pets, Response::HTTP_OK,[],['groups'=>'pet_showAll']);
     }
@@ -207,5 +208,20 @@ class UserController extends AbstractController
         $user = $userRepo->findAll();
 
         return $this->json($user, Response::HTTP_OK);
+    }
+
+    #[Route('/vets/nearby', methods: 'GET')]
+    public function nearbyVets(Request $request,UserRepository $userRepo):Response
+    {
+        $queryParams = (object)$request->query->all();
+
+        $myLongitude = $queryParams->lat;
+        $myLatitude = $queryParams->ltd;
+        $distance = $queryParams->distance;
+
+        $nearbyVets = $userRepo->getNearbyVets($myLatitude,$myLongitude,$distance);
+//        $nearbyVets = $userRepo->getVets();
+
+        return $this->json($nearbyVets,Response::HTTP_OK,[],['groups'=>'vet_nearby']);
     }
 }

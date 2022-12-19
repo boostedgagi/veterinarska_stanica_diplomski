@@ -16,10 +16,12 @@ class UserType extends AbstractType
             ->add('password')
             ->add('firstName')
             ->add('lastName')
-//            ->add('allowed')
             ->add('typeOfUser')
             ->add('image')
             ->add('phone')
+            ->add('vet')
+            ->add('latitude')
+            ->add('longitude')
         ;
     }
 

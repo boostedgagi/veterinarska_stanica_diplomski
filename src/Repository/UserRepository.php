@@ -4,10 +4,14 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -54,6 +58,63 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->save($user, true);
+    }
+
+    public function getNearbyVets(string $latitude, string $longitude, int $distance): array
+    {
+        $rsm = new ResultSetMapping;
+        $em = $this->getEntityManager();
+
+        $rsm->addEntityResult(User::class, 'u');
+        $rsm->addFieldResult('u', 'first_name', 'firstName');
+        $rsm->addFieldResult('u', 'last_name', 'lastName');
+        $rsm->addFieldResult('u', 'email', 'email');
+        $rsm->addFieldResult('u', 'phone', 'phone');
+        $rsm->addFieldResult('u', 'latitude', 'latitude');
+        $rsm->addFieldResult('u', 'longitude', 'longitude');
+
+        $sql = 'SELECT first_name, last_name, email, phone, latitude, longitude,(
+        3959 *
+        acos(
+            cos(radians(?)) *
+            cos(radians(latitude)) *
+            cos(radians(longitude) - radians(?)) + sin(radians(?)) *
+            sin(radians(latitude)))
+        ) AS distance
+        FROM user 
+        where type_of_user = 2
+        HAVING distance < ?
+        ORDER BY distance';
+
+        $query = $em->createNativeQuery($sql,$rsm);
+//        $vet = 2;
+        $query->setParameter(1, $latitude);
+        $query->setParameter(2, $longitude);
+        $query->setParameter(3, $latitude);
+//        $query->setParameter(4,$vet);
+        $query->setParameter(4, $distance);
+
+        $vets = $query->getResult();
+
+        return $vets;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getVets(): array
+    {
+        $em = $this->getEntityManager();
+        $rsm = new ResultSetMapping();
+
+        $conn = $em->getConnection();
+        $query = 'SELECT first_name,last_name,email,phone 
+                FROM user 
+                WHERE type_of_user = :vet_type';
+        $stmt = $conn->prepare($query);
+        $vets = $stmt->execute(array('vet_type' => 2));
+
+        return $vets->fetchAll();
     }
 
 //    /**

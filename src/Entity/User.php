@@ -35,7 +35,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'pet_foundPet',
             'pet_created',
             'healthRecord_created',
-            'healthRecord_showAll'
+            'healthRecord_showAll',
+            'vet_nearby'
         ]
     )]
     private ?string $email = null;
@@ -62,7 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'pet_showAll',
             'pet_created',
             'healthRecord_created',
-            'healthRecord_showAll'
+            'healthRecord_showAll',
+            'vet_nearby'
         ]
     )]
     private ?string $firstName = null;
@@ -75,7 +77,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'pet_showAll',
             'pet_created',
             'healthRecord_created',
-            'healthRecord_showAll'
+            'healthRecord_showAll',
+            'vet_nearby'
         ]
     )]
     private ?string $lastName = null;
@@ -116,13 +119,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $image = null;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class,cascade: ['persist','remove'])]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class, cascade: ['persist', 'remove'])]
     private Collection $pets;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;
 
     #[ORM\Column(length: 32, nullable: true)]
+    #[Groups(
+        [
+            'vet_nearby'
+        ]
+    )]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -170,7 +178,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**

@@ -48,8 +48,8 @@ class EmailRepository
 
     public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
     {
-//        $ngrok = getenv('NGROK_TUNNEL');
-        $ngrok = 'http://localhost:8000';
+        $ngrok = getenv('NGROK_TUNNEL');
+
         $email = (new Email())
             ->from('yourqrcode@vetshop.com')
             ->to($pet->getOwner()->getEmail())
@@ -58,10 +58,25 @@ class EmailRepository
                 <h4 style='font-weight: 500;'>This qr code is supposed to be located in your pet's necklace
                     and also to be scanned if your pet is lost and been found after.</h4>
                 <img 
-                    src=".$ngrok.$qrCodePath."
+                    src=".$ngrok.'/'.$qrCodePath."
                     height='140px' 
                     width='140px' 
                     alt='qr-code'>
+            ");
+
+        $this->mailer->send($email);
+    }
+
+    public function sendCancelMailByVet(Pet $pet,string $cancelText):void
+    {
+        $ngrok = getenv('NGROK_TUNNEL');
+
+        $email = (new Email())
+            ->from('cancel@vetshop.com')
+            ->to($pet->getOwner()->getEmail())
+            ->subject('Your pet\'s examination is canceled.')
+            ->html("
+                <h4 style='font-weight: 500;'>".$cancelText."</h4>
             ");
 
         $this->mailer->send($email);

@@ -44,7 +44,6 @@ class PetController extends AbstractController
     {
         $pet = $repo->find($id);
         $uploadImage = new UploadImage($request, $pet, $this->em);
-
         $uploadImage->upload();
         return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
     }
