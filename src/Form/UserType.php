@@ -19,7 +19,6 @@ class UserType extends AbstractType
             ->add('typeOfUser')
             ->add('image')
             ->add('phone')
-            ->add('vet')
             ->add('latitude')
             ->add('longitude')
         ;

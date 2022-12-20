@@ -53,7 +53,9 @@ final class UserFactory extends ModelFactory
             'lastName' => self::faker()->lastName(),
             'password' => self::faker()->password(),
             'roles' => [],
-            'typeOfUser' => self::faker()->numberBetween(1,3)
+            'typeOfUser' => self::faker()->numberBetween(1,3),
+            'latitude'=> self::faker()->latitude(),
+            'longitude'=> self::faker()->longitude(),
         ];
     }
 

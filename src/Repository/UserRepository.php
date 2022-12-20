@@ -60,43 +60,54 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getNearbyVets(string $latitude, string $longitude, int $distance): array
     {
-        $rsm = new ResultSetMapping;
+//        $rsm = new ResultSetMapping();
+//
+//        $rsm->addEntityResult(User::class,'u');
+//
+//        $rsm->addFieldResult('u','first_name','firstName');
+//        $rsm->addFieldResult('u','last_name','lastName');
+//        $rsm->addFieldResult('u','email','email');
+//        $rsm->addFieldResult('u','phone','phone');
+//        $rsm->addFieldResult('u','latitude','latitude');
+//        $rsm->addFieldResult('u','longitude','longitude');
+
         $em = $this->getEntityManager();
-
-        $rsm->addEntityResult(User::class, 'u');
-        $rsm->addFieldResult('u', 'first_name', 'firstName');
-        $rsm->addFieldResult('u', 'last_name', 'lastName');
-        $rsm->addFieldResult('u', 'email', 'email');
-        $rsm->addFieldResult('u', 'phone', 'phone');
-        $rsm->addFieldResult('u', 'latitude', 'latitude');
-        $rsm->addFieldResult('u', 'longitude', 'longitude');
-
-        $sql = 'SELECT first_name, last_name, email, phone, latitude, longitude,(
-        3959 *
-        acos(
-            cos(radians(?)) *
-            cos(radians(latitude)) *
-            cos(radians(longitude) - radians(?)) + sin(radians(?)) *
-            sin(radians(latitude)))
+        $km_constant = 6371;
+        $sql = "SELECT first_name,last_name,email,phone,latitude,longitude,round(
+        (
+            $km_constant * ACOS(COS(RADIANS(:latitude)) 
+            * COS(RADIANS(latitude)) * 
+            COS(RADIANS(longitude) - 
+            RADIANS(:longitude)) + 
+            SIN(RADIANS(:latitude)) * 
+            SIN(RADIANS(latitude)))
+            )
+        ,2
         ) AS distance
-        FROM user 
-        where type_of_user = 2
-        HAVING distance < ?
-        ORDER BY distance';
+        FROM
+            user
+        WHERE
+            type_of_user = 2
+        HAVING distance < :dist
+        ORDER BY distance
+        LIMIT 0 , 5";
 
-        $query = $em->createNativeQuery($sql,$rsm);
-//        $vet = 2;
-        $query->setParameter(1, $latitude);
-        $query->setParameter(2, $longitude);
-        $query->setParameter(3, $latitude);
-//        $query->setParameter(4,$vet);
-        $query->setParameter(4, $distance);
+        $conn = $em->getConnection();
+        $stmt = $conn->prepare($sql);
 
-        $vets = $query->getResult();
+        $stmt->bindValue('latitude', $latitude);
+        $stmt->bindValue('longitude', $longitude);
+        $stmt->bindValue('dist', $distance);
 
-        return $vets;
+        $nearbyVets = $stmt->execute();
+
+        //returns all from select clause with rounded distance by two decimal places
+        return $nearbyVets->fetchAll();
     }
 
     /**
@@ -106,13 +117,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $em = $this->getEntityManager();
         $rsm = new ResultSetMapping();
-
         $conn = $em->getConnection();
-        $query = 'SELECT first_name,last_name,email,phone 
+        $query = "
+                SELECT first_name,last_name,email,phone 
                 FROM user 
-                WHERE type_of_user = :vet_type';
+                WHERE type_of_user = 2
+                and first_name = :name;";
+
         $stmt = $conn->prepare($query);
-        $vets = $stmt->execute(array('vet_type' => 2));
+        $stmt->bindValue('name','Dragan');
+        $vets = $stmt->execute();
 
         return $vets->fetchAll();
     }

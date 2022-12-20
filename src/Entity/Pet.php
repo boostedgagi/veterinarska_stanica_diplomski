@@ -80,7 +80,7 @@ class Pet
             'pet_foundPet'
         ]
     )]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $owner = null;
 
     #[ORM\Column]

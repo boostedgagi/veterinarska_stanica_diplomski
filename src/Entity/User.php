@@ -140,7 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $longitude = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'users')]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]

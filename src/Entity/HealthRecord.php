@@ -37,7 +37,7 @@ class HealthRecord
             'healthRecord_showAll'
         ]
     )]
-    #[ORM\JoinColumn(nullable: false,onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]

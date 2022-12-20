@@ -12,6 +12,7 @@ use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use App\Service\RegistrationRepository;
 use App\Service\uploadImage;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -69,12 +70,21 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}', methods: 'PUT')]
-    public function updateUser(Request $request, int $id, UserRepository $repo): Response
+    public function updateUser(Request $request, int $id, UserRepository $repo,UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $repo->find($id);
-
+        $plainTextPassword = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $user, UserType::class);
 
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $plainTextPassword->password
+        );
+
+        $user->setPassword($hashedPassword);
+        if($user->getTypeOfUser()===2){
+            $user->setVet(null);
+        }
         $this->em->persist($user);
         $this->em->flush();
 
@@ -85,7 +95,9 @@ class UserController extends AbstractController
     public function deleteUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
-
+//        if($user->getTypeOfUser()===2){
+//            $user->getUsers()->clear();
+//        }
         $this->em->remove($user);
         $this->em->flush();
 
@@ -215,12 +227,15 @@ class UserController extends AbstractController
     {
         $queryParams = (object)$request->query->all();
 
-        $myLongitude = $queryParams->lat;
-        $myLatitude = $queryParams->ltd;
+        $latitude = $queryParams->lat;
+        $longitude = $queryParams->ltd;
         $distance = $queryParams->distance;
 
-        $nearbyVets = $userRepo->getNearbyVets($myLatitude,$myLongitude,$distance);
-//        $nearbyVets = $userRepo->getVets();
+        try {
+            $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, $distance);
+        } catch (Exception $e) {
+            return $this->json($e,Response::HTTP_OK);
+        }
 
         return $this->json($nearbyVets,Response::HTTP_OK,[],['groups'=>'vet_nearby']);
     }
