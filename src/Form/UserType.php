@@ -21,6 +21,9 @@ class UserType extends AbstractType
             ->add('phone')
             ->add('latitude')
             ->add('longitude')
+            ->add('vet', null,[
+                'required'=>false
+            ])
         ;
     }
 

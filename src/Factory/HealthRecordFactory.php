@@ -49,7 +49,7 @@ final class HealthRecordFactory extends ModelFactory
         return [
             'examination' => ExaminationFactory::random(), // TODO add App\Entity\Examination ORM type manually
             'startedAt' => new \DateTime(), // TODO add DATETIME ORM type manually
-            'finishedAt' => new \DateTime(), // TODO add DATETIME ORM type manually
+            'finishedAt' => new \DateTime('+1 hour'), // TODO add DATETIME ORM type manually
             'pet' => PetFactory::random(), // TODO add App\Entity\Pet ORM type manually
             'status' => self::faker()->text(64),
             'vet' => UserFactory::random() // TODO add App\Entity\User ORM type manually

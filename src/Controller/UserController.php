@@ -82,9 +82,6 @@ class UserController extends AbstractController
         );
 
         $user->setPassword($hashedPassword);
-        if($user->getTypeOfUser()===2){
-            $user->setVet(null);
-        }
         $this->em->persist($user);
         $this->em->flush();
 
