@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Form\PetType;
+use App\Repository\HealthRecordRepository;
 use App\Repository\PetRepository;
 use App\Service\EmailRepository;
 use App\Service\UploadImage;
@@ -15,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PetController extends AbstractController
@@ -89,18 +92,18 @@ class PetController extends AbstractController
     }
 
     #[Route('/qr-code', methods: 'POST')]
-    public function generateQRAndSendByMail(Request $request, PetRepository $repo, MailerInterface $mailer ,BuilderInterface $builder): Response
+    public function generateQRAndSendByMail(Request $request, PetRepository $repo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
         $data = json_decode($request->getContent(), false);
         $pet = $repo->find($data->id);
 
-        $possibleQRCode = $builder->data($data->url.$data->id)->build();
-        $qrCodePath = 'qr-codes/'.uniqid('', true) . '.png';
+        $possibleQRCode = $builder->data($data->url . $data->id)->build();
+        $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';
 
         $possibleQRCode->saveToFile($qrCodePath);
 
         $email = new EmailRepository($mailer);
-        $email->sendQrCodeWithMail($pet,$qrCodePath);
+        $email->sendQrCodeWithMail($pet, $qrCodePath);
 
         return $this->json($qrCodePath, Response::HTTP_OK);
     }
@@ -112,5 +115,24 @@ class PetController extends AbstractController
         $pet = $repo->find($queryParams->id);
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
+    }
+
+
+    #[Route('/notify', methods: 'GET')]
+    public function notifier(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo): Response
+    {
+
+        $examinationsToRemind = $healthRecRepo->getExaminationsInNextSevenDays();
+        foreach ($examinationsToRemind as $examination) {
+            try {
+                $email = new EmailRepository($mailer);
+                $email->notifyUserAboutPetHaircut($notifier, $examination->getPet());
+
+            } catch (\Exception $exception) {
+                return $this->json($exception, Response::HTTP_OK);
+            }
+        }
+
+        return $this->json('Owners are notified!', Response::HTTP_OK);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\HealthRecord;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -80,18 +81,16 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
-//    /**
-//     * @return HealthRecord[] Returns an array of HealthRecord objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('h')
-//            ->andWhere('h.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('h.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+
+    public function getExaminationsInNextSevenDays():array
+    {
+        $deadline = new DateTime('+7 days');
+
+        $qb = $this->createQueryBuilder('hr');
+        $qb->select('hr')
+            ->andWhere('hr.finishedAt<:deadline')
+            ->setParameter('deadline',$deadline);
+
+        return $qb->getQuery()->getResult();
+    }
 }

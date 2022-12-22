@@ -5,11 +5,11 @@ namespace App\Service;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\VerifyAccount;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCodeBundle\Response\QrCodeResponse;
-use phpDocumentor\Reflection\File;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 
 class EmailRepository
 {
@@ -80,5 +80,20 @@ class EmailRepository
             ");
 
         $this->mailer->send($email);
+    }
+
+    public function notifyUserAboutPetHaircut(NotifierInterface $notifier,Pet $pet):void
+    {
+
+        $notification = (new Notification('Just to remind you...',['email']))
+            ->content("your pet named ".$pet->getName()." have its haircutting in some time");
+
+        $user = $pet->getOwner();
+
+        $recipient = new Recipient(
+            $user->getEmail()
+        );
+
+        $notifier->send($notification,$recipient);
     }
 }
