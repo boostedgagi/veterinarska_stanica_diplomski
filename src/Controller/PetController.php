@@ -123,10 +123,14 @@ class PetController extends AbstractController
     {
 
         $examinationsToRemind = $healthRecRepo->getExaminationsInNextSevenDays();
+        if(count($examinationsToRemind)===0){
+            return $this->json('There are no owners to notify!', Response::HTTP_OK);
+        }
         foreach ($examinationsToRemind as $examination) {
             try {
                 $email = new EmailRepository($mailer);
-                $email->notifyUserAboutPetHaircut($notifier, $examination->getPet());
+                //$examination is the HealthRecordType
+                $email->notifyUserAboutPetHaircut($notifier, $examination);
 
             } catch (\Exception $exception) {
                 return $this->json($exception, Response::HTTP_OK);

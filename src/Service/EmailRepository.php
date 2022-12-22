@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\VerifyAccount;
+use DateTime;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -82,11 +84,23 @@ class EmailRepository
         $this->mailer->send($email);
     }
 
-    public function notifyUserAboutPetHaircut(NotifierInterface $notifier,Pet $pet):void
+    public function notifyUserAboutPetHaircut(NotifierInterface $notifier,HealthRecord $healthRecord):void
     {
 
-        $notification = (new Notification('Just to remind you...',['email']))
-            ->content("your pet named ".$pet->getName()." have its haircutting in some time");
+        $pet = $healthRecord->getPet();
+
+        $date = $healthRecord->getStartedAt();
+        $resultDate = $date->format('Y-m-d H:i:s');
+        $examination = $healthRecord->getExamination();
+        $notification = (new Notification('Reminder from VetShop',['email']))
+            ->content("Hi ".$pet->getOwner()->getFirstName()."!
+            
+            We are notifying you that your pet named ".$pet->getName().",
+             have ".$examination->getName()." in the ".$resultDate.".
+            Examination is ".$examination->getDuration()." minutes long.
+            See you then!
+            
+            Your VetShop!");
 
         $user = $pet->getOwner();
 

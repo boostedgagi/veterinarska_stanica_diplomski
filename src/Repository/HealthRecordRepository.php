@@ -84,10 +84,13 @@ class HealthRecordRepository extends ServiceEntityRepository
 
     public function getExaminationsInNextSevenDays():array
     {
+        $now = new DateTime();
         $deadline = new DateTime('+7 days');
 
         $qb = $this->createQueryBuilder('hr');
         $qb->select('hr')
+            ->andWhere('hr.startedAt>=:now')
+            ->setParameter('now',$now)
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline',$deadline);
 
