@@ -23,8 +23,7 @@ class UserType extends AbstractType
             ->add('longitude')
             ->add('vet', null,[
                 'required'=>false
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

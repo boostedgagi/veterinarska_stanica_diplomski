@@ -110,25 +110,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $nearbyVets->fetchAll();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getVets(): array
+    public function getFreeVetsInTimeRange(string $from,string $to): array
     {
-        $em = $this->getEntityManager();
-        $rsm = new ResultSetMapping();
-        $conn = $em->getConnection();
-        $query = "
-                SELECT first_name,last_name,email,phone 
-                FROM user 
-                WHERE type_of_user = 2
-                and first_name = :name;";
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u')
+            ->distinct()
+            ->join('u.healthRecords','health_record')
+            ->andWhere('health_record.startedAt not between :from and :to')
+            ->andWhere('health_record.finishedAt not between :from and :to')
+//            ->orWhere('u.id not in health_record.vet')
+                ->andWhere('u.typeOfUser=2')
+            ->setParameter('from',$from)
+            ->setParameter('to',$to)
+            ->orderBy('u.id');
 
-        $stmt = $conn->prepare($query);
-        $stmt->bindValue('name','Dragan');
-        $vets = $stmt->execute();
-
-        return $vets->fetchAll();
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

@@ -244,4 +244,18 @@ class UserController extends AbstractController
         return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
 
+    #[Route('/vets/free',methods: 'GET')]
+    public function getFreeVetsInTimeRange(Request $request,UserRepository $userRepo):Response
+    {
+        $queryParams = (object)$request->query->all();
+
+        $from = $queryParams->from;
+        $to = $queryParams->to;
+
+        $freeVets = $userRepo->getFreeVetsInTimeRange($from,$to);
+
+        return $this->json($freeVets,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+
+    }
+
 }
