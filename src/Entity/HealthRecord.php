@@ -97,6 +97,9 @@ class HealthRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
+    #[ORM\Column]
+    private ?bool $notified = null;
+
     public function __construct()
     {
     }
@@ -218,5 +221,17 @@ class HealthRecord
     public function prePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function isNotified(): ?bool
+    {
+        return $this->notified;
+    }
+
+    public function setNotified(bool $notified): self
+    {
+        $this->notified = $notified;
+
+        return $this;
     }
 }
