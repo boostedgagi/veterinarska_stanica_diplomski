@@ -118,25 +118,25 @@ class PetController extends AbstractController
     }
 
 
-    #[Route('/notify', methods: 'GET')]
-    public function notifier(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo): Response
-    {
-
-        $examinationsToRemind = $healthRecRepo->getExaminationsInNextSevenDays();
-        if(count($examinationsToRemind)===0){
-            return $this->json('There are no owners to notify!', Response::HTTP_OK);
-        }
-        foreach ($examinationsToRemind as $examination) {
-            try {
-                $email = new EmailRepository($mailer);
-                //$examination is the HealthRecordType
-                $email->notifyUserAboutPetHaircut($notifier, $examination);
-
-            } catch (\Exception $exception) {
-                return $this->json($exception, Response::HTTP_OK);
-            }
-        }
-
-        return $this->json('Owners are notified!', Response::HTTP_OK);
-    }
+//    #[Route('/notify', methods: 'GET')]
+//    public function notifier(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo): Response
+//    {
+//
+//        $examinationsToRemind = $healthRecRepo->getExaminationsInNextSevenDays();
+//        if(count($examinationsToRemind)===0){
+//            return $this->json('There are no owners to notify!', Response::HTTP_OK);
+//        }
+//        foreach ($examinationsToRemind as $examination) {
+//            try {
+//                $email = new EmailRepository($mailer);
+//                //$examination is the HealthRecordType
+//                $email->notifyUserAboutPetHaircut($notifier, $examination);
+//
+//            } catch (\Exception $exception) {
+//                return $this->json($exception, Response::HTTP_OK);
+//            }
+//        }
+//
+//        return $this->json('Owners are notified!', Response::HTTP_OK);
+//    }
 }

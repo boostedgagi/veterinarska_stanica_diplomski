@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\HealthRecord;
+use ContainerEMrMbsc\get_Console_Command_CacheWarmup_LazyService;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -92,7 +93,8 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->andWhere('hr.startedAt>=:now')
             ->setParameter('now',$now)
             ->andWhere('hr.finishedAt<:deadline')
-            ->setParameter('deadline',$deadline);
+            ->setParameter('deadline',$deadline)
+            ->andWhere('hr.notified = 0');
 
         return $qb->getQuery()->getResult();
     }

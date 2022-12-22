@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Repository\HealthRecordRepository;
 use App\Service\EmailRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpParser\Node\Stmt\Return_;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,17 +27,20 @@ class NotifyExaminationsCommand extends Command
     private MailerInterface $mailer;
     private NotifierInterface $notifier;
     private HealthRecordRepository $healthRecRepo;
+    private EntityManagerInterface $em;
 
     /**
      * @param MailerInterface $mailer
      * @param NotifierInterface $notifier
      * @param HealthRecordRepository $healthRecRepo
+     * @param EntityManagerInterface $em
      */
-    public function __construct(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo)
+    public function __construct(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo, EntityManagerInterface $em)
     {
         $this->mailer = $mailer;
         $this->notifier = $notifier;
         $this->healthRecRepo = $healthRecRepo;
+        $this->em = $em;
 
         parent::__construct();
 
@@ -55,8 +59,7 @@ class NotifyExaminationsCommand extends Command
     {
         $output->writeln([
             'Okay let\'s notify pet owners!',
-            '============',
-            '',
+            '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         ]);
 //        $arg1 = $input->getArgument('arg1');
 //
@@ -73,7 +76,7 @@ class NotifyExaminationsCommand extends Command
         if(count($examinationsToRemind)===0){
             $output->writeln([
                 'Great! But...',
-                '',
+                '~~~',
                 'All users are already notified!'
             ]);
             return Command::SUCCESS;
@@ -84,16 +87,23 @@ class NotifyExaminationsCommand extends Command
                 //$examination is the HealthRecordType
                 $email->notifyUserAboutPetHaircut($this->notifier, $examination);
 
-            } catch (\Exception $exception) {
+                $examination->setNotified(true);
+
+                $this->em->persist($examination);
+                $this->em->flush();
+            }
+            catch (\Exception $exception) {
                 return Command::FAILURE;
             }
         }
 
         $output->writeln([
             'Great!',
-            '',
+            '~~~',
             'Users are notified!'
         ]);
+
+
         return Command::SUCCESS;
     }
 }

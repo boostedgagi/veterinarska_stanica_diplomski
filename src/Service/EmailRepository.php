@@ -109,5 +109,7 @@ class EmailRepository
         );
 
         $notifier->send($notification,$recipient);
+
+
     }
 }
