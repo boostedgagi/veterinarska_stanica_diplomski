@@ -53,9 +53,14 @@ class UserController extends AbstractController
         $this->handleJSONForm($request, $user, UserType::class);
 
         $user->setPassword($hashedPassword);
-        $user->setAllowed(false);
 
         $email = new EmailRepository($mailer);
+        if ($user->getTypeOfUser() === 2) {
+            //I should add here sending custom mail exactly for vet because admin will make him an account
+            $user->setAllowed(true);
+        } else {
+            $user->setAllowed(false);
+        }
         $registrationRepo = new RegistrationRepository();
 
         $token = new VerifyAccount($registrationRepo->handleToken());
@@ -65,14 +70,14 @@ class UserController extends AbstractController
 
         $this->em->persist($token);
         $this->em->flush();
-
-        $email->sendWelcomeEmail($user, $token);
-
+        if ($user->getTypeOfUser() !== 2) {
+            $email->sendWelcomeEmail($user, $token);
+        }
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
     #[Route('/users/{id}', methods: 'PUT')]
-    public function updateUser(Request $request, int $id, UserRepository $repo,UserPasswordHasherInterface $passwordHasher): Response
+    public function updateUser(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $repo->find($id);
         $plainTextPassword = json_decode($request->getContent(), false);
@@ -162,11 +167,11 @@ class UserController extends AbstractController
         $vetUsers = $vet->getUsers();
         $pets = [];
         foreach ($vetUsers as $vetUser) {
-            if($vetUser->getPets()!==null) {
+            if ($vetUser->getPets() !== null) {
                 $pets[] = $vetUser->getPets();
             }
         }
-        return $this->json($pets, Response::HTTP_OK,[],['groups'=>'pet_showAll']);
+        return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
     #[Route('/user/engage', methods: 'POST')]
@@ -193,7 +198,7 @@ class UserController extends AbstractController
         $data = json_decode($request->getContent(), false);
 
         $user = $repo->find($id);
-        $allowedTypes = [1,2,3];
+        $allowedTypes = [1, 2, 3];
         if ($data->typeOfUser) {
 
             $user->setTypeOfUser($data->typeOfUser);
@@ -206,7 +211,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/login_check', methods: 'POST')]
-    public function login(UserRepository $userRepo,MobileDetectorInterface $detector): JsonResponse
+    public function login(UserRepository $userRepo, MobileDetectorInterface $detector): JsonResponse
     {
 //        $logHandler = new LogHandler();
 //
@@ -222,7 +227,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/nearby', methods: 'GET')]
-    public function nearbyVets(Request $request,UserRepository $userRepo):Response
+    public function nearbyVets(Request $request, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
@@ -233,10 +238,10 @@ class UserController extends AbstractController
         try {
             $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, $distance);
         } catch (Exception $e) {
-            return $this->json($e,Response::HTTP_OK);
+            return $this->json($e, Response::HTTP_OK);
         }
 
-        return $this->json($nearbyVets,Response::HTTP_OK,[],['groups'=>'vet_nearby']);
+        return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
 
 }

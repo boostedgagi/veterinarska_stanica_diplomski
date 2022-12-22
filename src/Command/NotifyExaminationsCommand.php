@@ -43,9 +43,7 @@ class NotifyExaminationsCommand extends Command
         $this->em = $em;
 
         parent::__construct();
-
     }
-
 
     protected function configure(): void
     {
