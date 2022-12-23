@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Repository\HealthRecordRepository;
 use App\Service\EmailRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use PhpParser\Node\Stmt\Return_;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -77,6 +78,7 @@ class NotifyExaminationsCommand extends Command
                 '~~~',
                 'All users are already notified!'
             ]);
+
             return Command::SUCCESS;
         }
         foreach ($examinationsToRemind as $examination) {
@@ -90,7 +92,12 @@ class NotifyExaminationsCommand extends Command
                 $this->em->persist($examination);
                 $this->em->flush();
             }
-            catch (\Exception $exception) {
+            catch (Exception $exception) {
+                $output->writeln([
+                    'Something bad happened:',
+                    'error: '.$exception
+                ]);
+
                 return Command::FAILURE;
             }
         }
@@ -100,7 +107,6 @@ class NotifyExaminationsCommand extends Command
             '~~~',
             'Users are notified!'
         ]);
-
 
         return Command::SUCCESS;
     }
