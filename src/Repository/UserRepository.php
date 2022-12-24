@@ -110,45 +110,43 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $nearbyVets->fetchAll();
     }
 
-    public function getFreeVetsInTimeRange(string $from,string $to): array
+    public function getOccupiedVetsInTimeRange($from,$to):array
     {
         $qb = $this->createQueryBuilder('u');
-        $qb->select('u')
-            ->distinct()
-            ->join('u.healthRecords','health_record')
-            ->andWhere('health_record.startedAt not between :from and :to')
-            ->andWhere('health_record.finishedAt not between :from and :to')
-//            ->orWhere('u.id not in health_record.vet')
-                ->andWhere('u.typeOfUser=2')
+
+        $qb->innerJoin('u.healthRecords','hr')
+//            ->addSelect('u.id')
+            ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
+            ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
+            ->orWhere('u.id not in (hr.vet)')
             ->setParameter('from',$from)
-            ->setParameter('to',$to)
+            ->setParameter('to',$to);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function excludeOccupiedVets(array $occupiedVets):array
+    {
+        $occupiedVetsIDs = [];
+        
+        foreach($occupiedVets as $occupiedVet){
+            $occupiedVetsIDs[] = $occupiedVet->getId();
+        }
+
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u')
+            ->andWhere('u.id not in (:occupiedVetsIDs)')
+            ->setParameter('occupiedVetsIDs',$occupiedVetsIDs)
+            ->andWhere('u.typeOfUser=2')
             ->orderBy('u.id');
 
         return $qb->getQuery()->getResult();
     }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getFreeVets($from,$to):array
+    {
+        $occupiedVets = $this->getOccupiedVetsInTimeRange($from,$to);
+        return $this->excludeOccupiedVets($occupiedVets);
+    }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

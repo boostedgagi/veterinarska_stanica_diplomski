@@ -17,6 +17,11 @@ class HealthRecord
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(
+        [
+            'healthRecord_showAll'
+        ]
+    )]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]

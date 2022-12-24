@@ -6,6 +6,7 @@ use App\Entity\Log;
 use App\Entity\User;
 use App\Entity\VerifyAccount;
 use App\Form\UserType;
+use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
 use App\Service\LogHandler;
@@ -245,14 +246,14 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/free',methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request,UserRepository $userRepo):Response
+    public function getFreeVetsInTimeRange(Request $request,UserRepository $userRepo,HealthRecordRepository $healthRecRepo):Response
     {
         $queryParams = (object)$request->query->all();
 
         $from = $queryParams->from;
         $to = $queryParams->to;
 
-        $freeVets = $userRepo->getFreeVetsInTimeRange($from,$to);
+        $freeVets = $userRepo->getFreeVets($from,$to);
 
         return $this->json($freeVets,Response::HTTP_OK,[],['groups'=>'user_showAll']);
 

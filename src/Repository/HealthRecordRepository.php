@@ -3,12 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\HealthRecord;
-use ContainerEMrMbsc\get_Console_Command_CacheWarmup_LazyService;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<HealthRecord>
@@ -98,4 +98,20 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+//    public function getScheduledExaminationsInTimeRange($from,$to):array
+//    {
+//        $qb = $this->createQueryBuilder('hr');
+//
+//        $qb->innerJoin('hr.vet','vet')
+//            ->addSelect('vet')
+//            ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
+//            ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
+//            ->setParameter('from',$from)
+//            ->setParameter('to',$to);
+//
+//        dd($qb->getQuery()->getResult());
+//
+//        return $qb->getQuery()->getResult();
+//    }
 }
