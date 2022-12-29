@@ -128,7 +128,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function excludeOccupiedVets(array $occupiedVets):array
     {
         $occupiedVetsIDs = [];
-        
+
         foreach($occupiedVets as $occupiedVet){
             $occupiedVetsIDs[] = $occupiedVet->getId();
         }
