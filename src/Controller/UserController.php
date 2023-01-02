@@ -11,7 +11,7 @@ use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
 use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
-use App\Service\RegistrationRepository;
+use App\Service\TokenRepository;
 use App\Service\uploadImage;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,7 +50,7 @@ class UserController extends AbstractController
             $user,
             $plainTextPassword->password
         );
-        //password hasher configured to hash in BCRYPT algorithm
+
         $this->handleJSONForm($request, $user, UserType::class);
 
         $user->setPassword($hashedPassword);
@@ -62,9 +62,9 @@ class UserController extends AbstractController
         } else {
             $user->setAllowed(false);
         }
-        $registrationRepo = new RegistrationRepository();
+        $registrationRepo = new TokenRepository();
 
-        $token = new VerifyAccount($registrationRepo->handleToken());
+        $token = new VerifyAccount($registrationRepo->makeNewToken());
 
         $this->em->persist($user);
         $this->em->flush();
@@ -212,7 +212,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/login_check', methods: 'POST')]
-    public function login(UserRepository $userRepo, MobileDetectorInterface $detector): JsonResponse
+    public function login(MobileDetectorInterface $detector, UserRepository $userRepo): JsonResponse
     {
 //        $logHandler = new LogHandler();
 //
@@ -220,8 +220,7 @@ class UserController extends AbstractController
 //
 //        $this->em->persist($log);
 //        $this->em->flush();
-        //maybe i should retrieve coordinates from
-        //method from above and patch user object with them in case he will need nearest vet, who knows.
+
         $user = $userRepo->findAll();
 
         return $this->json($user, Response::HTTP_OK);

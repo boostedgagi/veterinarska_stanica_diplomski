@@ -3,11 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Log;
+use App\Repository\UserRepository;
+use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use Doctrine\ORM\Cache\Lock;
 use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,5 +21,22 @@ class LoginController extends AbstractController
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->em = $entityManager;
+    }
+
+    #[Route('/login_check', methods: 'POST')]
+    public function login(MobileDetectorInterface $detector, UserRepository $userRepo): JsonResponse
+    {
+        $logHandler = new LogHandler();
+
+        $log = $logHandler->getMyLocation($detector);
+
+        $this->em->persist($log);
+        $this->em->flush();
+        //maybe I should retrieve coordinates from
+        //method from above and patch user object with them in case he will need nearest vet, who knows.
+        return $this->json('');
+//        $user = $userRepo->findAll();
+//
+//        return $this->json($user, Response::HTTP_OK);
     }
 }

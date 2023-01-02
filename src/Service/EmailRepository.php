@@ -109,7 +109,26 @@ class EmailRepository
         );
 
         $notifier->send($notification,$recipient);
+    }
 
+    public function sendPasswordRequest(object $token):void
+    {
+        $ngrok = getenv('NGROK_TUNNEL');
+        $email = (new Email())
+            ->from('password_reset@vetshop.com')
+            ->to($token->email)
+            ->subject('Your password renewal request.')
+            ->html("
+                <p>We noticed you requested a password renewal because you forgot it... :(<br>
+                Reset it by click on this button here!</p>
+                <a 
+                    type='button' 
+                    href='http://localhost:8000/password/make_new?token_id={$token->getId()}&token={$token->getToken()}&expires={$token->getExpires()}'
+                >
+                    Reset password
+                </a>
+            ");
 
+        $this->mailer->send($email);
     }
 }
