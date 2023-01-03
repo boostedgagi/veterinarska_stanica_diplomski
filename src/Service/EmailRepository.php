@@ -119,11 +119,11 @@ class EmailRepository
             ->to($token->email)
             ->subject('Your password renewal request.')
             ->html("
-                <p>We noticed you requested a password renewal because you forgot it... :(<br>
+                <p>We noticed you requested a password renewal probably because you forgot it... :(<br>
                 Reset it by click on this button here!</p>
                 <a 
                     type='button' 
-                    href='http://localhost:8000/password/make_new?token_id={$token->getId()}&token={$token->getToken()}&expires={$token->getExpires()}'
+                    href='http://localhost:8000/password/make_new?token_id={$token->getId()}&token={$token->getToken()}&expires={$token->getExpires()}&email={$token->email}'
                 >
                     Reset password
                 </a>
