@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\UserRepository;
-use App\Repository\VerifyAccountRepository;
+use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +21,12 @@ class VerifyAccountController extends AbstractController
     }
 
     #[Route('/verify_account', methods: 'GET')]
-    public function verifyAccount(Request $request, VerifyAccountRepository $verifyRepo, UserRepository $userRepo): Response
+    public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
         $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
+
         if ($savedToken[0]['token'] && ($savedToken[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
             $user = $userRepo->find($queryParams->user_id);
 
@@ -43,7 +44,7 @@ class VerifyAccountController extends AbstractController
 //    i think i used this route just once
 //    after that i added remove token in upper method
 //    #[Route('/remove_token/{id}', methods: 'DELETE')]
-//    public function removeToken(Request $request, VerifyAccountRepository $verifyRepo,int $id): Response
+//    public function removeToken(Request $request, TokenEntityRepository $verifyRepo,int $id): Response
 //    {
 //        $token = $verifyRepo->find($id);
 //        $this->em->remove($token);

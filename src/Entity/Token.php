@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\VerifyAccountRepository;
+use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: VerifyAccountRepository::class)]
+#[ORM\Entity(repositoryClass: TokenEntityRepository::class)]
 class Token
 {
     #[ORM\Id]
@@ -19,10 +19,6 @@ class Token
     #[ORM\Column(length: 255)]
     private ?string $expires = null;
 
-    /**
-     * @param string|null $token
-     * @param string|null $expires
-     */
     public function __construct(object $token)
     {
         $this->token = $token->tokenItself;

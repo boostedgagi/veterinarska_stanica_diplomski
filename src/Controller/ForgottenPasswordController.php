@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Token;
 use App\Repository\UserRepository;
-use App\Repository\VerifyAccountRepository;
+use App\Repository\TokenEntityRepository;
 use App\Service\EmailRepository;
 use App\Service\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +26,7 @@ class ForgottenPasswordController extends AbstractController
     }
 
     #[Route('/password/make_new', methods: 'POST')]
-    public function renewForgottenPassword(Request $request, VerifyAccountRepository $verifyRepo, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher): Response
+    public function renewForgottenPassword(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher): Response
     {
         $data = json_decode($request->getContent(), false);
 

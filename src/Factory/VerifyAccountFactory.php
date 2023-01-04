@@ -3,7 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\Token;
-use App\Repository\VerifyAccountRepository;
+use App\Repository\TokenEntityRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
@@ -19,7 +19,7 @@ use Zenstruck\Foundry\RepositoryProxy;
  * @method static Token|Proxy last(string $sortedField = 'id')
  * @method static Token|Proxy random(array $attributes = [])
  * @method static Token|Proxy randomOrCreate(array $attributes = [])
- * @method static VerifyAccountRepository|RepositoryProxy repository()
+ * @method static TokenEntityRepository|RepositoryProxy repository()
  * @method static Token[]|Proxy[] all()
  * @method static Token[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Token[]|Proxy[] createSequence(array|callable $sequence)

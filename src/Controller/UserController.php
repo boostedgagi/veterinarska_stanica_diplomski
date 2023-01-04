@@ -8,7 +8,7 @@ use App\Entity\Token;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
-use App\Repository\VerifyAccountRepository;
+use App\Repository\TokenEntityRepository;
 use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use App\Service\TokenRepository;
