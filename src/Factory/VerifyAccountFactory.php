@@ -2,30 +2,30 @@
 
 namespace App\Factory;
 
-use App\Entity\VerifyAccount;
+use App\Entity\Token;
 use App\Repository\VerifyAccountRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 
 /**
- * @extends ModelFactory<VerifyAccount>
+ * @extends ModelFactory<Token>
  *
- * @method        VerifyAccount|Proxy create(array|callable $attributes = [])
- * @method static VerifyAccount|Proxy createOne(array $attributes = [])
- * @method static VerifyAccount|Proxy find(object|array|mixed $criteria)
- * @method static VerifyAccount|Proxy findOrCreate(array $attributes)
- * @method static VerifyAccount|Proxy first(string $sortedField = 'id')
- * @method static VerifyAccount|Proxy last(string $sortedField = 'id')
- * @method static VerifyAccount|Proxy random(array $attributes = [])
- * @method static VerifyAccount|Proxy randomOrCreate(array $attributes = [])
+ * @method        Token|Proxy create(array|callable $attributes = [])
+ * @method static Token|Proxy createOne(array $attributes = [])
+ * @method static Token|Proxy find(object|array|mixed $criteria)
+ * @method static Token|Proxy findOrCreate(array $attributes)
+ * @method static Token|Proxy first(string $sortedField = 'id')
+ * @method static Token|Proxy last(string $sortedField = 'id')
+ * @method static Token|Proxy random(array $attributes = [])
+ * @method static Token|Proxy randomOrCreate(array $attributes = [])
  * @method static VerifyAccountRepository|RepositoryProxy repository()
- * @method static VerifyAccount[]|Proxy[] all()
- * @method static VerifyAccount[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static VerifyAccount[]|Proxy[] createSequence(array|callable $sequence)
- * @method static VerifyAccount[]|Proxy[] findBy(array $attributes)
- * @method static VerifyAccount[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static VerifyAccount[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static Token[]|Proxy[] all()
+ * @method static Token[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static Token[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Token[]|Proxy[] findBy(array $attributes)
+ * @method static Token[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static Token[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
 final class VerifyAccountFactory extends ModelFactory
 {
@@ -58,12 +58,12 @@ final class VerifyAccountFactory extends ModelFactory
     protected function initialize(): self
     {
         return $this
-            // ->afterInstantiate(function(VerifyAccount $verifyAccount): void {})
+            // ->afterInstantiate(function(Token $verifyAccount): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return VerifyAccount::class;
+        return Token::class;
     }
 }

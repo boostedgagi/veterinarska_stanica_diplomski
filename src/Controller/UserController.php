@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Log;
 use App\Entity\User;
-use App\Entity\VerifyAccount;
+use App\Entity\Token;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
@@ -64,7 +64,7 @@ class UserController extends AbstractController
         }
         $registrationRepo = new TokenRepository();
 
-        $token = new VerifyAccount($registrationRepo->makeNewToken());
+        $token = new Token($registrationRepo->makeNewToken());
 
         $this->em->persist($user);
         $this->em->flush();

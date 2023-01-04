@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\VerifyAccount;
+use App\Entity\Token;
 use App\Repository\UserRepository;
 use App\Repository\VerifyAccountRepository;
 use App\Service\EmailRepository;
@@ -70,7 +70,7 @@ class ForgottenPasswordController extends AbstractController
 
         $email = new EmailRepository($mailer);
 
-        $tokenWithData = new VerifyAccount($tokenRepo->makeNewToken());
+        $tokenWithData = new Token($tokenRepo->makeNewToken());
 
         $this->em->persist($tokenWithData);
         $this->em->flush();

@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
-use App\Entity\VerifyAccount;
+use App\Entity\Token;
 use DateTime;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -22,7 +22,7 @@ class EmailRepository
         $this->mailer = $mailer;
     }
 
-    public function sendWelcomeEmail(User $user, VerifyAccount $token): void
+    public function sendWelcomeEmail(User $user, Token $token): void
     {
         $email = (new Email())
             ->from('welcome@vetshop.com')

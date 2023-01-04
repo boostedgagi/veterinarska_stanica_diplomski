@@ -6,7 +6,7 @@ use App\Repository\VerifyAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VerifyAccountRepository::class)]
-class VerifyAccount
+class Token
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

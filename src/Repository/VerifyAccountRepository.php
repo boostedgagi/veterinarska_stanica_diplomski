@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\VerifyAccount;
+use App\Entity\Token;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<VerifyAccount>
+ * @extends ServiceEntityRepository<Token>
  *
- * @method VerifyAccount|null find($id, $lockMode = null, $lockVersion = null)
- * @method VerifyAccount|null findOneBy(array $criteria, array $orderBy = null)
- * @method VerifyAccount[]    findAll()
- * @method VerifyAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Token|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Token|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Token[]    findAll()
+ * @method Token[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class VerifyAccountRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, VerifyAccount::class);
+        parent::__construct($registry, Token::class);
     }
 
-    public function save(VerifyAccount $entity, bool $flush = false): void
+    public function save(Token $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class VerifyAccountRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(VerifyAccount $entity, bool $flush = false): void
+    public function remove(Token $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -53,7 +53,7 @@ class VerifyAccountRepository extends ServiceEntityRepository
 
 
 //    /**
-//     * @return VerifyAccount[] Returns an array of VerifyAccount objects
+//     * @return Token[] Returns an array of Token objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -67,7 +67,7 @@ class VerifyAccountRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?VerifyAccount
+//    public function findOneBySomeField($value): ?Token
 //    {
 //        return $this->createQueryBuilder('v')
 //            ->andWhere('v.exampleField = :val')
