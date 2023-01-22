@@ -52,7 +52,8 @@ final class HealthRecordFactory extends ModelFactory
             'finishedAt' => new \DateTime('+1 hour'), // TODO add DATETIME ORM type manually
             'pet' => PetFactory::random(), // TODO add App\Entity\Pet ORM type manually
             'status' => self::faker()->text(64),
-            'vet' => UserFactory::random() // TODO add App\Entity\User ORM type manually
+            'vet' => UserFactory::random(), // TODO add App\Entity\User ORM type manually
+            'notified' => 0
 //            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }

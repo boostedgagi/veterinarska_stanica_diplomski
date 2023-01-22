@@ -41,16 +41,4 @@ class VerifyAccountController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-//    i think i used this route just once
-//    after that i added remove token in upper method
-//    #[Route('/remove_token/{id}', methods: 'DELETE')]
-//    public function removeToken(Request $request, TokenEntityRepository $verifyRepo,int $id): Response
-//    {
-//        $token = $verifyRepo->find($id);
-//        $this->em->remove($token);
-//        $this->em->flush();
-//
-//        return $this->json("", Response::HTTP_NO_CONTENT);
-//    }
-
 }

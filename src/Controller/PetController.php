@@ -12,6 +12,7 @@ use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Endroid\QrCodeBundle\Response\QrCodeResponse;
+use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,9 @@ class PetController extends AbstractController
     public function createPet(Request $request): Response
     {
         $pet = new Pet();
+
         $this->handleJSONForm($request, $pet, PetType::class);
+
         $this->em->persist($pet);
         $this->em->flush();
 

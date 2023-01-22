@@ -50,8 +50,8 @@ class EmailRepository
 
     public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
     {
-        $ngrok = getenv('NGROK_TUNNEL');
-
+//        $ngrok = getenv('NGROK_TUNNEL');
+        $ngrok = 'http://d2ef-147-91-199-142.ngrok.io';
         $email = (new Email())
             ->from('yourqrcode@vetshop.com')
             ->to($pet->getOwner()->getEmail())

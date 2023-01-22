@@ -71,9 +71,11 @@ class UserController extends AbstractController
 
         $this->em->persist($token);
         $this->em->flush();
+
         if ($user->getTypeOfUser() !== 2) {
             $email->sendWelcomeEmail($user, $token);
         }
+
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
@@ -160,7 +162,7 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/vet/{id}/pets', methods: 'GET')]
+    #[Route('/vets/{id}/pets', methods: 'GET')]
     public function getVetPetsData(UserRepository $repo, int $id): Response
     {
         $vet = $repo->find($id);
@@ -214,13 +216,6 @@ class UserController extends AbstractController
     #[Route('/login_check', methods: 'POST')]
     public function login(MobileDetectorInterface $detector, UserRepository $userRepo): JsonResponse
     {
-//        $logHandler = new LogHandler();
-//
-//        $log = $logHandler->getMyLocation($detector);
-//
-//        $this->em->persist($log);
-//        $this->em->flush();
-
         $user = $userRepo->findAll();
 
         return $this->json($user, Response::HTTP_OK);
@@ -255,7 +250,14 @@ class UserController extends AbstractController
         $freeVets = $userRepo->getFreeVets($from,$to);
 
         return $this->json($freeVets,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+    }
 
+    #[Route('/public/vets', methods: 'GET')]
+    public function showAllVets(Request $request, UserRepository $repo): Response
+    {
+        $allUsers = $repo->findAll();
+
+        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
 }

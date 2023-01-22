@@ -36,7 +36,8 @@ security:
 #         - { path: ^/, roles: ROLE_USER }
 #         - { path: ^/all_users, roles: PUBLIC_ACCESS }
 #         - { path: ^/users, roles: ROLE_USER }
-#         - { path: ^/login_check, roles: PUBLIC_ACCESS }
+         - { path: ^/public/, roles: PUBLIC_ACCESS }
+         - { path: ^/login_check, roles: PUBLIC_ACCESS }
          - { path: ^/password/, roles: PUBLIC_ACCESS }
 
 when@test:
