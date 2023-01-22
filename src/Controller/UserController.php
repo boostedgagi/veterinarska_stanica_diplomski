@@ -54,14 +54,10 @@ class UserController extends AbstractController
         $this->handleJSONForm($request, $user, UserType::class);
 
         $user->setPassword($hashedPassword);
+        $user->setAllowed(false);
+        $user->setTypeOfUser(3);
 
         $email = new EmailRepository($mailer);
-        if ($user->getTypeOfUser() === 2) {
-            //I should add here sending custom mail exactly for vet because admin will make him an account
-            $user->setAllowed(true);
-        } else {
-            $user->setAllowed(false);
-        }
         $registrationRepo = new TokenRepository();
 
         $token = new Token($registrationRepo->makeNewToken());
@@ -72,9 +68,7 @@ class UserController extends AbstractController
         $this->em->persist($token);
         $this->em->flush();
 
-        if ($user->getTypeOfUser() !== 2) {
-            $email->sendWelcomeEmail($user, $token);
-        }
+        $email->sendWelcomeEmail($user, $token);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
@@ -239,17 +233,17 @@ class UserController extends AbstractController
         return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
 
-    #[Route('/vets/free',methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request,UserRepository $userRepo,HealthRecordRepository $healthRecRepo):Response
+    #[Route('/vets/free', methods: 'GET')]
+    public function getFreeVetsInTimeRange(Request $request, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
         $from = $queryParams->from;
         $to = $queryParams->to;
 
-        $freeVets = $userRepo->getFreeVets($from,$to);
+        $freeVets = $userRepo->getFreeVets($from, $to);
 
-        return $this->json($freeVets,Response::HTTP_OK,[],['groups'=>'user_showAll']);
+        return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
     #[Route('/public/vets', methods: 'GET')]
