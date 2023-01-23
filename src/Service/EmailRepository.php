@@ -48,6 +48,26 @@ class EmailRepository
         $this->mailer->send($email);
     }
 
+    public function sendMailToNewVet(User $vet,string $password):void
+    {
+        $email = (new Email())
+            ->from('welcome@vetshop.com')
+            ->to($vet->getEmail())
+            ->subject('Welcome to the vetShop')
+            ->html("
+                <p>
+                    Hi {$vet->getFirstName()}!<br>
+                    Our administrator made you a personal account!<br>
+                    It will be your job account where you will be notified about your examinations, etc.<br>
+                    Your email is {$vet->getEmail()}, and password is $password and we suggest to change it after first log in.<br><br>
+                    Kind regards,<br>
+                    Your VetShop
+                </p>
+                ");
+
+        $this->mailer->send($email);
+    }
+
     public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
     {
 //        $ngrok = getenv('NGROK_TUNNEL');

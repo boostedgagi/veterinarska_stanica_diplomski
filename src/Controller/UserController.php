@@ -40,6 +40,20 @@ class UserController extends AbstractController
         $this->em = $entityManager;
     }
 
+//    #[Route('/roleadmin/{id}','POST')]
+//    public function makeadmin(UserRepository $userRepo,int $id):Response
+//    {
+//        $user = $userRepo->find($id);
+//        $user->setRoles(["ROLE_ADMIN"]);
+//
+//
+//        $this->em->persist($user);
+//        $this->em->flush();
+//
+//        return $this->json('proslo',Response::HTTP_OK);
+//    }
+//this method was used to update my user object with ROLE_ADMIN in order to use exact methods with only admin entry, Dragan
+
     #[Route('/users', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -72,6 +86,39 @@ class UserController extends AbstractController
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
+
+    #[Route('/make_vet',methods: 'POST')]
+    public function makeVet(Request $request,UserPasswordHasherInterface $passwordHasher,MailerInterface $mailer):Response
+    {
+        $vet = new User();
+//        $requestData = json_decode($request->getContent(), false);
+
+        $this->handleJSONForm($request, $vet, UserType::class);
+        $plainPassword = $this->makeTemporaryPassword($vet);
+        $hashedPassword = $passwordHasher->hashPassword(
+            $vet,
+            $plainPassword
+        );
+
+        $vet->setPassword($hashedPassword);
+        $vet->setAllowed(true);
+        $vet->setTypeOfUser(2);
+
+        $email = new EmailRepository($mailer);
+
+        $this->em->persist($vet);
+        $this->em->flush();
+
+        $email->sendMailToNewVet($vet,$plainPassword);
+
+        return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+    }
+
+    private function makeTemporaryPassword(User $user):string
+    {
+        return strtolower($user->getFirstName()).strtolower($user->getPhone()).strtolower($user->getLastName());
+    }
+
 
     #[Route('/users/{id}', methods: 'PUT')]
     public function updateUser(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
