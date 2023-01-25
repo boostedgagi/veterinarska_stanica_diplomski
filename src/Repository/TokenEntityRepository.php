@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Token;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -50,7 +51,17 @@ class TokenEntityRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function getExpiredTokens():array
+    {
+        $now = strtotime(date('Y-m-d h:i:s'));
 
+        $qb = $this->createQueryBuilder('token');
+        $qb->select('token')
+            ->andWhere('token.expires < :now')
+            ->setParameter('now',$now);
+
+        return $qb->getQuery()->getResult();
+    }
 
 //    /**
 //     * @return Token[] Returns an array of Token objects

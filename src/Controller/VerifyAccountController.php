@@ -41,4 +41,6 @@ class VerifyAccountController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
+
+
 }
