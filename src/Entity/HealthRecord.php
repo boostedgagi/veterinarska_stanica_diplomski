@@ -25,13 +25,13 @@ class HealthRecord
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(
         [
             'healthRecord_created',
             'healthRecord_showAll'
         ]
     )]
+    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?User $vet = null;
 
 

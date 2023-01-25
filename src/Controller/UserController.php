@@ -87,14 +87,13 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/make_vet',methods: 'POST')]
-    public function makeVet(Request $request,UserPasswordHasherInterface $passwordHasher,MailerInterface $mailer):Response
+    #[Route('/make_vet', methods: 'POST')]
+    public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $vet = new User();
-//        $requestData = json_decode($request->getContent(), false);
 
         $this->handleJSONForm($request, $vet, UserType::class);
-        $plainPassword = $this->makeTemporaryPassword($vet);
+        $plainPassword = $this->makeTemporaryPasswordForVet($vet);
         $hashedPassword = $passwordHasher->hashPassword(
             $vet,
             $plainPassword
@@ -109,14 +108,14 @@ class UserController extends AbstractController
         $this->em->persist($vet);
         $this->em->flush();
 
-        $email->sendMailToNewVet($vet,$plainPassword);
+        $email->sendMailToNewVet($vet, $plainPassword);
 
         return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    private function makeTemporaryPassword(User $user):string
+    private function makeTemporaryPasswordForVet(User $user): string
     {
-        return strtolower($user->getFirstName()).strtolower($user->getPhone()).strtolower($user->getLastName());
+        return strtolower($user->getFirstName()) . strtolower($user->getPhone()) . strtolower($user->getLastName());
     }
 
 
@@ -125,6 +124,7 @@ class UserController extends AbstractController
     {
         $user = $repo->find($id);
         $plainTextPassword = json_decode($request->getContent(), false);
+
         $this->handleJSONForm($request, $user, UserType::class);
 
         $hashedPassword = $passwordHasher->hashPassword(
@@ -143,9 +143,11 @@ class UserController extends AbstractController
     public function deleteUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
-//        if($user->getTypeOfUser()===2){
-//            $user->getUsers()->clear();
-//        }
+        if ($user->getTypeOfUser() === 2) {
+
+            $user->getUsers()->clear();
+            $user->getHealthRecords()->clear();
+        }
         $this->em->remove($user);
         $this->em->flush();
 

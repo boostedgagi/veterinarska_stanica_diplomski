@@ -122,7 +122,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class, cascade: ['persist', 'remove'])]
     private Collection $pets;
 
-    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
+    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class,cascade: ['persist'])]
+//    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private Collection $healthRecords;
 
     #[ORM\Column(length: 32, nullable: true)]
@@ -463,7 +464,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
             if ($user->getVet() === $this) {
-                $user->setVet(null);
+//                $user->setVet();
             }
         }
 

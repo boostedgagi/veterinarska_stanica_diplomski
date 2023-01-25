@@ -13,7 +13,9 @@ class HealthRecordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('vet')
+            ->add('vet',null,[
+                'required'=>false
+            ])
             ->add('pet')
             ->add('examination')
             ->add('startedAt', DateTimeType::class, [
