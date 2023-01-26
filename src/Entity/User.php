@@ -140,6 +140,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
+    #[Groups(['user_showAll'])]
+    private ?string $popularity;
+
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?self $vet = null;
@@ -417,6 +420,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+
     public function getLongitude(): ?string
     {
         return $this->longitude;
@@ -428,6 +433,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getPopularity(): ?string
+    {
+        return $this->popularity;
+    }
+
+    /**
+     * @param string|null $popularity
+     */
+    public function setPopularity(?string $popularity): void
+    {
+        $this->popularity = $popularity;
+    }
+
+
 
     public function getVet(): ?self
     {

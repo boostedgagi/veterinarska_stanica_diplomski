@@ -84,20 +84,13 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
-    #[Route('/health_record/vet_stats',methods: 'GET')]
-    public function getVetPopularity(HealthRecordRepository $healthRepo):Response
-    {
-        $popularity = $healthRepo->getVetPercentage();
-
-        return $this->json($popularity,Response::HTTP_OK);
-    }
-
     #[Route('/health_record/{id}/cancel',methods: 'POST')]
     public function cancelHealthRecord(Request $request,HealthRecordRepository $healthRepo,UserRepository $userRepo,MailerInterface $mailer,int $id):Response
     {
         $healthRecord = $healthRepo->find($id);
 
         $data = json_decode($request->getContent(), false);
+
         $cancelText = $data->cancelText;
         $personWhoCancel = $userRepo->find($data->cancelerId);
 

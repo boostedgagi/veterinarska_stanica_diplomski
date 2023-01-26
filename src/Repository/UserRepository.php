@@ -76,17 +76,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getNearbyVets(string $latitude, string $longitude, int $distance): array
     {
-//        $rsm = new ResultSetMapping();
-//
-//        $rsm->addEntityResult(User::class,'u');
-//
-//        $rsm->addFieldResult('u','first_name','firstName');
-//        $rsm->addFieldResult('u','last_name','lastName');
-//        $rsm->addFieldResult('u','email','email');
-//        $rsm->addFieldResult('u','phone','phone');
-//        $rsm->addFieldResult('u','latitude','latitude');
-//        $rsm->addFieldResult('u','longitude','longitude');
-
         $em = $this->getEntityManager();
         $km_constant = 6371;
         $sql = "SELECT first_name,last_name,email,phone,latitude,longitude,round(
@@ -126,7 +115,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $qb = $this->createQueryBuilder('u');
 
         $qb->innerJoin('u.healthRecords','hr')
-//            ->addSelect('u.id')
             ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
             ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
             ->orWhere('u.id not in (hr.vet)')
@@ -157,6 +145,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getFreeVets($from,$to):array
     {
         $occupiedVets = $this->getOccupiedVetsInTimeRange($from,$to);
+
         return $this->excludeOccupiedVets($occupiedVets);
     }
 

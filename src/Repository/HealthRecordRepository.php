@@ -43,38 +43,6 @@ class HealthRecordRepository extends ServiceEntityRepository
         }
     }
 
-    public function getVetPercentage(): array
-    {
-        $qb = $this->createQueryBuilder('hr');
-        $qb->select(
-              'vet.id',
-              'vet.firstName',
-              'vet.lastName',
-              'count(hr.vet) examinations'
-            )
-            ->join('hr.vet', 'vet')
-            ->groupBy('hr.vet')
-            ->orderBy('hr.vet', 'desc');
-
-        $count = $this->examinationsCount();
-        $vetsWithPercentage = [];
-
-        foreach ($qb->getQuery()->getResult() as $vet) {
-
-            $percentage = 100*$vet['examinations'] / $count;
-            //upper row is multiplying result of dividing number of examinations
-            //by count of all examinations
-
-            $vet += ['percentage' => number_format((float)$percentage, 2, '.', '')];
-            //this, last item in assoc array object of each vet must be concatenated
-            //on its end with '%' while displaying on the front end
-
-            $vetsWithPercentage[] = $vet;
-        }
-
-        return $vetsWithPercentage;
-    }
-
     public function examinationsCount(): int
     {
         $qb = $this->createQueryBuilder('hr');
@@ -98,20 +66,4 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
-//    public function getScheduledExaminationsInTimeRange($from,$to):array
-//    {
-//        $qb = $this->createQueryBuilder('hr');
-//
-//        $qb->innerJoin('hr.vet','vet')
-//            ->addSelect('vet')
-//            ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
-//            ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
-//            ->setParameter('from',$from)
-//            ->setParameter('to',$to);
-//
-//        dd($qb->getQuery()->getResult());
-//
-//        return $qb->getQuery()->getResult();
-//    }
 }

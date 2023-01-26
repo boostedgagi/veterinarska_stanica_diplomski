@@ -296,11 +296,21 @@ class UserController extends AbstractController
     }
 
     #[Route('/public/vets', methods: 'GET')]
-    public function showAllVets(Request $request, UserRepository $repo): Response
+    public function showAllVets(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
     {
-        $allUsers = $repo->findAll();
+        $vets = $repo->findAll();
 
-        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
+        $numberOfAllExaminations = $healthRecordRepo->examinationsCount();
+        foreach ($vets as $vet) {
+
+            $numberOfVetExaminations = count($vet->getHealthRecords());
+            $percentage = 100 * $numberOfVetExaminations / $numberOfAllExaminations;
+
+            $vet->setPopularity(
+                number_format((float)$percentage, 2, '.', '') . '%');
+        }
+
+        return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
 }
