@@ -143,10 +143,10 @@ class UserController extends AbstractController
     public function deleteUser(Request $request, int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
-        if ($user->getTypeOfUser() === 2) {
 
+        if ($user->getTypeOfUser() === 2) {
             $user->getUsers()->clear();
-            $user->getHealthRecords()->clear();
+
         }
         $this->em->remove($user);
         $this->em->flush();
@@ -178,13 +178,9 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
     }
 
-    //this method will have its place here for some time until I made a better one
-    //for now it will be here just to make sure password_verify verify the symfony hashed password
     #[Route('/password_verify/{id}', methods: 'POST')]
     public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
     {
-        //this method work for some reason.
-        //nice!
         $user = $repo->find($id);
 
         $data = json_decode($request->getContent(), false);

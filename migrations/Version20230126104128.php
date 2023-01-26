@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230123225804 extends AbstractMigration
+final class Version20230126104128 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -49,7 +49,7 @@ final class Version20230123225804 extends AbstractMigration
             "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\MySQL80Platform'."
         );
 
-        $this->addSql('CREATE TABLE health_record (id INT AUTO_INCREMENT NOT NULL, vet_id INT NULL, pet_id INT DEFAULT NULL, examination_id INT NOT NULL, started_at DATETIME NOT NULL, finished_at DATETIME NOT NULL, comment LONGTEXT CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`, status VARCHAR(64) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL, notified TINYINT(1) NOT NULL, INDEX IDX_E0DE771440369CAB (vet_id), INDEX IDX_E0DE7714966F7FB6 (pet_id), INDEX IDX_E0DE7714DAD0CFBF (examination_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
+        $this->addSql('CREATE TABLE health_record (id INT AUTO_INCREMENT NOT NULL, vet_id INT DEFAULT NULL, pet_id INT DEFAULT NULL, examination_id INT NOT NULL, started_at DATETIME NOT NULL, finished_at DATETIME NOT NULL, comment LONGTEXT CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`, status VARCHAR(64) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL, notified TINYINT(1) NOT NULL, INDEX IDX_E0DE771440369CAB (vet_id), INDEX IDX_E0DE7714966F7FB6 (pet_id), INDEX IDX_E0DE7714DAD0CFBF (examination_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQL80Platform,
             "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\MySQL80Platform'."

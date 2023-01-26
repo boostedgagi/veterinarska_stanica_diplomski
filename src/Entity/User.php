@@ -122,8 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class, cascade: ['persist', 'remove'])]
     private Collection $pets;
 
-    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class,cascade: ['persist'])]
-//    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;
 
     #[ORM\Column(length: 32, nullable: true)]
@@ -143,8 +142,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user_showAll'])]
     private ?string $popularity;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]

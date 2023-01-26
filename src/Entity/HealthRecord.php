@@ -32,7 +32,7 @@ class HealthRecord
         ]
     )]
     #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
-    private ?User $vet = null;
+    private User $vet;
 
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
