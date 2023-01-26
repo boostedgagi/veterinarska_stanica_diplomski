@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 class PetController extends AbstractController
 {
@@ -97,10 +98,14 @@ class PetController extends AbstractController
     #[Route('/qr-code', methods: 'POST')]
     public function generateQRAndSendByMail(Request $request, PetRepository $repo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
+        $ngrok = $_ENV["NGROK_TUNNEL"];
+
         $data = json_decode($request->getContent(), false);
         $pet = $repo->find($data->id);
 
-        $possibleQRCode = $builder->data($data->url . $data->id)->build();
+        $url = $ngrok."/found_pet?id=".$data->id;
+
+        $possibleQRCode = $builder->data($url)->build();
         $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';
 
         $possibleQRCode->saveToFile($qrCodePath);
@@ -114,32 +119,11 @@ class PetController extends AbstractController
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $repo): Response
     {
-        $queryParams = (object)$request->query->all();
-        $pet = $repo->find($queryParams->id);
+        $queryData = (object)$request->query->all();
 
-        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_foundPet']);
+        $pet = $repo->find($queryData->id);
+
+        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
-
-//    #[Route('/notify', methods: 'GET')]
-//    public function notifier(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo): Response
-//    {
-//
-//        $examinationsToRemind = $healthRecRepo->getExaminationsInNextSevenDays();
-//        if(count($examinationsToRemind)===0){
-//            return $this->json('There are no owners to notify!', Response::HTTP_OK);
-//        }
-//        foreach ($examinationsToRemind as $examination) {
-//            try {
-//                $email = new EmailRepository($mailer);
-//                //$examination is the HealthRecordType
-//                $email->notifyUserAboutPetHaircut($notifier, $examination);
-//
-//            } catch (\Exception $exception) {
-//                return $this->json($exception, Response::HTTP_OK);
-//            }
-//        }
-//
-//        return $this->json('Owners are notified!', Response::HTTP_OK);
-//    }
 }
