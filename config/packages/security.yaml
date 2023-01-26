@@ -34,9 +34,9 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
 #         - { path: ^/, roles: ROLE_USER }
-#         - { path: ^/all_users, roles: PUBLIC_ACCESS }
-         - { path: ^/make_vet, roles: ROLE_ADMIN }
          - { path: ^/public/, roles: PUBLIC_ACCESS }
+         - { path: ^/vets/, roles: [ROLE_USER,ROLE_ADMIN] }
+         - { path: ^/make_vet, roles: ROLE_ADMIN }
          - { path: ^/login_check, roles: PUBLIC_ACCESS }
          - { path: ^/password/, roles: PUBLIC_ACCESS }
 

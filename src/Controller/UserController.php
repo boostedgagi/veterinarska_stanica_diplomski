@@ -68,6 +68,7 @@ class UserController extends AbstractController
         $this->handleJSONForm($request, $user, UserType::class);
 
         $user->setPassword($hashedPassword);
+        $user->setRoles(["ROLE_USER"]);
         $user->setAllowed(false);
         $user->setTypeOfUser(3);
 
@@ -100,6 +101,7 @@ class UserController extends AbstractController
         );
 
         $vet->setPassword($hashedPassword);
+        $vet->setRoles(["ROLE_VET"]);
         $vet->setAllowed(true);
         $vet->setTypeOfUser(2);
 
