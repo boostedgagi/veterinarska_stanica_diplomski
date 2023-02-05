@@ -263,17 +263,17 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/nearby', methods: 'GET')]
-    public function nearbyVets(Request $request, UserRepository $userRepo): Response
+    public function nearbyVets(Request $request, UserRepository $userRepo,MobileDetectorInterface $detector): Response
     {
         $queryParams = (object)$request->query->all();
-
-        $latitude = $queryParams->lat;
-        $longitude = $queryParams->ltd;
         $distance = $queryParams->distance;
+        $latitude = $queryParams->latitude;
+        $longitude = $queryParams->longitude;
 
         try {
             $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, $distance);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return $this->json($e, Response::HTTP_OK);
         }
 
@@ -293,7 +293,7 @@ class UserController extends AbstractController
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/public/vets', methods: 'GET')]
+    #[Route('/get/vets', methods: 'GET')]
     public function showAllVets(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
     {
         $vets = $repo->findAll();

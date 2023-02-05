@@ -28,7 +28,7 @@ class LoginController extends AbstractController
     {
         $logHandler = new LogHandler();
 
-        $log = $logHandler->getMyLocation($detector);
+        $log = $logHandler->getMyLoginLocation($detector);
 
         $this->em->persist($log);
         $this->em->flush();
