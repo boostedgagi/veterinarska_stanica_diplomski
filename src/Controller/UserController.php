@@ -9,6 +9,7 @@ use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
+use App\Service\JwtService;
 use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use App\Service\TokenRepository;
@@ -225,15 +226,18 @@ class UserController extends AbstractController
 
         $user = $repo->find($data->user_id);
         $vet = $repo->find($data->vet_id);
+
+//        dd($vet);
         if ($vet->getTypeOfUser() === 2 && $user->getTypeOfUser() === 3) {
 
             $user->setVet($vet);
 
             $this->em->persist($user);
             $this->em->flush();
+
             return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
         }
-        return $this->json(['error' => 'he ain\'t vet'], Response::HTTP_OK);
+        return $this->json(['error' => 'someone is lying'], Response::HTTP_OK);
     }
 
     #[Route('/users/{id}/change_type', methods: 'PATCH')]
@@ -281,7 +285,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/free', methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
+    public function getFreeVetsInTimeRange(Request $request,JwtService $tokenService, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
@@ -289,7 +293,11 @@ class UserController extends AbstractController
         $to = $queryParams->to;
 
         $freeVets = $userRepo->getFreeVets($from, $to);
-
+        $personalVet = $tokenService->getCurrentUser()->getVet();
+//        dd($personalVet);
+        if(!in_array($personalVet, $freeVets)){
+            $freeVets[] = ['notification'=>'Your vet is occupied in this period of time, try to choose another vet.'];
+    }
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 

@@ -47,12 +47,10 @@ class UploadImage
                 $this->em->flush();
 
                 unset($uploadedFile);
-//                return true;
             } catch (\Exception $e) {
                 error_log($e->getMessage());
             }
 
         }
-//        return false;
     }
 }
