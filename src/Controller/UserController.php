@@ -294,7 +294,7 @@ class UserController extends AbstractController
 
         $freeVets = $userRepo->getFreeVets($from, $to);
         $personalVet = $tokenService->getCurrentUser()->getVet();
-//        dd($personalVet);
+
         if(!in_array($personalVet, $freeVets)){
             $freeVets[] = ['notification'=>'Your vet is occupied in this period of time, try to choose another vet.'];
     }

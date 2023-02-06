@@ -105,6 +105,9 @@ class HealthRecord
     #[ORM\Column]
     private ?bool $notified = null;
 
+    #[ORM\Column]
+    private ?bool $madeByVet = null;
+
     public function __construct()
     {
     }
@@ -236,6 +239,18 @@ class HealthRecord
     public function setNotified(bool $notified): self
     {
         $this->notified = $notified;
+
+        return $this;
+    }
+
+    public function isMadeByVet(): ?bool
+    {
+        return $this->madeByVet;
+    }
+
+    public function setMadeByVet(bool $madeByVet): self
+    {
+        $this->madeByVet = $madeByVet;
 
         return $this;
     }

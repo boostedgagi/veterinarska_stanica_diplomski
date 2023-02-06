@@ -9,8 +9,10 @@ use App\Repository\HealthRecordRepository;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
 use App\Service\EmailRepository;
+use App\Service\JwtService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,21 +36,46 @@ class HealthRecordController extends AbstractController
     }
 
 
+    /**
+     * @throws Exception
+     */
     #[Route('/health_record', methods: 'POST')]
-    public function insertHealthRecord(Request $request): Response
+    public function makeHealthRecord(Request $request, JwtService $jwtService): Response
     {
         $healthRecord = new HealthRecord();
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
+        $madeByVet = $this->isVet($jwtService);
+        if ($madeByVet) {
+
+            $healthRecord->setMadeByVet(true);
+            $healthRecord->setStartedAt(new DateTime());
+
+            define('ONE_MINUTE_IN_SECONDS',60);
+            $examDurationInSeconds = $healthRecord->getExamination()->getDuration()*ONE_MINUTE_IN_SECONDS;
+
+            $healthRecord->setFinishedAt(new DateTime('+'.$examDurationInSeconds.'seconds'));
+        }
+        else {
+            $healthRecord->setMadeByVet(false);
+        }
         $this->em->persist($healthRecord);
         $this->em->flush();
 
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
+    private function isVet(JwtService $jwtService): bool
+    {
+        if ($jwtService->getCurrentUser()->getTypeOfUser() !== 3) {
+            return true;
+        }
+        return false;
+    }
+
     #[Route('/health_record/{id}', methods: 'PUT')]
-    public function editHealthRecord(Request $request,int $id,HealthRecordRepository $repo): Response
+    public function editHealthRecord(Request $request, int $id, HealthRecordRepository $repo): Response
     {
 //        $form = new HealthRecordType();
 //        $form->buildForm();
@@ -64,14 +91,14 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}', methods: 'DELETE')]
-    public function deleteHealthRecord(Request $request,int $id,HealthRecordRepository $repo): Response
+    public function deleteHealthRecord(Request $request, int $id, HealthRecordRepository $repo): Response
     {
         $healthRecord = $repo->find($id);
 
         $this->em->remove($healthRecord);
         $this->em->flush();
 
-        return $this->json("",Response::HTTP_NO_CONTENT);
+        return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/pets/{id}/health_record', methods: 'GET')]
@@ -84,8 +111,8 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
-    #[Route('/health_record/{id}/cancel',methods: 'POST')]
-    public function cancelHealthRecord(Request $request,HealthRecordRepository $healthRepo,UserRepository $userRepo,MailerInterface $mailer,int $id):Response
+    #[Route('/health_record/{id}/cancel', methods: 'POST')]
+    public function cancelHealthRecord(Request $request, HealthRecordRepository $healthRepo, UserRepository $userRepo, MailerInterface $mailer, int $id): Response
     {
         $healthRecord = $healthRepo->find($id);
 
@@ -97,18 +124,18 @@ class HealthRecordController extends AbstractController
         $now = new DateTime();
         $timeDiff = $healthRecord->getStartedAt()->diff($now);
 
-        if($timeDiff->h == 0){
-            return $this->json(['error' => 'Examination is impossible to cancel less than hour before of its start'],Response::HTTP_OK);
+        if ($timeDiff->h == 0) {
+            return $this->json(['error' => 'Examination is impossible to cancel less than hour before of its start'], Response::HTTP_OK);
         }
-        if($personWhoCancel->getTypeOfUser()===2){
+        if ($personWhoCancel->getTypeOfUser() === 2) {
             $email = new EmailRepository($mailer);
-            $email->sendCancelMailByVet($healthRecord->getPet(),$cancelText);
+            $email->sendCancelMailByVet($healthRecord->getPet(), $cancelText);
         }
         $healthRecord->setStatus('canceled');
         $this->em->persist($healthRecord);
         $this->em->flush();
 
-        return $this->json(['status'=>'successfully canceled'],Response::HTTP_OK);
+        return $this->json(['status' => 'successfully canceled'], Response::HTTP_OK);
     }
 
 
