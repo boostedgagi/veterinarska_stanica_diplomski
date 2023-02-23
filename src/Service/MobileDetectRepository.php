@@ -16,13 +16,12 @@ class MobileDetectRepository
         $this->mobileDetector = $mobileDetector;
     }
 
-
     public function getDeviceInfo():string
     {
 
         $deviceType = ($this->mobileDetector->isMobile() ? ($this->mobileDetector->isTablet() ? 'Tablet' : 'Phone') : 'Computer');
 
-        if ($deviceType === "Phone" OR $deviceType === "Tablet") {
+        if ($deviceType === "Phone" || $deviceType === "Tablet") {
 
             if ($this->mobileDetector->isiOS()) {
                 return $deviceType.' iOS';

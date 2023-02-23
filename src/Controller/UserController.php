@@ -14,6 +14,7 @@ use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
 use App\Service\TokenRepository;
 use App\Service\uploadImage;
+use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
@@ -170,10 +171,12 @@ class UserController extends AbstractController
     public function showOneUser(Request $request, int $id, UserRepository $repo,HealthRecordRepository $healthRecordRepo): Response
     {
         $user = $repo->find($id);
+        $userService = new UserService();
+
         if($user->getTypeOfUser()===2){
 
             $examinationsCount = $healthRecordRepo->examinationsCount();
-            $user->setPopularity($this->vetPopularity($user,$examinationsCount));
+            $user->setPopularity($userService->vetPopularity($user,$examinationsCount));
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
@@ -320,12 +323,6 @@ class UserController extends AbstractController
         return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    private function vetPopularity(User $vet,int $examinationsCount):string
-    {
-        $numberOfVetExaminations = count($vet->getHealthRecords());
-        $percentage = 100 * $numberOfVetExaminations / $examinationsCount;
 
-        return number_format((float)$percentage, 2, '.', '') . '%';
-    }
 
 }
