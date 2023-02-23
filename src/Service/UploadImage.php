@@ -43,6 +43,7 @@ class UploadImage
                 $uploadedFile = $image->move($uploadPath, $newFileName);
                 $imagePath = $uploadedFile->getPathName();
                 $this->entity->setImage($imagePath);
+
                 $this->em->persist($this->entity);
                 $this->em->flush();
 

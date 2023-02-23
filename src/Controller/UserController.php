@@ -95,6 +95,7 @@ class UserController extends AbstractController
         $vet = new User();
 
         $this->handleJSONForm($request, $vet, UserType::class);
+        
         $plainPassword = $this->makeTemporaryPasswordForVet($vet);
         $hashedPassword = $passwordHasher->hashPassword(
             $vet,
@@ -165,34 +166,38 @@ class UserController extends AbstractController
         return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/users/{id}', methods: 'GET')]
-    public function showOneUser(Request $request, int $id, UserRepository $repo): Response
+    #[Route('/users/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    public function showOneUser(Request $request, int $id, UserRepository $repo,HealthRecordRepository $healthRecordRepo): Response
     {
         $user = $repo->find($id);
+        if($user->getTypeOfUser()===2){
 
+            $examinationsCount = $healthRecordRepo->examinationsCount();
+            $user->setPopularity($this->vetPopularity($user,$examinationsCount));
+        }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/users/{id}/pets', methods: 'GET')]
-    public function showOneUserPets(Request $request, int $id, UserRepository $repo): Response
+    #[Route('/users/{id}/pets',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    public function showOneUserPets(int $id, UserRepository $repo): Response
     {
         $user = $repo->find($id);
         $pets = $user->getPets();
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
     }
 
-    #[Route('/password_verify/{id}', methods: 'POST')]
-    public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
-    {
-        $user = $repo->find($id);
+//    #[Route('/password_verify/{id}', methods: 'POST')]
+//    public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
+//    {
+//        $user = $repo->find($id);
+//
+//        $data = json_decode($request->getContent(), false);
+//
+//        $okay = password_verify($data->password, $user->getPassword());
+//        return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
+//    }
 
-        $data = json_decode($request->getContent(), false);
-
-        $okay = password_verify($data->password, $user->getPassword());
-        return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
-    }
-
-    #[Route('/user_upload_image/{id}', methods: 'POST')]
+    #[Route('/user_upload_image/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'POST')]
     public function uploadProfileImage(Request $request, UserRepository $repo, int $id): Response
     {
         $user = $repo->find($id);
@@ -204,7 +209,7 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/vets/{id}/pets', methods: 'GET')]
+    #[Route('/vets/{id}/pets',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(UserRepository $repo, int $id): Response
     {
         $vet = $repo->find($id);
@@ -259,7 +264,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/login_check', methods: 'POST')]
-    public function login(MobileDetectorInterface $detector, UserRepository $userRepo): JsonResponse
+    public function login(UserRepository $userRepo): JsonResponse
     {
         $user = $userRepo->findAll();
 
@@ -267,7 +272,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/nearby', methods: 'GET')]
-    public function nearbyVets(Request $request, UserRepository $userRepo,MobileDetectorInterface $detector): Response
+    public function nearbyVets(Request $request, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
         $distance = $queryParams->distance;
@@ -306,17 +311,21 @@ class UserController extends AbstractController
     {
         $vets = $repo->findAll();
 
-        $numberOfAllExaminations = $healthRecordRepo->examinationsCount();
+        $examinationsCount = $healthRecordRepo->examinationsCount();
         foreach ($vets as $vet) {
-
-            $numberOfVetExaminations = count($vet->getHealthRecords());
-            $percentage = 100 * $numberOfVetExaminations / $numberOfAllExaminations;
-
-            $vet->setPopularity(
-                number_format((float)$percentage, 2, '.', '') . '%');
+            $vetPopularity = $this->vetPopularity($vet,$examinationsCount);
+            $vet->setPopularity($vetPopularity);
         }
 
         return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
+    }
+
+    private function vetPopularity(User $vet,int $examinationsCount):string
+    {
+        $numberOfVetExaminations = count($vet->getHealthRecords());
+        $percentage = 100 * $numberOfVetExaminations / $examinationsCount;
+
+        return number_format((float)$percentage, 2, '.', '') . '%';
     }
 
 }

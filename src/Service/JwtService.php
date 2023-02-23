@@ -10,10 +10,7 @@ class JwtService
 {
     private TokenStorageInterface $tokenStorage;
 
-
-    public function __construct(
-        TokenStorageInterface $storage,
-    )
+    public function __construct(TokenStorageInterface $storage)
     {
         $this->tokenStorage = $storage;
     }
@@ -25,7 +22,6 @@ class JwtService
         if ($token instanceof TokenInterface) {
 
             return $token->getUser();
-
         }
         return null;
     }

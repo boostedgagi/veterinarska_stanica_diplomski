@@ -14,6 +14,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -27,6 +28,7 @@ class HealthRecordController extends AbstractController
 
     private EntityManagerInterface $em;
 
+    public const ONE_MINUTE_IN_SECONDS = 60;
     /**
      * @param EntityManagerInterface $entityManager
      */
@@ -35,7 +37,6 @@ class HealthRecordController extends AbstractController
         $this->em = $entityManager;
     }
 
-
     /**
      * @throws Exception
      */
@@ -43,19 +44,15 @@ class HealthRecordController extends AbstractController
     public function makeHealthRecord(Request $request, JwtService $jwtService): Response
     {
         $healthRecord = new HealthRecord();
-
+        $postData = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
         $madeByVet = $this->isVet($jwtService);
-        if ($madeByVet) {
-
-            $healthRecord->setMadeByVet(true);
-            $healthRecord->setStartedAt(new DateTime());
-
-            define('ONE_MINUTE_IN_SECONDS',60);
-            $examDurationInSeconds = $healthRecord->getExamination()->getDuration()*ONE_MINUTE_IN_SECONDS;
-
-            $healthRecord->setFinishedAt(new DateTime('+'.$examDurationInSeconds.'seconds'));
+        if ($madeByVet && $postData->atPresent) {
+            //atPresent field in POST request is for scheduling it now or
+            // scheduling in it some exact defined time range
+            //this field is enabled only for vet
+            $this->makeHealthRecordNow($healthRecord);
         }
         else {
             $healthRecord->setMadeByVet(false);
@@ -68,10 +65,22 @@ class HealthRecordController extends AbstractController
 
     private function isVet(JwtService $jwtService): bool
     {
-        if ($jwtService->getCurrentUser()->getTypeOfUser() !== 3) {
-            return true;
-        }
-        return false;
+        return $jwtService->getCurrentUser()->getTypeOfUser() === 2;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function makeHealthRecordNow(HealthRecord $healthRecord):HealthRecord
+    {
+        $healthRecord->setMadeByVet(true);
+        $healthRecord->setStartedAt(new DateTime());
+
+        $examDurationInSeconds = $healthRecord->getExamination()->getDuration() * self::ONE_MINUTE_IN_SECONDS;
+
+        $healthRecord->setFinishedAt(new DateTime('+'.$examDurationInSeconds.'seconds'));
+
+        return $healthRecord;
     }
 
     #[Route('/health_record/{id}', methods: 'PUT')]

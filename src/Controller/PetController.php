@@ -79,8 +79,8 @@ class PetController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}', methods: 'GET')]
-    public function showOnePet(Request $request, PetRepository $repo, int $id): Response
+    #[Route('/pets/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    public function showOnePet(PetRepository $repo,int $id): Response
     {
         $pet = $repo->find($id);
 
@@ -107,7 +107,6 @@ class PetController extends AbstractController
 
         $possibleQRCode = $builder->data($url)->build();
         $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';
-
         $possibleQRCode->saveToFile($qrCodePath);
 
         $email = new EmailRepository($mailer);
@@ -125,5 +124,4 @@ class PetController extends AbstractController
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
-
 }
