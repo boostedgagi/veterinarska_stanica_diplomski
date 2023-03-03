@@ -39,6 +39,7 @@ security:
          - { path: ^/make_vet, roles: ROLE_ADMIN }
          - { path: ^/login_check, roles: PUBLIC_ACCESS }
          - { path: ^/password/, roles: PUBLIC_ACCESS }
+         - { path: ^/engage_vet, roles: ROLE_USER }
 #         - { path: /vets/free, roles: [ROLE_USER,ROLE_ADMIN]}
 when@test:
     security:

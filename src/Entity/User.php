@@ -310,6 +310,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isVet():bool
+    {
+        return $this->getTypeOfUser() === 2;
+    }
+
     public function getImage(): ?string
     {
         return $this->image;
@@ -461,6 +466,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, self>

@@ -227,7 +227,7 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
-    #[Route('/user/engage', methods: 'POST')]
+    #[Route('/engage_vet', methods: 'POST')]
     public function engageVet(Request $request, UserRepository $repo): Response
     {
         $data = json_decode($request->getContent(), false);
@@ -235,8 +235,7 @@ class UserController extends AbstractController
         $user = $repo->find($data->user_id);
         $vet = $repo->find($data->vet_id);
 
-//        dd($vet);
-        if ($vet->getTypeOfUser() === 2 && $user->getTypeOfUser() === 3) {
+        if ($vet->isVet() && !$user->isVet()) {
 
             $user->setVet($vet);
 
@@ -277,6 +276,7 @@ class UserController extends AbstractController
     #[Route('/vets/nearby', methods: 'GET')]
     public function nearbyVets(Request $request, UserRepository $userRepo): Response
     {
+        //need to think about enabling this route to public access
         $queryParams = (object)$request->query->all();
         $distance = $queryParams->distance;
         $latitude = $queryParams->latitude;
@@ -304,7 +304,7 @@ class UserController extends AbstractController
         $personalVet = $tokenService->getCurrentUser()->getVet();
 
         if(!in_array($personalVet, $freeVets)){
-            $freeVets[] = ['notification'=>'Your vet is occupied in this period of time, try to choose another vet.'];
+            $freeVets[] = ['notification'=>'Your vet is occupied in this period of time, try to choose different time period.'];
     }
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
@@ -315,8 +315,9 @@ class UserController extends AbstractController
         $vets = $repo->findAll();
 
         $examinationsCount = $healthRecordRepo->examinationsCount();
+        $userService = new UserService();
         foreach ($vets as $vet) {
-            $vetPopularity = $this->vetPopularity($vet,$examinationsCount);
+            $vetPopularity = $userService->vetPopularity($vet,$examinationsCount);
             $vet->setPopularity($vetPopularity);
         }
 
