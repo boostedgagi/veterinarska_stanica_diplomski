@@ -28,7 +28,9 @@ class HealthRecordType extends AbstractType
             ->add('status')
             ->add('notified',null,[
                 'required'=>false
-            ]);
+            ])
+            ->add('madeByVet',null,[
+                'required'=>false]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

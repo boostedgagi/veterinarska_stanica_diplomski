@@ -2,25 +2,19 @@
 
 namespace App\Controller;
 
-use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Form\PetType;
-use App\Repository\HealthRecordRepository;
 use App\Repository\PetRepository;
 use App\Service\EmailRepository;
 use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
-use Endroid\QrCodeBundle\Response\QrCodeResponse;
-use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
 class PetController extends AbstractController
 {
@@ -79,11 +73,9 @@ class PetController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function showOnePet(PetRepository $repo,int $id): Response
+    #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function show(Pet $pet): Response
     {
-        $pet = $repo->find($id);
-
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
@@ -103,7 +95,7 @@ class PetController extends AbstractController
         $data = json_decode($request->getContent(), false);
         $pet = $repo->find($data->id);
 
-        $url = $ngrok."/found_pet?id=".$data->id;
+        $url = $ngrok . "/found_pet?id=" . $data->id;
 
         $possibleQRCode = $builder->data($url)->build();
         $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';

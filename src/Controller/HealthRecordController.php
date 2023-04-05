@@ -49,8 +49,8 @@ class HealthRecordController extends AbstractController
 
         $madeByVet = $this->isVet($jwtService);
         if ($madeByVet && $postData->atPresent) {
-            //atPresent field in POST request is for scheduling it now or
-            // scheduling in it some exact defined time range
+            //atPresent field in POST request is for scheduling it `now` or
+            // scheduling in it `some exact defined time range`
             //this field is enabled only for vet
             $this->makeHealthRecordNow($healthRecord);
         }
@@ -110,7 +110,7 @@ class HealthRecordController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}/health_record', methods: 'GET')]
+    #[Route('/pets/{id}/health_record',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
     public function getHealthRecordsForOnePet(Request $request, int $id, PetRepository $petRepo): Response
     {
         $pet = $petRepo->find($id);

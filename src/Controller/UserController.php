@@ -176,7 +176,8 @@ class UserController extends AbstractController
         if($user->getTypeOfUser()===2){
 
             $examinationsCount = $healthRecordRepo->examinationsCount();
-            $user->setPopularity($userService->vetPopularity($user,$examinationsCount));
+            $popularity = $userService->vetPopularity($user,$examinationsCount);
+            $user->setPopularity($popularity);
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
@@ -188,17 +189,6 @@ class UserController extends AbstractController
         $pets = $user->getPets();
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
     }
-
-//    #[Route('/password_verify/{id}', methods: 'POST')]
-//    public function passwordVerify(int $id, UserRepository $repo, Request $request): Response
-//    {
-//        $user = $repo->find($id);
-//
-//        $data = json_decode($request->getContent(), false);
-//
-//        $okay = password_verify($data->password, $user->getPassword());
-//        return $this->json($okay, Response::HTTP_OK, [], ['groups' => 'user_ok']);
-//    }
 
     #[Route('/user_upload_image/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'POST')]
     public function uploadProfileImage(Request $request, UserRepository $repo, int $id): Response
