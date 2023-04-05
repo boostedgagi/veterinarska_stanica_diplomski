@@ -28,7 +28,7 @@ class PetController extends AbstractController
     }
 
     #[Route('/pets', methods: 'POST')]
-    public function createPet(Request $request): Response
+    public function create(Request $request): Response
     {
         $pet = new Pet();
 
@@ -50,7 +50,7 @@ class PetController extends AbstractController
     }
 
     #[Route('/pets/{id}', methods: 'PUT')]
-    public function updatePet(Request $request, PetRepository $repo, int $id): Response
+    public function edit(Request $request, PetRepository $repo, int $id): Response
     {
         $pet = $repo->find($id);
 
@@ -63,7 +63,7 @@ class PetController extends AbstractController
     }
 
     #[Route('/pets/{id}', methods: 'DELETE')]
-    public function deletePet(Request $request, PetRepository $repo, int $id): Response
+    public function delete(Request $request, PetRepository $repo, int $id): Response
     {
         $pet = $repo->find($id);
 

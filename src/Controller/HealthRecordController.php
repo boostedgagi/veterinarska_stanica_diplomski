@@ -44,13 +44,15 @@ class HealthRecordController extends AbstractController
     public function create(Request $request, JwtService $jwtService): Response
     {
         $healthRecord = new HealthRecord();
+
         $postData = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
         $madeByVet = $this->isVet($jwtService);
+
+        //atPresent field in POST request is for scheduling it `now` or scheduling in it `some exact defined time range`
+        //this field is enabled only for vet
         if ($madeByVet && $postData->atPresent) {
-            //atPresent field in POST request is for scheduling it `now` or scheduling in it `some exact defined time range`
-            //this field is enabled only for vet
             $this->makeHealthRecordNow($healthRecord);
         }
         else {

@@ -222,6 +222,7 @@ class UserController extends AbstractController
     {
         $data = json_decode($request->getContent(), false);
 
+        //this can also be done by handling only vet because user_id can be found by jwtService's method
         $user = $repo->find($data->user_id);
         $vet = $repo->find($data->vet_id);
 
@@ -255,6 +256,10 @@ class UserController extends AbstractController
         return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
     }
 
+    /**
+     * @param UserRepository $userRepo
+     * @return JsonResponse
+     */
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {
@@ -300,7 +305,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/get/vets', methods: 'GET')]
-    public function showAllVets(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
+    public function showAll(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
     {
         $vets = $repo->findAll();
 

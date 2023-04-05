@@ -106,7 +106,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $nearbyVets = $stmt->execute();
 
-        //returns all from select clause with rounded distance by two decimal places
+        //returns all from select clause with distance rounded by two decimal places
         return $nearbyVets->fetchAll();
     }
 
