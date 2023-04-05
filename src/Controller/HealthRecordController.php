@@ -41,7 +41,7 @@ class HealthRecordController extends AbstractController
      * @throws Exception
      */
     #[Route('/health_record', methods: 'POST')]
-    public function makeHealthRecord(Request $request, JwtService $jwtService): Response
+    public function create(Request $request, JwtService $jwtService): Response
     {
         $healthRecord = new HealthRecord();
         $postData = json_decode($request->getContent(), false);
@@ -49,8 +49,7 @@ class HealthRecordController extends AbstractController
 
         $madeByVet = $this->isVet($jwtService);
         if ($madeByVet && $postData->atPresent) {
-            //atPresent field in POST request is for scheduling it `now` or
-            // scheduling in it `some exact defined time range`
+            //atPresent field in POST request is for scheduling it `now` or scheduling in it `some exact defined time range`
             //this field is enabled only for vet
             $this->makeHealthRecordNow($healthRecord);
         }
@@ -84,7 +83,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}', methods: 'PUT')]
-    public function editHealthRecord(Request $request, int $id, HealthRecordRepository $repo): Response
+    public function edit(Request $request, int $id, HealthRecordRepository $repo): Response
     {
 //        $form = new HealthRecordType();
 //        $form->buildForm();
@@ -100,7 +99,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}', methods: 'DELETE')]
-    public function deleteHealthRecord(Request $request, int $id, HealthRecordRepository $repo): Response
+    public function delete(Request $request, int $id, HealthRecordRepository $repo): Response
     {
         $healthRecord = $repo->find($id);
 
@@ -121,7 +120,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
-    public function cancelHealthRecord(Request $request, HealthRecordRepository $healthRepo, UserRepository $userRepo, MailerInterface $mailer, int $id): Response
+    public function cancel(Request $request, HealthRecordRepository $healthRepo, UserRepository $userRepo, MailerInterface $mailer, int $id): Response
     {
         $healthRecord = $healthRepo->find($id);
 

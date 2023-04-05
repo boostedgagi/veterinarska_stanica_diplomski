@@ -14,8 +14,8 @@ class TokenRepository
     {
         $hashedToken = md5(uniqid('', true) . mt_rand(10, 100));
 
-        $expires = strtotime(date('Y-m-d h:i:s')) + (60 * 30);
         //duration of token is 30minutes
+        $expires = strtotime(date('Y-m-d h:i:s')) + (60 * 30);
 
         return (object)[
             'tokenItself' => $hashedToken,

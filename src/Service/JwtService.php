@@ -20,7 +20,6 @@ class JwtService
         $token = $this->tokenStorage->getToken();
 
         if ($token instanceof TokenInterface) {
-
             return $token->getUser();
         }
         return null;
