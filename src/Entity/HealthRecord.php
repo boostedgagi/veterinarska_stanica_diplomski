@@ -106,7 +106,7 @@ class HealthRecord
     private ?bool $notified = null;
 
     #[ORM\Column]
-    private ?bool $madeByVet = null;
+    private bool $madeByVet;
 
     public function __construct()
     {
