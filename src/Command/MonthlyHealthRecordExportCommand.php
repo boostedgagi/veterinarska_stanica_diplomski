@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\HealthRecord;
 use App\Repository\HealthRecordRepository;
+use App\Service\EmailRepository;
 use App\Service\ExportService;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -13,6 +14,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'MonthlyHealthRecordExport',
@@ -23,11 +26,13 @@ class MonthlyHealthRecordExportCommand extends Command
 {
     private HealthRecordRepository $healthRecordRepo;
     private ExportService $exportService;
+    private MailerInterface $mailer;
 
-    public function __construct(HealthRecordRepository $healthRecordRepo, ExportService $exportService)
+    public function __construct(HealthRecordRepository $healthRecordRepo, ExportService $exportService,MailerInterface $mailer)
     {
         $this->healthRecordRepo = $healthRecordRepo;
         $this->exportService = $exportService;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
@@ -55,10 +60,15 @@ class MonthlyHealthRecordExportCommand extends Command
 
         try {
             $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
-            $output->writeln('Data successfully exported in ' . $filePath);
+            $email = new EmailRepository($this->mailer);
+            $email->sendMonthlyCSVByMail($filePath);
+
+
         } catch (Exception $e) {
             $output->writeln('Error occurred: ' . $e->getMessage());
+            return Command::FAILURE;
         }
+        $output->writeln('Data successfully exported in ' . $filePath . ' and sent to admin by mail.');
         return Command::SUCCESS;
     }
 }

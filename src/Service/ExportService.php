@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportService
 {
+    public const PATH = 'public/exports/';
+
     /**
      * @param array $healthRecords
      * @param string $fileName
@@ -19,8 +21,8 @@ class ExportService
     public function exportHealthRecords(array $healthRecords, string $fileName): string
     {
         try {
-            dump(count($healthRecords));
-            $csv = fopen('public/exports/' . $fileName, 'w+');
+            $path =
+            $csv = fopen( self::PATH . $fileName, 'w+');
             fputcsv($csv,
                 [
                     'veterinarian',
@@ -43,10 +45,10 @@ class ExportService
                     ]
                 );
             }
-
+            return self::PATH . $fileName;
         } catch (Exception $e) {
-            dump($e);
+            error_log($e->getMessage());
         }
-        return 'done';
+        return 'Error occurred. Try again later.';
     }
 }
