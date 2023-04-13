@@ -168,7 +168,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUser(Request $request, int $id, UserRepository $repo,HealthRecordRepository $healthRecordRepo): Response
+    public function showOneUser(int $id, UserRepository $repo,HealthRecordRepository $healthRecordRepo): Response
     {
         $user = $repo->find($id);
         $userService = new UserService();
@@ -176,7 +176,7 @@ class UserController extends AbstractController
         if($user->getTypeOfUser()===2){
 
             $examinationsCount = $healthRecordRepo->examinationsCount();
-            $popularity = $userService->vetPopularity($user,$examinationsCount);
+            $popularity = $userService->handlePopularity($user,$examinationsCount);
             $user->setPopularity($popularity);
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
@@ -312,7 +312,7 @@ class UserController extends AbstractController
         $examinationsCount = $healthRecordRepo->examinationsCount();
         $userService = new UserService();
         foreach ($vets as $vet) {
-            $vetPopularity = $userService->vetPopularity($vet,$examinationsCount);
+            $vetPopularity = $userService->handlePopularity($vet,$examinationsCount);
             $vet->setPopularity($vetPopularity);
         }
 

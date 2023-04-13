@@ -6,7 +6,7 @@ use App\Entity\User;
 
 class UserService
 {
-    public function vetPopularity(User $vet, int $examinationsCount):string
+    public function handlePopularity(User $vet, int $examinationsCount):string
     {
         $numberOfVetExaminations = count($vet->getHealthRecords());
         $percentage = 100 * $numberOfVetExaminations / $examinationsCount;

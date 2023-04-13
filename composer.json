@@ -7,12 +7,15 @@
         "php": ">=8.0.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "beberlei/doctrineextensions": "dev-master",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.7",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.13",
         "endroid/qr-code-bundle": "^4.1",
+        "gedmo/doctrine-extensions": "^3.11",
         "gesdinet/jwt-refresh-token-bundle": "^1.1",
+        "league/csv": "^9.0",
         "lexik/jwt-authentication-bundle": "^2.16",
         "nebkam/symfony-traits": "^4.0",
         "nelmio/cors-bundle": "^2.2",
@@ -52,7 +55,8 @@
             "composer/package-versions-deprecated": true,
             "symfony/flex": true,
             "symfony/runtime": true,
-            "endroid/installer": true
+            "endroid/installer": true,
+            "php-http/discovery": true
         },
         "optimize-autoloader": true,
         "preferred-install": {

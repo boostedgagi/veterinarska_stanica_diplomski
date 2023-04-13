@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\HealthRecord;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -65,5 +66,25 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->andWhere('hr.notified = 0');
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getLastMonthHealthRecords(int $numericalMonth)
+    {
+        $em = $this->getEntityManager();
+
+        $sql = 'SELECT *
+           FROM health_record
+           WHERE MONTH(finished_at) = :month';
+
+        $conn = $em->getConnection();
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bindValue('month',$numericalMonth);
+
+        return $stmt->execute()->fetchAll();
+
     }
 }
