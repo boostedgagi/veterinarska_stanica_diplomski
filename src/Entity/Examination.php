@@ -13,6 +13,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ExaminationRepository::class)]
 class Examination
 {
+    private const ONE_HOUR_IN_MINUTES = 60;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -189,5 +191,17 @@ class Examination
         }
 
         return $this;
+    }
+
+    public function descriptiveLength(): bool
+    {
+        if ($this->getDuration() > 60)
+            return 'Long';
+        if ($this->getDuration() > 30)
+            return 'Medium';
+        if ($this->getDuration() > 15)
+            return 'Short';
+
+        return 'Mini';
     }
 }
