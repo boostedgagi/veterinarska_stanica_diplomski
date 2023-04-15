@@ -13,6 +13,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 
 class EmailRepository
 {
@@ -159,8 +160,8 @@ class EmailRepository
             ->from('export@vetshop.com')
             ->to('dragan.02jelic@gmail.com')
             ->subject('Monthly report of done examinations.')
-            ->text('You can download it from attachment and print it with minimal changes required.\n')
-            ->attachFromPath($CSVPath);
+            ->text('You can download it from attachment and print it with minimal changes required.')
+            ->addPart(new DataPart(new File($CSVPath)));
 
         $this->mailer->send($email);
     }
