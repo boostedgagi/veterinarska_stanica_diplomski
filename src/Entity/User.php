@@ -453,8 +453,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->popularity = $popularity;
     }
 
-
-
     public function getVet(): ?self
     {
         return $this->vet;

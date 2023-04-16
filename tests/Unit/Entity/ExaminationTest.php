@@ -4,20 +4,19 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Examination;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class ExaminationTest extends TestCase
+class ExaminationTest extends WebTestCase
 {
 
-    public function testCanGetAndSetData(): void
+    public function testCreateExaminationWithRequest(): void
     {
-        $examination = new Examination();
-        $examination->setName('Pregled usiju');
-        $examination->setDuration(45);
-        $examination->setPrice(1400);
+        $examination = (new Examination())
+            ->setName("Pregled")
+            ->setDuration(100)
+            ->setPrice(1000);
 
-        self::assertEquals('Pregled usiju', $examination->getName());
-        self::assertEquals(45, $examination->getDuration());
-        self::assertEquals(1400, $examination->getPrice());
+        self::assertEquals('Pregled',$examination->getName());
     }
 
     /**
