@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Model\Token as ModelToken;
 
 #[ORM\Entity(repositoryClass: TokenEntityRepository::class)]
 class Token
@@ -19,10 +20,10 @@ class Token
     #[ORM\Column(length: 255)]
     private ?string $expires = null;
 
-    public function __construct(object $token)
+    public function __construct(ModelToken $token)
     {
-        $this->token = $token->tokenItself;
-        $this->expires = $token->expires;
+        $this->token = $token->getToken();
+        $this->expires = $token->getExpires();
     }
 
     public function getId(): ?int

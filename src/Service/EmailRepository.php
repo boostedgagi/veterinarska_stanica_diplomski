@@ -6,6 +6,7 @@ use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\Token;
+use App\Model\Token as ModelToken;
 use DateTime;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -133,19 +134,19 @@ class EmailRepository
         $notifier->send($notification,$recipient);
     }
 
-    public function sendPasswordRequest(object $token):void
+    public function sendPasswordRequest(int $tokenId,ModelToken $token):void
     {
         $ngrok = getenv('NGROK_TUNNEL');
         $email = (new Email())
             ->from('password_reset@vetshop.com')
-            ->to($token->email)
+            ->to($token->getEmailAddress())
             ->subject('Your password renewal request.')
             ->html("
                 <p>We noticed you requested a password renewal probably because you forgot it... :(<br>
                 Reset it by click on this button here!</p>
                 <a 
                     type='button' 
-                    href='http://localhost:8000/password/make_new?token_id={$token->getId()}&token={$token->getToken()}&expires={$token->getExpires()}&email={$token->email}'
+                    href='http://localhost:8000/password/make_new?token_id={$tokenId}&token={$token->getToken()}&expires={$token->getExpires()}&email={$token->getEmailAddress()}'
                 >
                     Reset password
                 </a>

@@ -2,13 +2,12 @@
 
 namespace App\Controller;
 
-use App\Model\Token;
+use App\Entity\Token;
+use App\Model\Token as ModelToken;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
 use App\Service\EmailRepository;
-use App\Service\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\Object_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +35,7 @@ class ForgottenPasswordController extends AbstractController
         }
 
         $userData = $userRepo->findUserIdByMail($data->email);
-        $user = $userRepo->find($userData[0]['id']);
+        $user = $userRepo->find($userData[0]['user_id']);
 
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
@@ -59,24 +58,31 @@ class ForgottenPasswordController extends AbstractController
             $this->em->flush();
             return $this->json('You changed your password!', Response::HTTP_OK);
         }
-
         return $this->json('Something wrong happened, try again later.', Response::HTTP_OK);
     }
 
     #[Route('/password/request_new', methods: 'POST')]
-    public function requestPasswordRenewal(Request $request, MailerInterface $mailer, TokenRepository $tokenRepo): Response
+    public function requestPasswordRenewal(Request $request, MailerInterface $mailer,UserRepository $userRepo): Response
     {
         $data = (object)json_decode($request->getContent(), false);
 
         $email = new EmailRepository($mailer);
 
-        $token = (new Token())->make30MinToken();
+        $preparedToken = (new ModelToken())->make30MinToken();
+
+        $userData = $userRepo->findUserIdByMail($data->email);
+        $user = $userRepo->find($userData[0]['user_id']);
+        if (!$user) {
+            return $this->json('User not found.', Response::HTTP_OK);
+        }
+
+        $token = new Token($preparedToken);
 
         $this->em->persist($token);
         $this->em->flush();
 
-        $token->setEmailAddress($data->email);
-        $email->sendPasswordRequest($token);
+        $preparedToken->setEmailAddress($data->email);
+        $email->sendPasswordRequest($token->getId(),$preparedToken);
 
         return $this->json(['status' => 'Email with password renewal request is sent. Check your mail!'], Response::HTTP_OK);
     }
