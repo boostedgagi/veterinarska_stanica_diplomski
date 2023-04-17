@@ -54,12 +54,12 @@ class TokenEntityRepository extends ServiceEntityRepository
     public function getExpiredTokens():array
     {
         $now = strtotime(date('Y-m-d h:i:s'));
-
+        dump($now);
         $qb = $this->createQueryBuilder('token');
         $qb->select('token')
             ->andWhere('token.expires < :now')
             ->setParameter('now',$now);
-
+        dump($qb->getQuery()->getResult());
         return $qb->getQuery()->getResult();
     }
 

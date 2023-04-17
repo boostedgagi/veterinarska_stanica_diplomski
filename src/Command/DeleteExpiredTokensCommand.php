@@ -52,7 +52,6 @@ class DeleteExpiredTokensCommand extends Command
         ]);
 
         $expiredTokens = $this->tokenEntityRepo->getExpiredTokens();
-
         if(count($expiredTokens)===0){
             $output->writeln([
                 'Great! But...',
