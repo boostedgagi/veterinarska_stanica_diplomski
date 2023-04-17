@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Token;
+use App\Model\Token;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
 use App\Service\EmailRepository;
@@ -31,15 +31,15 @@ class ForgottenPasswordController extends AbstractController
         $data = json_decode($request->getContent(), false);
 
         $token = $verifyRepo->findTokenByTokenValue($data->token);
-        if(!$token){
-            return $this->json('Token is not valid.',Response::HTTP_OK);
+        if (!$token) {
+            return $this->json('Token is not valid.', Response::HTTP_OK);
         }
 
         $userData = $userRepo->findUserIdByMail($data->email);
         $user = $userRepo->find($userData[0]['id']);
 
-        if(!$user){
-            return $this->json('User not found.',Response::HTTP_OK);
+        if (!$user) {
+            return $this->json('User not found.', Response::HTTP_OK);
         }
 
         if ($token[0]['token'] && ($token[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
@@ -57,10 +57,10 @@ class ForgottenPasswordController extends AbstractController
 
             $this->em->remove($tokenObj);
             $this->em->flush();
-            return $this->json('You changed your password!',Response::HTTP_OK);
+            return $this->json('You changed your password!', Response::HTTP_OK);
         }
 
-        return $this->json('Something wrong happened, try again later.',Response::HTTP_OK);
+        return $this->json('Something wrong happened, try again later.', Response::HTTP_OK);
     }
 
     #[Route('/password/request_new', methods: 'POST')]
@@ -70,16 +70,13 @@ class ForgottenPasswordController extends AbstractController
 
         $email = new EmailRepository($mailer);
 
-        $tokenWithData = new Token($tokenRepo->makeNewToken());
+        $token = (new Token())->make30MinToken();
 
-        $this->em->persist($tokenWithData);
+        $this->em->persist($token);
         $this->em->flush();
 
-        $tokenWithData->email = $data->email;
-        //here I expanded object with only token data, with mail where token will be sent
-
-        $email->sendPasswordRequest($tokenWithData);
-        //mail is sent here
+        $token->setEmailAddress($data->email);
+        $email->sendPasswordRequest($token);
 
         return $this->json(['status' => 'Email with password renewal request is sent. Check your mail!'], Response::HTTP_OK);
     }
