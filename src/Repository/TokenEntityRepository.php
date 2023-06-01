@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Token;
+use App\Model\SavedToken;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,27 +41,35 @@ class TokenEntityRepository extends ServiceEntityRepository
         }
     }
 
-    public function findTokenByTokenValue(string $token):array
+    public function findTokenByTokenValue(string $token):SavedToken
     {
         $qb = $this->createQueryBuilder('va');
-        $qb->addSelect('va.token as token')
-            ->addSelect('va.expires as expires')
+        $qb
+            ->select('va.token token,va.expires expires')
             ->andWhere('va.token = :token')
             ->setParameter('token',$token);
 
-        return $qb->getQuery()->getResult();
+        return $this->hydrate($qb->getQuery()->getResult());
     }
 
     public function getExpiredTokens():array
     {
         $now = strtotime(date('Y-m-d h:i:s'));
-        dump($now);
         $qb = $this->createQueryBuilder('token');
         $qb->select('token')
             ->andWhere('token.expires < :now')
             ->setParameter('now',$now);
-        dump($qb->getQuery()->getResult());
+
         return $qb->getQuery()->getResult();
+    }
+
+    private function hydrate(array $results):SavedToken
+    {
+        $savedToken = new SavedToken();
+        foreach($results[0] as $key=>$value){
+            $savedToken->resolveAndFillVariable($key,$value);
+        }
+        return $savedToken;
     }
 
 //    /**

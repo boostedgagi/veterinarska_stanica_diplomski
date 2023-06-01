@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Log;
 use App\Entity\User;
 use App\Entity\Token;
+use App\Model\Token as ModelToken;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
@@ -12,7 +13,6 @@ use App\Repository\TokenEntityRepository;
 use App\Service\JwtService;
 use App\Service\LogHandler;
 use App\Service\MobileDetectRepository;
-use App\Service\TokenRepository;
 use App\Service\uploadImage;
 use App\Service\UserService;
 use Doctrine\DBAL\Exception;
@@ -60,24 +60,27 @@ class UserController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $user = new User();
-        $plainTextPassword = json_decode($request->getContent(), false);
-
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $plainTextPassword->password
-        );
 
         $this->handleJSONForm($request, $user, UserType::class);
 
-        $user->setPassword($hashedPassword);
+        if($plainPassword = $user->getPlainPassword()){
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $plainPassword
+            );
+            $user->setPassword($hashedPassword);
+        }
+        else if(!$user->getPlainPassword()){
+            return $this->json('Invalid password');
+        }
         $user->setRoles(["ROLE_USER"]);
         $user->setAllowed(false);
         $user->setTypeOfUser(3);
 
         $email = new EmailRepository($mailer);
-        $registrationRepo = new TokenRepository();
 
-        $token = new Token($registrationRepo->makeNewToken());
+        $token30minutes = (new ModelToken())->make30MinToken();
+        $token = new Token($token30minutes);
 
         $this->em->persist($user);
         $this->em->flush();

@@ -26,21 +26,18 @@ class VerifyAccountController extends AbstractController
         $queryParams = (object)$request->query->all();
 
         $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
-
-        if ($savedToken[0]['token'] && ($savedToken[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
+//        dump($queryParams);
+//        dd($savedToken);
+        if ($savedToken->token && ($savedToken->expires > strtotime(date('Y-m-d h:i:s')))) {
             $user = $userRepo->find($queryParams->user_id);
 
             $user->setAllowed(true);
             $this->em->persist($user);
-            $this->em->flush();
 
             $token = $verifyRepo->find($queryParams->token_id);
             $this->em->remove($token);
             $this->em->flush();
         }
-        return $this->json("", Response::HTTP_NO_CONTENT);
+        return $this->json("Account verified.", Response::HTTP_OK);
     }
-
-
-
 }

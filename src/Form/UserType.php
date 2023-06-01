@@ -16,6 +16,9 @@ class UserType extends AbstractType
             ->add('password')
             ->add('firstName')
             ->add('lastName')
+            ->add('plainPassword',null,[
+                'required'=>false
+            ])
             ->add('typeOfUser',null,[
                 'required'=>false
             ])
@@ -32,6 +35,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'allow_extra_fields'=>true
         ]);
     }
 }

@@ -55,7 +55,7 @@ class DeleteExpiredTokensCommand extends Command
         if(count($expiredTokens)===0){
             $output->writeln([
                 'Great! But...',
-                '~~~',
+                '----------------------------------',
                 'All expired tokens are already deleted!'
             ]);
 
