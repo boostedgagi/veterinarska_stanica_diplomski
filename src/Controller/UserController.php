@@ -126,8 +126,7 @@ class UserController extends AbstractController
         return strtolower($user->getFirstName()) . strtolower($user->getPhone()) . strtolower($user->getLastName());
     }
 
-
-    #[Route('/users/{id}', methods: 'PUT')]
+    #[Route('/users/{id}', methods: 'PATCH')]
     public function updateUser(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $repo->find($id);
@@ -148,15 +147,15 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}', methods: 'DELETE')]
-    public function deleteUser(Request $request, int $id, UserRepository $repo): Response
+    public function deleteUser(User $vet,): Response
     {
-        $user = $repo->find($id);
-
-        if ($user->getTypeOfUser() === 2) {
-            $user->getUsers()->clear();
-
+        if ($vet->getTypeOfUser() === User::TYPE_VET) {
+            /** @var User $client */
+            foreach ($vet->getClients() as $client){
+                $client->setVet($vet);
+            }
         }
-        $this->em->remove($user);
+        $this->em->remove($vet);
         $this->em->flush();
 
         return $this->json("", Response::HTTP_NO_CONTENT);
@@ -210,7 +209,7 @@ class UserController extends AbstractController
     {
         $vet = $repo->find($id);
 
-        $vetUsers = $vet->getUsers();
+        $vetUsers = $vet->getClients();
         $pets = [];
         foreach ($vetUsers as $vetUser) {
             if ($vetUser->getPets() !== null) {
@@ -242,13 +241,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}/change_type', methods: 'PATCH')]
-    public function changeTypeOfUser(Request $request, int $id, UserRepository $repo): Response
+    public function changeTypeOfUser(Request $request,User $user): Response
     {
         $data = json_decode($request->getContent(), false);
 
-        $user = $repo->find($id);
-        $allowedTypes = [1, 2, 3];
-        if ($data->typeOfUser) {
+        if ($data->typeOfUser && in_array($data->typeOfUser,[User::TYPE_ADMIN,User::TYPE_VET,User::TYPE_USER])) {
 
             $user->setTypeOfUser($data->typeOfUser);
 

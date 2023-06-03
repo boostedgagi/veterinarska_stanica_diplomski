@@ -465,18 +465,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->vet;
     }
 
-    public function setVet(User $vet): self
+    public function setVet(null|User $vet): self
     {
-        $this->vet = $vet;
+        $this->vet = $this->isVetSet($vet);
 
         return $this;
     }
 
+    private function isVetSet(?User $vet):null|User
+    {
+        if($vet){
+            return $vet;
+        }
+        return null;
+    }
 
-    /**
-     * @return Collection<int, self>
-     */
-    public function getUsers(): Collection
+    public function getClients(): Collection
     {
         return $this->users;
     }

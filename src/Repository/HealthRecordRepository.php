@@ -63,7 +63,7 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->setParameter('now',$now)
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline',$deadline)
-            ->andWhere('hr.notified = 0');
+            ->andWhere('hr.notifiedWeekBefore = 0');
 
         return $qb->getQuery()->getResult();
     }
@@ -71,7 +71,7 @@ class HealthRecordRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function getLastMonthHealthRecords(int $numericalMonth)
+    public function getLastMonthHealthRecords(int $numericalMonth):array
     {
         $em = $this->getEntityManager();
 

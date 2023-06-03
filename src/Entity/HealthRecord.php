@@ -103,10 +103,13 @@ class HealthRecord
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column]
-    private ?bool $notified = null;
+    private ?bool $notifiedWeekBefore = null;
 
     #[ORM\Column]
     private bool $madeByVet;
+
+    #[ORM\Column]
+    private ?bool $notifiedDayBefore = null;
 
     public function __construct()
     {
@@ -251,6 +254,18 @@ class HealthRecord
     public function setMadeByVet(bool $madeByVet): self
     {
         $this->madeByVet = $madeByVet;
+
+        return $this;
+    }
+
+    public function isNotifiedDayBefore(): ?bool
+    {
+        return $this->notifiedDayBefore;
+    }
+
+    public function setNotifiedDayBefore(bool $notifiedDayBefore): self
+    {
+        $this->notifiedDayBefore = $notifiedDayBefore;
 
         return $this;
     }

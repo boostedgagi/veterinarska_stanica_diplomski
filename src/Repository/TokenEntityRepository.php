@@ -7,6 +7,7 @@ use App\Model\SavedToken;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Http\Discovery\Exception\NotFoundException;
 
 /**
  * @extends ServiceEntityRepository<Token>
@@ -48,7 +49,9 @@ class TokenEntityRepository extends ServiceEntityRepository
             ->select('va.token token,va.expires expires')
             ->andWhere('va.token = :token')
             ->setParameter('token',$token);
-
+        if(!$qb->getQuery()->getResult()){
+            exit('Token not found.');
+        }
         return $this->hydrate($qb->getQuery()->getResult());
     }
 

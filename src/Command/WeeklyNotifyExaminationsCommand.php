@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\NotifierInterface;
     description: 'Notify all pet owners whose pets have an scheduled examination in the next 7 days',
     aliases: ['notify:examinations']
 )]
-class NotifyExaminationsCommand extends Command
+class WeeklyNotifyExaminationsCommand extends Command
 {
     private MailerInterface $mailer;
     private NotifierInterface $notifier;

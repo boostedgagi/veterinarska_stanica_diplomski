@@ -124,18 +124,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    public function excludeOccupiedVets(array $occupiedVets):array
+    private function occupiedVetsIds(array $occupiedVets):array
     {
         $occupiedVetsIDs = [];
 
         foreach($occupiedVets as $occupiedVet){
             $occupiedVetsIDs[] = $occupiedVet->getId();
         }
+        return $occupiedVetsIDs;
+    }
 
+    public function excludeOccupiedVets(array $occupiedVets):array
+    {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u')
             ->andWhere('u.id not in (:occupiedVetsIDs)')
-            ->setParameter('occupiedVetsIDs',$occupiedVetsIDs)
+            ->setParameter('occupiedVetsIDs',$this->occupiedVetsIDs($occupiedVets))
             ->andWhere('u.typeOfUser=2')
             ->orderBy('u.id');
 
