@@ -52,26 +52,39 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function getExaminationsInNextSevenDays():array
+    public function getExaminationsInTimeRange(string $today): array
     {
         $now = new DateTime();
-        $deadline = new DateTime('+7 days');
+        $deadline = $this->timeRange($today);
 
         $qb = $this->createQueryBuilder('hr');
         $qb->select('hr')
             ->andWhere('hr.startedAt>=:now')
-            ->setParameter('now',$now)
+            ->setParameter('now', $now)
             ->andWhere('hr.finishedAt<:deadline')
-            ->setParameter('deadline',$deadline)
+            ->setParameter('deadline', $deadline)
             ->andWhere('hr.notifiedWeekBefore = 0');
 
         return $qb->getQuery()->getResult();
     }
 
+    private function timeRange(string $range): DateTime|string
+    {
+        if($range === 'today'){
+            return new DateTime('+1 day');
+        }
+        else if($range === 'next week'){
+            return new DateTime('+7 days');
+        }
+        else{
+            return 'wrong time range selected';
+        }
+    }
+
     /**
      * @throws Exception
      */
-    public function getLastMonthHealthRecords(int $numericalMonth):array
+    public function getLastMonthHealthRecords(int $numericalMonth): array
     {
         $em = $this->getEntityManager();
 
@@ -82,7 +95,7 @@ class HealthRecordRepository extends ServiceEntityRepository
         $conn = $em->getConnection();
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindValue('month',$numericalMonth);
+        $stmt->bindValue('month', $numericalMonth);
 
         return $stmt->execute()->fetchAll();
 

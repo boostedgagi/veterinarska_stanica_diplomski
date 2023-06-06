@@ -2,6 +2,11 @@
 
 namespace App\Command;
 
+use App\Entity\HealthRecord;
+use App\Repository\HealthRecordRepository;
+use App\Service\EmailRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -9,6 +14,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Notifier\NotifierInterface;
 
 #[AsCommand(
     name: 'DailyNotifyExaminationsCommand',
@@ -16,6 +23,26 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DailyNotifyExaminationsCommand extends Command
 {
+    private MailerInterface $mailer;
+    private NotifierInterface $notifier;
+    private HealthRecordRepository $healthRecRepo;
+    private EntityManagerInterface $em;
+
+    /**
+     * @param MailerInterface $mailer
+     * @param NotifierInterface $notifier
+     * @param HealthRecordRepository $healthRecRepo
+     * @param EntityManagerInterface $em
+     */
+    public function __construct(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo, EntityManagerInterface $em)
+    {
+        $this->mailer = $mailer;
+        $this->notifier = $notifier;
+        $this->healthRecRepo = $healthRecRepo;
+        $this->em = $em;
+
+        parent::__construct();
+    }
     protected function configure(): void
     {
         $this
@@ -26,18 +53,53 @@ class DailyNotifyExaminationsCommand extends Command
         //i need to change this command to daily notify
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
+        $output->writeln([
+            'Okay let\'s notify pet owners!',
+            '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+        ]);
 
-        if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
+        $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next week');
+//        if(is_string($examinationsToRemind)){
+//            $output->writeln([
+//                $examinationsToRemind
+//            ]);
+//        }
+        if(count($examinationsToRemind)===0){
+            $output->writeln([
+                'Great! But...',
+                '~~~',
+                'All users are already notified!'
+            ]);
+
+            return Command::SUCCESS;
+        }
+        /** @var HealthRecord $examination */
+        foreach ($examinationsToRemind as $examination) {
+            try {
+                $email = new EmailRepository($this->mailer);
+
+                $email->notifyUserAboutPetHaircut($this->notifier, $examination);
+
+                $examination->setNotifiedDayBefore(true);
+
+                $this->em->persist($examination);
+                $this->em->flush();
+            }
+            catch (Exception $exception) {
+                $output->writeln([
+                    'Something bad happened:',
+                    'error: '.$exception
+                ]);
+
+                return Command::FAILURE;
+            }
         }
 
-        if ($input->getOption('option1')) {
-            // ...
-        }
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $output->writeln([
+            'Great!',
+            '~~~',
+            'Users are notified!'
+        ]);
 
         return Command::SUCCESS;
     }

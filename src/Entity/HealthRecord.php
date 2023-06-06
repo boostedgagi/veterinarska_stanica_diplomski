@@ -258,6 +258,22 @@ class HealthRecord
         return $this;
     }
 
+    /**
+     * @return bool|null
+     */
+    public function getNotifiedWeekBefore(): ?bool
+    {
+        return $this->notifiedWeekBefore;
+    }
+
+    /**
+     * @param bool|null $notifiedWeekBefore
+     */
+    public function setNotifiedWeekBefore(?bool $notifiedWeekBefore): void
+    {
+        $this->notifiedWeekBefore = $notifiedWeekBefore;
+    }
+
     public function isNotifiedDayBefore(): ?bool
     {
         return $this->notifiedDayBefore;

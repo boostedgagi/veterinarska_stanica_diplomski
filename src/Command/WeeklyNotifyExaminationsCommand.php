@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\HealthRecord;
 use App\Repository\HealthRecordRepository;
 use App\Service\EmailRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Notifier\NotifierInterface;
 #[AsCommand(
     name: 'notify-examinations',
     description: 'Notify all pet owners whose pets have an scheduled examination in the next 7 days',
-    aliases: ['notify:examinations']
+    aliases: ['notify:examinations:week']
 )]
 class WeeklyNotifyExaminationsCommand extends Command
 {
@@ -61,7 +62,7 @@ class WeeklyNotifyExaminationsCommand extends Command
             '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         ]);
 
-        $examinationsToRemind = $this->healthRecRepo->getExaminationsInNextSevenDays();
+        $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next eek');
 
         if(count($examinationsToRemind)===0){
             $output->writeln([
@@ -72,13 +73,14 @@ class WeeklyNotifyExaminationsCommand extends Command
 
             return Command::SUCCESS;
         }
+        /** @var HealthRecord $examination */
         foreach ($examinationsToRemind as $examination) {
             try {
                 $email = new EmailRepository($this->mailer);
                 //$examination is the HealthRecordType
                 $email->notifyUserAboutPetHaircut($this->notifier, $examination);
 
-                $examination->setNotified(true);
+                $examination->setNotifiedWeekBefore(true);
 
                 $this->em->persist($examination);
                 $this->em->flush();
