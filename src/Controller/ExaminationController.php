@@ -23,20 +23,18 @@ class ExaminationController extends AbstractController
         $this->em = $entityManager;
     }
 
-    #[Route('/examinations',methods: 'GET')]
-    public function showAllExaminations(ExaminationRepository $repo):Response
+    #[Route('/examinations', methods: 'GET')]
+    public function showAllExaminations(ExaminationRepository $repo): Response
     {
         $allExaminations = $repo->findAll();
 
-        return $this->json($allExaminations,Response::HTTP_OK,[],['groups'=>'examination_showAll']);
+        return $this->json($allExaminations, Response::HTTP_OK, [], ['groups' => 'examination_showAll']);
     }
 
-    #[Route('/examinations/{id}',methods: 'GET')]
-    public function showOneExamination(int $id,ExaminationRepository $repo):Response
+    #[Route('/examinations/{id}', methods: 'GET')]
+    public function showOneExamination(Examination $examination): Response
     {
-        $examination = $repo->find($id);
-
-        return $this->json($examination,Response::HTTP_OK,[],['groups'=>'examination_showAll']);
+        return $this->json($examination, Response::HTTP_OK, [], ['groups' => 'examination_showAll']);
     }
 
     #[Route('/examinations', methods: 'POST')]
@@ -52,7 +50,7 @@ class ExaminationController extends AbstractController
     }
 
     #[Route('/examinations/{id}', methods: 'PUT')]
-    public function updateExamination(Request $request,int $id,ExaminationRepository $repo): Response
+    public function updateExamination(Request $request, int $id, ExaminationRepository $repo): Response
     {
         $examination = $repo->find($id);
         $this->handleJSONForm($request, $examination, ExaminationType::class);
@@ -64,7 +62,7 @@ class ExaminationController extends AbstractController
     }
 
     #[Route('/examinations/{id}', methods: 'DELETE')]
-    public function deleteExamination(int $id,ExaminationRepository $repo):Response
+    public function deleteExamination(int $id, ExaminationRepository $repo): Response
     {
         $examination = $repo->find($id);
 

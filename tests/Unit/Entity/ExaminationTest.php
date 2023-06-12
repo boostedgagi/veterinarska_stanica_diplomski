@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ExaminationTest extends WebTestCase
 {
-
     public function testCreateExaminationWithRequest(): void
     {
         $examination = (new Examination())
