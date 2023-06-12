@@ -11,6 +11,7 @@
 /public/exports
 /.idea
 /mysqldata
+/public/qr-codes
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###

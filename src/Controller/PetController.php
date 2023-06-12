@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Pet;
 use App\Form\PetType;
+use App\Form\QRCodeType;
+use App\Model\QRCode;
 use App\Repository\PetRepository;
 use App\Service\EmailRepository;
 use App\Service\UploadImage;
+use Container4vugFVx\getPetRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -88,23 +91,17 @@ class PetController extends AbstractController
     }
 
     #[Route('/qr-code', methods: 'POST')]
-    public function generateQRAndSendByMail(Request $request, PetRepository $repo, MailerInterface $mailer, BuilderInterface $builder): Response
+    public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer,BuilderInterface $builder): Response
     {
-        $ngrok = $_ENV["NGROK_TUNNEL"];
+        $qrCode = new QRCode($builder);
 
-        $data = json_decode($request->getContent(), false);
-        $pet = $repo->find($data->id);
+        $this->handleJSONForm($request,$qrCode,QRCodeType::class);
 
-        $url = $ngrok . "/found_pet?id=" . $data->id;
-
-        $possibleQRCode = $builder->data($url)->build();
-        $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';
-        $possibleQRCode->saveToFile($qrCodePath);
-
+        $pet = $petRepo->find($qrCode->getPetId());
         $email = new EmailRepository($mailer);
-        $email->sendQrCodeWithMail($pet, $qrCodePath);
+        $email->sendQrCodeWithMail($pet, $qrCode->generateQRCode());
 
-        return $this->json($qrCodePath, Response::HTTP_OK);
+        return $this->json("QR code is generated and sent to your mail. :)", Response::HTTP_OK);
     }
 
     #[Route('/found_pet', methods: 'GET')]

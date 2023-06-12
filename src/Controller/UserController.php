@@ -265,7 +265,7 @@ class UserController extends AbstractController
     {
         $user = $userRepo->findAll();
 
-        return $this->json($user, Response::HTTP_OK);
+        return $this->json($user, Response::HTTP_OK,['application/json']);
     }
 
     #[Route('/vets/nearby', methods: 'GET')]
