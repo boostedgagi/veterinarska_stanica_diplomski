@@ -46,14 +46,14 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.2.*",
         "symfony/css-selector": "6.2.*",
-        "symfony/maker-bundle": "^1.48",
+        "symfony/maker-bundle": "^1.49",
         "symfony/phpunit-bridge": "^6.2",
         "symfony/stopwatch": "6.0.*",
         "symfony/web-profiler-bundle": "6.0.*",
-        "zenstruck/foundry": "^1.24",
-        "phpunit/phpunit": "^9.5"
+        "zenstruck/foundry": "^1.24"
     },
     "config": {
         "allow-plugins": {
@@ -91,6 +91,7 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
+
         },
         "post-install-cmd": [
             "@auto-scripts"
