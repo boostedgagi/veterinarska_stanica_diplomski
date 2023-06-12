@@ -23,15 +23,25 @@ when@test:
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
+#    doctrine:
+#        orm:
+#            auto_generate_proxy_classes: false
+#            query_cache_driver:
+#                type: pool
+#                pool: doctrine.system_cache_pool
+#            result_cache_driver:
+#                type: pool
+#                pool: doctrine.result_cache_pool
     doctrine:
-        orm:
-            auto_generate_proxy_classes: false
-            query_cache_driver:
-                type: pool
-                pool: doctrine.system_cache_pool
-            result_cache_driver:
-                type: pool
-                pool: doctrine.result_cache_pool
+        dbal:
+            # configure these for your database server
+#            driver: 'pdo_mysql'
+            server_version: '14'
+            charset: utf8mb4
+            default_table_options:
+                charset: utf8mb4
+                collate: utf8mb4_unicode_ci
+            url: '%env(resolve:DATABASE_URL)%'
 
     framework:
         cache:
