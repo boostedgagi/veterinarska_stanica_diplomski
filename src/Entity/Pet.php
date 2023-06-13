@@ -105,7 +105,7 @@ class Pet
     )]
     private ?string $image = null;
 
-    #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class,cascade: ['persist','remove'])]
+    #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class, cascade: ['persist', 'remove'])]
     private Collection $healthRecords;
 
     public function __construct()
@@ -113,6 +113,12 @@ class Pet
         $this->healthRecords = new ArrayCollection();
     }
 
+    #[Groups(
+        [
+            'pet_showByUser',
+            'pet_created'
+        ]
+    )]
     public function getId(): ?int
     {
         return $this->id;

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\HealthRecord;
+use App\Entity\Pet;
 use App\Entity\User;
 use App\Form\HealthRecordType;
 use App\Repository\HealthRecordRepository;
@@ -45,14 +46,14 @@ class HealthRecordController extends AbstractController
     {
         $healthRecord = new HealthRecord();
 
-        $postData = json_decode($request->getContent(), false);
+        $decoded = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
-
+        if(!$healthRecord->getVet()){
+            return $this->json("You didn't choose any vet.");
+        }
         $madeByVet = $this->isVet($jwtService);
 
-        //atPresent field in POST request is for scheduling it `now` or scheduling in it `some exact defined time range`
-        //this field is enabled only for vet
-        if ($madeByVet && $postData->atPresent) {
+        if ($madeByVet && $decoded->atPresent) {
             $this->makeHealthRecordNow($healthRecord);
         }
         else {
@@ -112,10 +113,8 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/pets/{id}/health_record',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function getHealthRecordsForOnePet(Request $request, int $id, PetRepository $petRepo): Response
+    public function getHealthRecordsForOnePet(Pet $pet): Response
     {
-        $pet = $petRepo->find($id);
-
         $petHealthRecords = $pet->getHealthRecords();
 
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);

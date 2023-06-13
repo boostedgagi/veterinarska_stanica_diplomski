@@ -334,9 +334,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Pet>
-     */
+
+    #[Groups(
+        [
+            'pet_showByUser',
+            'pet_created'
+        ]
+    )]
     public function getPets(): Collection
     {
         return $this->pets;
@@ -429,8 +433,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
 
     public function getLongitude(): ?string
     {

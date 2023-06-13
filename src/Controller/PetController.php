@@ -52,10 +52,9 @@ class PetController extends AbstractController
         return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
     }
 
-    #[Route('/pets/{id}', methods: 'PUT')]
-    public function edit(Request $request, PetRepository $repo, int $id): Response
+    #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'PUT')]
+    public function edit(Pet $pet, Request $request): Response
     {
-        $pet = $repo->find($id);
 
         $this->handleJSONForm($request, $pet, PetType::class);
 
@@ -91,11 +90,11 @@ class PetController extends AbstractController
     }
 
     #[Route('/qr-code', methods: 'POST')]
-    public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer,BuilderInterface $builder): Response
+    public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
         $qrCode = new QRCode($builder);
 
-        $this->handleJSONForm($request,$qrCode,QRCodeType::class);
+        $this->handleJSONForm($request, $qrCode, QRCodeType::class);
 
         $pet = $petRepo->find($qrCode->getPetId());
         $email = new EmailRepository($mailer);

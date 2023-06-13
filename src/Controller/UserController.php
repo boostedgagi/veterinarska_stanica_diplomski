@@ -185,10 +185,10 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}/pets',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUserPets(int $id, UserRepository $repo): Response
+    public function showOneUserPets(User $user, UserRepository $repo): Response
     {
-        $user = $repo->find($id);
         $pets = $user->getPets();
+
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
     }
 
