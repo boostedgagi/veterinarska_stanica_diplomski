@@ -35,11 +35,6 @@ when@prod:
     doctrine:
         dbal:
             # configure these for your database server
-            dbname: vet_shop
-            host: https://elekronski-karton.herokuapp.com
-            port: 3396
-            user: admin
-            password: golfdvojkadizel
             driver: pdo_mysql
             server_version: '14'
             charset: utf8mb4
