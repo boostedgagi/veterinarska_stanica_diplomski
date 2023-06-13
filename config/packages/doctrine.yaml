@@ -35,7 +35,7 @@ when@prod:
     doctrine:
         dbal:
             # configure these for your database server
-#            driver: 'pdo_mysql'
+            driver: 'pdo_mysql'
             server_version: '14'
             charset: utf8mb4
             default_table_options:
