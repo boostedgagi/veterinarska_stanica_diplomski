@@ -41,7 +41,7 @@ class HealthRecordController extends AbstractController
     /**
      * @throws Exception
      */
-    #[Route('/health_record', methods: 'POST')]
+    #[Route('/health_records', methods: 'POST')]
     public function create(Request $request, JwtService $jwtService): Response
     {
         $healthRecord = new HealthRecord();
@@ -85,7 +85,7 @@ class HealthRecordController extends AbstractController
         return $healthRecord;
     }
 
-    #[Route('/health_record/{id}', methods: 'PUT')]
+    #[Route('/health_records/{id}', methods: 'PUT')]
     public function edit(Request $request, int $id, HealthRecordRepository $repo): Response
     {
 //        $form = new HealthRecordType();
@@ -101,7 +101,7 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
-    #[Route('/health_record/{id}', methods: 'DELETE')]
+    #[Route('/health_records/{id}', methods: 'DELETE')]
     public function delete(Request $request, int $id, HealthRecordRepository $repo): Response
     {
         $healthRecord = $repo->find($id);

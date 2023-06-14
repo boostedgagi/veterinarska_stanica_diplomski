@@ -17,6 +17,12 @@ use Symfony\Component\Validator\Constraints\Date;
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
 {
+    #[Groups(
+        [
+            'pet_showByUser',
+            'pet_created'
+        ]
+    )]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -113,12 +119,6 @@ class Pet
         $this->healthRecords = new ArrayCollection();
     }
 
-    #[Groups(
-        [
-            'pet_showByUser',
-            'pet_created'
-        ]
-    )]
     public function getId(): ?int
     {
         return $this->id;

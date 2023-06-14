@@ -36,6 +36,7 @@ security:
 #         - { path: ^/, roles: ROLE_USER }
          - { path: ^/get/, roles: PUBLIC_ACCESS }
          - { path: ^/vets/, roles: [ROLE_USER,ROLE_ADMIN] }
+#         - { path: ^/pets/, roles: [ROLE_USER,ROLE_ADMIN] }
          - { path: ^/pets/, roles: PUBLIC_ACCESS }
          - { path: ^/make_vet, roles: ROLE_ADMIN }
          - { path: ^/login_check, roles: PUBLIC_ACCESS }

@@ -153,4 +153,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->excludeOccupiedVets($occupiedVets);
     }
 
+    public function getId(string $email)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb
+            ->select('u.id')
+            ->andWhere('u.email=:email')
+            ->setParameter('email',$email);
+
+        return $qb->getQuery()->getResult();
+    }
+
 }

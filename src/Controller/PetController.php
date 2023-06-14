@@ -55,7 +55,6 @@ class PetController extends AbstractController
     #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'PUT')]
     public function edit(Pet $pet, Request $request): Response
     {
-
         $this->handleJSONForm($request, $pet, PetType::class);
 
         $this->em->persist($pet);

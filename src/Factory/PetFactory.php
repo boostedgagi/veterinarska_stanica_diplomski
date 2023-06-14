@@ -52,7 +52,8 @@ final class PetFactory extends ModelFactory
 //            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'dateOfBirth' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'name' => self::faker()->firstNameMale(255),
-            'owner' => UserFactory::random(), // TODO add App\Entity\User ORM type manually
+            'owner' => UserFactory::random(), // TODO add App\Entity\User ORM type manually,
+            'image' => 'https://picsum.photos/200'
         ];
     }
 

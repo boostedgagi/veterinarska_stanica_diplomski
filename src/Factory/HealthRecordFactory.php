@@ -53,7 +53,8 @@ final class HealthRecordFactory extends ModelFactory
             'pet' => PetFactory::random(), // TODO add App\Entity\Pet ORM type manually
             'status' => self::faker()->text(64),
             'vet' => UserFactory::random(), // TODO add App\Entity\User ORM type manually
-            'notified' => 0,
+            'notifiedWeekBefore' => 0,
+            'notifiedDayBefore' => 0,
             'madeByVet' => 0
 //            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];

@@ -63,14 +63,13 @@ class UserController extends AbstractController
 
         $this->handleJSONForm($request, $user, UserType::class);
 
-        if($plainPassword = $user->getPlainPassword()){
+        if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
                 $plainPassword
             );
             $user->setPassword($hashedPassword);
-        }
-        else if(!$user->getPlainPassword()){
+        } else if (!$user->getPlainPassword()) {
             return $this->json('Invalid password');
         }
         $user->setRoles(["ROLE_USER"]);
@@ -99,7 +98,7 @@ class UserController extends AbstractController
         $vet = new User();
 
         $this->handleJSONForm($request, $vet, UserType::class);
-        
+
         $plainPassword = $this->makeTemporaryPasswordForVet($vet);
         $hashedPassword = $passwordHasher->hashPassword(
             $vet,
@@ -126,20 +125,20 @@ class UserController extends AbstractController
         return strtolower($user->getFirstName()) . strtolower($user->getPhone()) . strtolower($user->getLastName());
     }
 
-    #[Route('/users/{id}', methods: 'PATCH')]
-    public function updateUser(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
+    #[Route('/users/{id}', methods: 'PUT')]
+    public function edit(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = $repo->find($id);
-        $plainTextPassword = json_decode($request->getContent(), false);
 
         $this->handleJSONForm($request, $user, UserType::class);
 
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $plainTextPassword->password
-        );
-
-        $user->setPassword($hashedPassword);
+        if ($user->getPlainPassword()) {
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $user->getPlainPassword()
+            );
+            $user->setPassword($hashedPassword);
+        }
         $this->em->persist($user);
         $this->em->flush();
 
@@ -151,7 +150,7 @@ class UserController extends AbstractController
     {
         if ($vet->getTypeOfUser() === User::TYPE_VET) {
             /** @var User $client */
-            foreach ($vet->getClients() as $client){
+            foreach ($vet->getClients() as $client) {
                 $client->setVet($vet);
             }
         }
@@ -169,22 +168,22 @@ class UserController extends AbstractController
         return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/users/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUser(int $id, UserRepository $repo,HealthRecordRepository $healthRecordRepo): Response
+    #[Route('/users/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function showOneUser(int $id, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
     {
         $user = $repo->find($id);
         $userService = new UserService();
 
-        if($user->getTypeOfUser()===2){
+        if ($user->getTypeOfUser() === 2) {
 
             $examinationsCount = $healthRecordRepo->examinationsCount();
-            $popularity = $userService->handlePopularity($user,$examinationsCount);
+            $popularity = $userService->handlePopularity($user, $examinationsCount);
             $user->setPopularity($popularity);
         }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/users/{id}/pets',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/users/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function showOneUserPets(User $user, UserRepository $repo): Response
     {
         $pets = $user->getPets();
@@ -192,7 +191,7 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
     }
 
-    #[Route('/user_upload_image/{id}',requirements: ['id'=>Requirements::NUMERIC], methods: 'POST')]
+    #[Route('/user_upload_image/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
     public function uploadProfileImage(Request $request, UserRepository $repo, int $id): Response
     {
         $user = $repo->find($id);
@@ -204,7 +203,7 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-    #[Route('/vets/{id}/pets',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(UserRepository $repo, int $id): Response
     {
         $vet = $repo->find($id);
@@ -241,11 +240,11 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}/change_type', methods: 'PATCH')]
-    public function changeTypeOfUser(Request $request,User $user): Response
+    public function changeTypeOfUser(Request $request, User $user): Response
     {
         $data = json_decode($request->getContent(), false);
 
-        if ($data->typeOfUser && in_array($data->typeOfUser,[User::TYPE_ADMIN,User::TYPE_VET,User::TYPE_USER])) {
+        if ($data->typeOfUser && in_array($data->typeOfUser, [User::TYPE_ADMIN, User::TYPE_VET, User::TYPE_USER])) {
 
             $user->setTypeOfUser($data->typeOfUser);
 
@@ -254,6 +253,14 @@ class UserController extends AbstractController
             return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
         }
         return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
+    }
+
+    #[Route('/get_id', methods: 'GET')]
+    public function getId(Request $request,UserRepository $userRepo): JsonResponse
+    {
+        $email = $request->query->get('email');
+        $id = $userRepo->getId($email);
+        return $this->json($id, Response::HTTP_OK);
     }
 
     /**
@@ -265,7 +272,7 @@ class UserController extends AbstractController
     {
         $user = $userRepo->findAll();
 
-        return $this->json($user, Response::HTTP_OK,['application/json']);
+        return $this->json($user, Response::HTTP_OK, ['application/json']);
     }
 
     #[Route('/vets/nearby', methods: 'GET')]
@@ -279,8 +286,7 @@ class UserController extends AbstractController
 
         try {
             $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, $distance);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->json($e, Response::HTTP_OK);
         }
 
@@ -288,7 +294,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/vets/free', methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request,JwtService $tokenService, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
+    public function getFreeVetsInTimeRange(Request $request, JwtService $tokenService, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
@@ -298,9 +304,9 @@ class UserController extends AbstractController
         $freeVets = $userRepo->getFreeVets($from, $to);
         $personalVet = $tokenService->getCurrentUser()->getVet();
 
-        if(!in_array($personalVet, $freeVets)){
-            $freeVets[] = ['notification'=>'Your vet is occupied in this period of time, try to choose different time period.'];
-    }
+        if (!in_array($personalVet, $freeVets)) {
+            $freeVets[] = ['notification' => 'Your vet is occupied in this period of time, try to choose different time period.'];
+        }
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
@@ -312,13 +318,12 @@ class UserController extends AbstractController
         $examinationsCount = $healthRecordRepo->examinationsCount();
         $userService = new UserService();
         foreach ($vets as $vet) {
-            $vetPopularity = $userService->handlePopularity($vet,$examinationsCount);
+            $vetPopularity = $userService->handlePopularity($vet, $examinationsCount);
             $vet->setPopularity($vetPopularity);
         }
 
         return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
-
 
 
 }

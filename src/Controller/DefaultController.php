@@ -12,7 +12,7 @@ class DefaultController extends AbstractController
     public function ping()
     {
         return $this->json([
-            'message' => 'pong'
+            'Vojko' => 'V'
         ]);
     }
 }

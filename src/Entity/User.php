@@ -217,7 +217,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(null|string $password): self
     {
 
         $this->password = $password;
@@ -337,8 +337,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            'pet_showByUser',
-            'pet_created'
+            'pet_showByUser'
         ]
     )]
     public function getPets(): Collection
@@ -476,10 +475,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private function isVetSet(?User $vet):null|User
     {
-        if($vet){
-            return $vet;
-        }
-        return null;
+        return $vet ? $vet : null ;
     }
 
     public function getClients(): Collection
