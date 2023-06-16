@@ -26,7 +26,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             'user_created',
-            'user_showAll'
+            'user_showAll',
+            'healthRecord_showAll'
         ]
     )]
     private ?int $id = null;

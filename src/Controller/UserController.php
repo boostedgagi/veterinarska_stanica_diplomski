@@ -126,19 +126,23 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}', methods: 'PUT')]
-    public function edit(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher): Response
+    public function edit(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher,JwtService $jwtService): Response
     {
         $user = $repo->find($id);
 
         $this->handleJSONForm($request, $user, UserType::class);
-
-        if ($user->getPlainPassword()) {
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $user->getPlainPassword()
-            );
-            $user->setPassword($hashedPassword);
-        }
+//        if($user!==JwtService::getCurrentUser())
+//            {
+//                return $this->json("Only user itself can delete his account.");
+//            }
+        if ($user->getPlainPassword())
+            {
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $user,
+                    $user->getPlainPassword()
+                );
+                $user->setPassword($hashedPassword);
+            }
         $this->em->persist($user);
         $this->em->flush();
 

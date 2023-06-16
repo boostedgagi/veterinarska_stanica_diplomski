@@ -98,6 +98,18 @@ class HealthRecordRepository extends ServiceEntityRepository
         $stmt->bindValue('month', $numericalMonth);
 
         return $stmt->execute()->fetchAll();
+    }
 
+    public function findAllHealthRecords(User $user):array
+    {
+        $qb = $this->createQueryBuilder('hr');
+
+        $qb
+            ->innerJoin('hr.pet','p')
+            ->innerJoin('p.owner','u')
+            ->andWhere('u.id=:id')
+            ->setParameter('id',$user->getId());
+
+        return $qb->getQuery()->getResult();
     }
 }

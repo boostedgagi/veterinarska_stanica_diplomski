@@ -234,17 +234,6 @@ class HealthRecord
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function isNotified(): ?bool
-    {
-        return $this->notified;
-    }
-
-    public function setNotified(bool $notified): self
-    {
-        $this->notified = $notified;
-
-        return $this;
-    }
 
     public function isMadeByVet(): ?bool
     {

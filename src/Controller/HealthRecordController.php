@@ -48,6 +48,7 @@ class HealthRecordController extends AbstractController
 
         $decoded = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+
         if(!$healthRecord->getVet()){
             return $this->json("You didn't choose any vet.");
         }
@@ -86,12 +87,8 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_records/{id}', methods: 'PUT')]
-    public function edit(Request $request, int $id, HealthRecordRepository $repo): Response
+    public function edit(Request $request,HealthRecord $healthRecord, HealthRecordRepository $repo): Response
     {
-//        $form = new HealthRecordType();
-//        $form->buildForm();
-
-        $healthRecord = $repo->find($id);
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
@@ -112,12 +109,20 @@ class HealthRecordController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}/health_record',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function getHealthRecordsForOnePet(Pet $pet): Response
+    #[Route('/pets/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    public function getHealthRecords(Pet $pet): Response
     {
         $petHealthRecords = $pet->getHealthRecords();
 
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+    }
+
+    #[Route('/users/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    public function getAllUserHealthRecords(User $user,HealthRecordRepository $healthRecordRepo): Response
+    {
+        $allHealthRecords = $healthRecordRepo->findAllHealthRecords($user);
+        
+        return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
@@ -146,6 +151,4 @@ class HealthRecordController extends AbstractController
 
         return $this->json(['status' => 'successfully canceled'], Response::HTTP_OK);
     }
-
-
 }

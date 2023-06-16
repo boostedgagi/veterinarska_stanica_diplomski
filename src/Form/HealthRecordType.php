@@ -26,7 +26,10 @@ class HealthRecordType extends AbstractType
             ])
             ->add('comment')
             ->add('status')
-            ->add('notified',null,[
+            ->add('notifiedDayBefore',null,[
+                'required'=>false
+            ])
+            ->add('notifiedWeekBefore',null,[
                 'required'=>false
             ]);
     }

@@ -20,7 +20,8 @@ class Pet
     #[Groups(
         [
             'pet_showByUser',
-            'pet_created'
+            'pet_created',
+            'healthRecord_showAll'
         ]
     )]
     #[ORM\Id]
