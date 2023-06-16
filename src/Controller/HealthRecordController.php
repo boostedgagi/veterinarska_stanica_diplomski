@@ -6,6 +6,7 @@ use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Form\HealthRecordType;
+use App\Model\CancelHealthRecord;
 use App\Repository\HealthRecordRepository;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
@@ -15,13 +16,12 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
-use phpDocumentor\Reflection\Types\This;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Date;
 
 class HealthRecordController extends AbstractController
 {
@@ -66,9 +66,9 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
-    private function isVet(JwtService $jwtService): bool
+    private function isVet(TokenStorageInterface $tokenStorage): bool
     {
-        return $jwtService->getCurrentUser()->getTypeOfUser() === 2;
+        return JwtService::getCurrentUser($tokenStorage)->getTypeOfUser() === 2;
     }
 
     /**
@@ -87,9 +87,11 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_records/{id}', methods: 'PUT')]
-    public function edit(Request $request,HealthRecord $healthRecord, HealthRecordRepository $repo): Response
+    public function edit(Request $request,?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
     {
-
+        if(!$healthRecord){
+            return $this->json(["error"=>"Health record not found."]);
+        }
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
         $this->em->persist($healthRecord);
@@ -98,11 +100,22 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
     }
 
-    #[Route('/health_records/{id}', methods: 'DELETE')]
-    public function delete(Request $request, int $id, HealthRecordRepository $repo): Response
+    #[Route('/health_records/{id}', methods: 'GET')]
+    public function showOne(?HealthRecord $healthRecord): Response
     {
-        $healthRecord = $repo->find($id);
+        if(!$healthRecord){
+            return $this->json(["error"=>"Health record not found."]);
+        }
 
+        return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+    }
+
+    #[Route('/health_records/{id}', methods: 'DELETE')]
+    public function delete(?HealthRecord $healthRecord): Response
+    {
+        if(!$healthRecord){
+            return $this->json(["error"=>"Health record not found."]);
+        }
         $this->em->remove($healthRecord);
         $this->em->flush();
 
@@ -110,45 +123,57 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/pets/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function getHealthRecords(Pet $pet): Response
+    public function getHealthRecords(?Pet $pet): Response
     {
+        if(!$pet){
+            return $this->json(["error"=>"Pet not found."]);
+        }
         $petHealthRecords = $pet->getHealthRecords();
 
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
     #[Route('/users/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function getAllUserHealthRecords(User $user,HealthRecordRepository $healthRecordRepo): Response
+    public function getAllUserHealthRecords(?User $user,HealthRecordRepository $healthRecordRepo): Response
     {
+        if(!$user){
+            return $this->json(["error"=>"Health record not found."]);
+        }
         $allHealthRecords = $healthRecordRepo->findAllHealthRecords($user);
         
         return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
-    #[Route('/health_record/{id}/cancel', methods: 'POST')]
-    public function cancel(Request $request, HealthRecordRepository $healthRepo, UserRepository $userRepo, MailerInterface $mailer, int $id): Response
+    #[Route('/health_records/{id}/cancel', methods: 'POST')]
+    public function cancel(Request $request, ?HealthRecord $healthRecord, UserRepository $userRepo, MailerInterface $mailer): Response
     {
-        $healthRecord = $healthRepo->find($id);
+        if(!$healthRecord)
+            {
+            return $this->json("Health record not found.");
+            }
 
-        $data = json_decode($request->getContent(), false);
-
-        $cancelText = $data->cancelText;
-        $personWhoCancel = $userRepo->find($data->cancelerId);
+        $cancel = new CancelHealthRecord();
+        $this->handleJSONForm($request,$cancel,CancelHealthRecord::class);
 
         $now = new DateTime();
         $timeDiff = $healthRecord->getStartedAt()->diff($now);
 
-        if ($timeDiff->h == 0) {
-            return $this->json(['error' => 'Examination is impossible to cancel less than hour before of its start'], Response::HTTP_OK);
-        }
-        if ($personWhoCancel->getTypeOfUser() === 2) {
+        if ($timeDiff->h == 0 && $cancel->getCanceler()->getTypeOfUser()===3)
+            {
+            return $this->json(['error' => $cancel::getDenyCancelMessage()]);
+            }
+        if ($cancel->getCanceler()->getTypeOfUser() === 2)
+            {
             $email = new EmailRepository($mailer);
-            $email->sendCancelMailByVet($healthRecord->getPet(), $cancelText);
-        }
-        $healthRecord->setStatus('canceled');
+            $email->sendCancelMailByVet(
+                $healthRecord->getPet(),
+                $cancel->getCancelContent());
+            }
+        $healthRecord->setStatus($healthRecord::STATUS_CANCELED);
+
         $this->em->persist($healthRecord);
         $this->em->flush();
 
-        return $this->json(['status' => 'successfully canceled'], Response::HTTP_OK);
+        return $this->json(['status' => 'Examination successfully canceled.'], Response::HTTP_OK);
     }
 }

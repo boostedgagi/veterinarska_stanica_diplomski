@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: HealthRecordRepository::class)]
 class HealthRecord
 {
+    public const STATUS_CANCELED = 'canceled';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
