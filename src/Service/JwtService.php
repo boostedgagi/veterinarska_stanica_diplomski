@@ -8,16 +8,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class JwtService
 {
-    private TokenStorageInterface $tokenStorage;
-
-    public function __construct(TokenStorageInterface $storage)
+    public static function getCurrentUser(TokenStorageInterface $tokenStorage):?User
     {
-        $this->tokenStorage = $storage;
-    }
-
-    public function getCurrentUser():?User
-    {
-        $token = $this->tokenStorage->getToken();
+        $token = $tokenStorage->getToken();
 
         if ($token instanceof TokenInterface) {
             return $token->getUser();
