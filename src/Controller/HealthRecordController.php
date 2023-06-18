@@ -25,11 +25,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HealthRecordController extends AbstractController
 {
+    public const ONE_MINUTE_IN_SECONDS = 60;
+
+
     use FormTrait;
 
     private EntityManagerInterface $em;
 
-    public const ONE_MINUTE_IN_SECONDS = 60;
     /**
      * @param EntityManagerInterface $entityManager
      */

@@ -1,0 +1,18 @@
+nelmio_api_doc:
+    use_validation_groups: true
+    documentation:
+        servers:
+#            - url: https://api.example.com/secured
+#              description: API over HTTPS
+        info:
+            title: vetShopBackEnd
+            description: This is app that offers scheduling appointments for pet health care.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []

@@ -44,17 +44,22 @@ class PetController extends AbstractController
     }
 
     #[Route('/pet_upload_image/{id}', methods: 'POST')]
-    public function uploadProfileImage(Request $request, PetRepository $repo, int $id): Response
+    public function uploadProfileImage(Request $request,?Pet $pet): Response
     {
-        $pet = $repo->find($id);
+        if(!$pet){
+            return $this->json('Pet not found.');
+        }
         $uploadImage = new UploadImage($request, $pet, $this->em);
         $uploadImage->upload();
         return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
     }
 
     #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'PUT')]
-    public function edit(Pet $pet, Request $request): Response
+    public function edit(?Pet $pet, Request $request): Response
     {
+        if(!$pet){
+            return $this->json('Pet not found.');
+        }
         $this->handleJSONForm($request, $pet, PetType::class);
 
         $this->em->persist($pet);
@@ -64,9 +69,11 @@ class PetController extends AbstractController
     }
 
     #[Route('/pets/{id}', methods: 'DELETE')]
-    public function delete(Request $request, PetRepository $repo, int $id): Response
+    public function delete(?Pet $pet): Response
     {
-        $pet = $repo->find($id);
+        if(!$pet){
+            return $this->json('Pet not found.');
+        }
 
         $this->em->remove($pet);
         $this->em->flush();
@@ -75,8 +82,12 @@ class PetController extends AbstractController
     }
 
     #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function show(Pet $pet): Response
+    public function show(?Pet $pet): Response
     {
+        if(!$pet)
+            {
+            return $this->json('Pet not found.');
+            }
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
@@ -103,12 +114,13 @@ class PetController extends AbstractController
     }
 
     #[Route('/found_pet', methods: 'GET')]
-    public function foundPet(Request $request, PetRepository $repo): Response
+    public function foundPet(Request $request, PetRepository $petRepo): Response
     {
-        $queryData = (object)$request->query->all();
-
-        $pet = $repo->find($queryData->id);
-
+        $pet = $petRepo->find($request->query->get('id'));
+        if(!$pet)
+            {
+            return $this->json("Pet not existing in our database.");
+            }
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 }

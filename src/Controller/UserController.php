@@ -19,14 +19,14 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Notifier\NotifierInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\EmailRepository;
@@ -314,6 +314,12 @@ class UserController extends AbstractController
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
+
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns all vets registered on this website.',
+        content: new Model(type: User::class,groups: ['user_showAll']),
+    )]
     #[Route('/get/vets', methods: 'GET')]
     public function showAll(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
     {
