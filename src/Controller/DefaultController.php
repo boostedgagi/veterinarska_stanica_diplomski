@@ -9,10 +9,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends AbstractController
 {
     #[Route('/',methods:'GET')]
-    public function ping()
+    public function default()
     {
         return $this->json([
-            'Vojko' => 'V'
+            'Server' => 'radi'
         ]);
     }
 }
