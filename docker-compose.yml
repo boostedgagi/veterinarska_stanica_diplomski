@@ -14,3 +14,16 @@ services:
 #  mailer:
 #    image: schickling/mailcatcher
 #    ports: [ 1025, 1080 ]
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin_vet_shop
+    links:
+      - mysql
+    environment:
+      PMA_HOST: vet_shop
+      PMA_ARBITRARY: 1
+      MYSQL_USERNAME: 'admin'
+      MYSQL_ROOT_PASSWORD: 'password_pma'
+    restart: always
+    ports:
+      - "8082:80"
