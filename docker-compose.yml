@@ -20,10 +20,10 @@ services:
     links:
       - mysql
     environment:
-      PMA_HOST: vet_shop
+      PMA_HOST: eu-cdbr-west-03.cleardb.net
       PMA_ARBITRARY: 1
-      MYSQL_USERNAME: 'admin'
-      MYSQL_ROOT_PASSWORD: 'password_pma'
+      MYSQL_USERNAME: 'b56af87347d7c7'
+      MYSQL_ROOT_PASSWORD: 'f57784a7'
     restart: always
     ports:
       - "8082:80"
