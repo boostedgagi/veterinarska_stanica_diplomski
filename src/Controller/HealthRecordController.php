@@ -16,12 +16,12 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HealthRecordController extends AbstractController
 {
@@ -44,19 +44,18 @@ class HealthRecordController extends AbstractController
      * @throws Exception
      */
     #[Route('/health_records', methods: 'POST')]
-    public function create(Request $request, JwtService $jwtService): Response
+    public function create(Request $request,TokenStorageInterface $tokenStorage): Response
     {
         $healthRecord = new HealthRecord();
 
-        $decoded = json_decode($request->getContent(), false);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+        if(!$healthRecord->checkHolyTrinity())
+            {
+            return $this->json('Invalid appointment.');
+            }
+        $madeByVet = $this->isVet($tokenStorage);
 
-        if(!$healthRecord->getVet()){
-            return $this->json("You didn't choose any vet.");
-        }
-        $madeByVet = $this->isVet($jwtService);
-
-        if ($madeByVet && $decoded->atPresent) {
+        if ($madeByVet && $healthRecord->getAtPresent()) {
             $this->makeHealthRecordNow($healthRecord);
         }
         else {

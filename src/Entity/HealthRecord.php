@@ -112,6 +112,8 @@ class HealthRecord
     #[ORM\Column]
     private ?bool $notifiedDayBefore = null;
 
+    private ?string $atPresent;
+
     public function __construct()
     {
     }
@@ -275,4 +277,25 @@ class HealthRecord
 
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getAtPresent(): ?string
+    {
+        return $this->atPresent;
+    }
+
+    /**
+     * @param string|null $atPresent
+     */
+    public function setAtPresent(?string $atPresent): void
+    {
+        $this->atPresent = $atPresent;
+    }
+
+    public function checkHolyTrinity():bool{
+        return $this->getVet() && $this->getPet() && $this->getExamination();
+    }
+
 }

@@ -313,8 +313,14 @@ class UserController extends AbstractController
 
         $freeVets = $userRepo->getFreeVets($from, $to);
         $personalVet = JwtService::getCurrentUser($tokenStorage)->getVet();
-
-        $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
+        if($personalVet)
+            {
+            $freeVets = $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
+            }
+        else
+            {
+            $freeVets[] = ['notification' => 'You don\'t have personal vet.'];
+            }
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
