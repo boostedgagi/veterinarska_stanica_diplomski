@@ -14,7 +14,7 @@
 #/public/qr-codes
 ###< symfony/framework-bundle ###
 db.sql
-.env
+#.env
 ###> lexik/jwt-authentication-bundle ###
 #/config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
