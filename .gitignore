@@ -8,14 +8,15 @@
 /var/
 /vendor/
 #/.env
-/public/exports
+#/public/exports
 /.idea
 /mysqldata
-/public/qr-codes
+#/public/qr-codes
 ###< symfony/framework-bundle ###
 db.sql
+.env
 ###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
+#/config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
 ###> symfony/phpunit-bridge ###

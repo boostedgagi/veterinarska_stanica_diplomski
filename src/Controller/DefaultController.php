@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends AbstractController
 {
     #[Route('/',methods:'GET')]
-    public function default()
+    public function default():Response
     {
         return $this->json([
             'Server' => 'radi'

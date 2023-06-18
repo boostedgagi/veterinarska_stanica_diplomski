@@ -30,6 +30,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\EmailRepository;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends AbstractController
 {
@@ -297,8 +298,13 @@ class UserController extends AbstractController
         return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
 
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns all vets that are free in time range.',
+        content: new Model(type: User::class,groups: ['user_showAll'])
+    )]
     #[Route('/vets/free', methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request, JwtService $tokenService, UserRepository $userRepo, HealthRecordRepository $healthRecRepo): Response
+    public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
@@ -306,19 +312,25 @@ class UserController extends AbstractController
         $to = $queryParams->to;
 
         $freeVets = $userRepo->getFreeVets($from, $to);
-        $personalVet = $tokenService->getCurrentUser()->getVet();
+        $personalVet = JwtService::getCurrentUser($tokenStorage)->getVet();
 
-        if (!in_array($personalVet, $freeVets)) {
-            $freeVets[] = ['notification' => 'Your vet is occupied in this period of time, try to choose different time period.'];
-        }
+        $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
+    private function addNotificationIfVetIsOccupied(User $personalVet, array $freeVets):array
+    {
+        if (!in_array($personalVet, $freeVets))
+            {
+            return $freeVets[] = ['notification' => 'Your vet is occupied in this period of time, try to choose different time period.'];
+            }
+        return $freeVets[] = ['notification' => 'Your vet is free in chosen time range and you can reserve him.'];
+    }
 
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns all vets registered on this website.',
-        content: new Model(type: User::class,groups: ['user_showAll']),
+        content: new Model(type: User::class,groups: ['user_showAll'])
     )]
     #[Route('/get/vets', methods: 'GET')]
     public function showAll(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
