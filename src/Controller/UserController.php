@@ -315,7 +315,7 @@ class UserController extends AbstractController
         $personalVet = JwtService::getCurrentUser($tokenStorage)->getVet();
         if($personalVet)
             {
-            $freeVets = $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
+            $freeVets[] = $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
             }
         else
             {

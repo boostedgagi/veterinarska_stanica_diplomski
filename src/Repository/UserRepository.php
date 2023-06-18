@@ -149,7 +149,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getFreeVets($from,$to):array
     {
         $occupiedVets = $this->getOccupiedVetsInTimeRange($from,$to);
-
         return $this->excludeOccupiedVets($occupiedVets);
     }
 
