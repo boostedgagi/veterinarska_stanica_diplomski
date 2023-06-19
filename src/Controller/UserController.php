@@ -313,13 +313,14 @@ class UserController extends AbstractController
                 name: 'finished_at',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string')),
-            new OA\Parameter(
-                name: 'token',
-                in: 'authorization',
-                required: true,
-                schema: new OA\Schema(type: 'string')),
+                schema: new OA\Schema(type: 'string'))
         ]
+    )]
+    #[OA\HeaderParameter(
+        name: 'Authorization',
+        description: 'Bearer token in form of JWT need to be provided.',
+        required: true,
+        schema: new OA\Schema(type: 'string')
     )]
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
