@@ -63,7 +63,6 @@ class UserController extends AbstractController
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
-
         if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
