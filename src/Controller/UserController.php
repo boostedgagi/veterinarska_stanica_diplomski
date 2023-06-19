@@ -314,6 +314,11 @@ class UserController extends AbstractController
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(
+                name: 'token',
+                in: 'authorization',
+                required: true,
+                schema: new OA\Schema(type: 'string')),
         ]
     )]
     #[Route('/vets/free', methods: 'GET')]
