@@ -20,11 +20,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes\MediaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -125,16 +125,44 @@ class UserController extends AbstractController
         return strtolower($user->getFirstName()) . strtolower($user->getPhone()) . strtolower($user->getLastName());
     }
 
-    #[Route('/users/{id}', methods: 'PUT')]
-    public function edit(Request $request, int $id, UserRepository $repo, UserPasswordHasherInterface $passwordHasher,JwtService $jwtService): Response
-    {
-        $user = $repo->find($id);
+    #[OA\PUT(
+        description:'Edit user data here.',
 
+        requestBody:
+            new OA\RequestBody(
+                description: 'User data from user form type.',
+                required: true,
+                content: new OA\MediaType(
+                    schema: new OA\Schema(
+                        type: UserType::class
+                    )
+                )
+            )
+        ,
+        responses:[
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns updated user with new data.',
+                content: new Model(type: User::class, groups: ['user_showAll'])
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User not found',
+//                content: new Model(type: User::class, groups: ['user_showAll'])
+            ),
+        ]
+    )]
+    #[Route('/users/{id}', methods: 'PUT')]
+    public function edit(?User $user, Request $request,UserPasswordHasherInterface $passwordHasher,TokenStorageInterface $tokenStorage): Response
+    {
+        if(!$user){
+            return $this->json('User not found');
+        }
         $this->handleJSONForm($request, $user, UserType::class);
-//        if($user!==JwtService::getCurrentUser())
-//            {
-//                return $this->json("Only user itself can delete his account.");
-//            }
+        if($user!==JwtService::getCurrentUser($tokenStorage))
+            {
+                return $this->json("Only user itself can delete his account.");
+            }
         if ($user->getPlainPassword())
             {
                 $hashedPassword = $passwordHasher->hashPassword(
