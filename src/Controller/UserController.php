@@ -302,6 +302,20 @@ class UserController extends AbstractController
         description: 'Returns all vets that are free in time range.',
         content: new Model(type: User::class,groups: ['user_showAll'])
     )]
+    #[OA\Get(
+        parameters: [
+            new OA\Parameter(
+                name: 'started_at',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(
+                name: 'finished_at',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string')),
+        ]
+    )]
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
     {
