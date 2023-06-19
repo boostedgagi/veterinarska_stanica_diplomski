@@ -297,18 +297,14 @@ class UserController extends AbstractController
         return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
 
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns all vets that are free in time range.',
-        content: new Model(type: User::class,groups: ['user_showAll'])
-    )]
     #[OA\Get(
         security: [
             new OA\SecurityScheme(
                 type: 'http',
                 description: 'Bearer token in form of JWT need to be provided.',
                 name: 'JWT',
-                in: 'header'
+                in: 'header',
+
             )
         ],
         parameters: [
@@ -322,6 +318,13 @@ class UserController extends AbstractController
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns all vets that are free in time range.',
+                content: new Model(type: User::class, groups: ['user_showAll'])
+            )
         ]
     )]
 
