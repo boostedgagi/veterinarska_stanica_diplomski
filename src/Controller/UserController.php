@@ -300,13 +300,13 @@ class UserController extends AbstractController
     #[OA\Get(
         parameters: [
             new OA\Parameter(
-                name: 'started_at',
-                in: 'path',
+                name: 'from',
+                in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'string')),
             new OA\Parameter(
-                name: 'finished_at',
-                in: 'path',
+                name: 'to',
+                in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'string'))
         ],
