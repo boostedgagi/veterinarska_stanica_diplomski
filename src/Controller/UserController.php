@@ -303,6 +303,14 @@ class UserController extends AbstractController
         content: new Model(type: User::class,groups: ['user_showAll'])
     )]
     #[OA\Get(
+        security: [
+            new OA\SecurityScheme(
+                type: 'http',
+                description: 'Bearer token in form of JWT need to be provided.',
+                name: 'JWT',
+                in: 'header'
+            )
+        ],
         parameters: [
             new OA\Parameter(
                 name: 'started_at',
@@ -316,12 +324,7 @@ class UserController extends AbstractController
                 schema: new OA\Schema(type: 'string'))
         ]
     )]
-    #[OA\SecurityScheme(
-        type: 'http',
-        description: 'Bearer token in form of JWT need to be provided.',
-        name: 'JWT',
-        in: 'header'
-    )]
+
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
     {
