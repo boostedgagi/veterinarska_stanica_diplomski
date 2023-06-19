@@ -298,14 +298,6 @@ class UserController extends AbstractController
     }
 
     #[OA\Get(
-        security: [
-            new OA\SecurityScheme(
-                type: 'http',
-                description: 'Bearer token in form of JWT need to be provided.',
-                name: 'JWT',
-                in: 'header'
-            )
-        ],
         parameters: [
             new OA\Parameter(
                 name: 'started_at',
