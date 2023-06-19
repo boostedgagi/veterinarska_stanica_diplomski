@@ -303,8 +303,7 @@ class UserController extends AbstractController
                 type: 'http',
                 description: 'Bearer token in form of JWT need to be provided.',
                 name: 'JWT',
-                in: 'header',
-
+                in: 'header'
             )
         ],
         parameters: [
