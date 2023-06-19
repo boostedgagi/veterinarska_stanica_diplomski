@@ -127,7 +127,6 @@ class UserController extends AbstractController
 
     #[OA\PUT(
         description:'Edit user data here.',
-
         requestBody:
             new OA\RequestBody(
                 description: 'User data from user form type.',
