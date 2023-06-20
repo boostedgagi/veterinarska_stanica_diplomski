@@ -73,7 +73,7 @@ class EmailRepository
 
     public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
     {
-        $ngrok = $_ENV["NGROK_TUNNEL"];
+        $host = $_ENV["HOST"];
 
         $email = (new Email())
             ->from('yourqrcode@vetshop.com')
@@ -83,7 +83,7 @@ class EmailRepository
                 <h4 style='font-weight: 500;'>This qr code is supposed to be located in your pet's necklace<br>
                     and also to be scanned if your pet is lost and been found after.</h4>
                 <img 
-                    src=".$ngrok.'/'.$qrCodePath."
+                    src=".$host.'/'.$qrCodePath."
                     height='140px' 
                     width='140px' 
                     alt='qr-code'>
