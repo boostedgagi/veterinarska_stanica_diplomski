@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -132,6 +133,7 @@ class UserController extends AbstractController
                 description: 'User data from user form type.',
                 required: true,
                 content: new OA\MediaType(
+                    mediaType:'application/json',
                     schema: new OA\Schema(
                         type: UserType::class
                     )
