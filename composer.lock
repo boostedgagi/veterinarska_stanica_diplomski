@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8624546f273b50a8c3f7d32344047905",
+    "content-hash": "7794b916b5295262d2b7953af132844e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -9023,6 +9023,47 @@
                 }
             ],
             "time": "2023-03-08T13:26:56+00:00"
+        },
+        {
+            "name": "nebkam/fluent-test",
+            "version": "4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nebkam/fluent-test.git",
+                "reference": "602d3883cc5b2a583e7069bc1b34dace4ffac2f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nebkam/fluent-test/zipball/602d3883cc5b2a583e7069bc1b34dace4ffac2f3",
+                "reference": "602d3883cc5b2a583e7069bc1b34dace4ffac2f3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.2 || ^8.0",
+                "symfony/browser-kit": "^4.4.7 || ^5.0.7 || 6.*",
+                "symfony/framework-bundle": "^4.4.7 || ^5.0.7 || 6.*",
+                "symfony/http-foundation": "^4.4.7 || ^5.0.7 || 6.*"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^5.0 || 6.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nebkam\\FluentTest\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A few helpers to ease functional API testing in Symfony",
+            "support": {
+                "issues": "https://github.com/nebkam/fluent-test/issues",
+                "source": "https://github.com/nebkam/fluent-test/tree/4.1"
+            },
+            "time": "2022-03-11T12:05:48+00:00"
         },
         {
             "name": "nikic/php-parser",
