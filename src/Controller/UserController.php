@@ -134,6 +134,7 @@ class UserController extends AbstractController
                 required: true,
                 content: new OA\MediaType(
                     mediaType:'application/json',
+                    //comment to comment
                     schema: new OA\Schema(
                         type: UserType::class
                     )
