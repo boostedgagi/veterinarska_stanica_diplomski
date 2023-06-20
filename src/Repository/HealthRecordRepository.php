@@ -84,26 +84,39 @@ class HealthRecordRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function getLastMonthHealthRecords(int $numericalMonth): array
+    public function getLastMonthHealthRecords(int $numericalLastMonth): array
     {
-        $em = $this->getEntityManager();
+        $from = new DateTime('- 30 days');
+        $to = new DateTime();
 
-        $sql = 'SELECT *
-           FROM health_record
-           WHERE MONTH(finished_at) = :month';
+        $qb = $this->createQueryBuilder('hr');
+        $qb
+            ->select(
+                'hr.id id',
+                'vet.firstName vetFirstName',
+                'pet.name petName',
+                'exam.name examName',
+                'hr.startedAt',
+                'hr.finishedAt',
+                'hr.notifiedWeekBefore',
+                'hr.notifiedDayBefore',
+                'hr.madeByVet'
+            )
+            ->innerJoin('hr.vet','vet')
+            ->innerJoin('hr.examination','exam')
+            ->innerJoin('hr.pet','pet')
+            ->andWhere('hr.startedAt>:from')
+            ->setParameter('from',$from->format('Y-m-d'))
+            ->andWhere('hr.finishedAt<:to')
+            ->setParameter('to',$to->format('Y-m-d'))
+            ->orderBy('hr.startedAt','ASC');
 
-        $conn = $em->getConnection();
-        $stmt = $conn->prepare($sql);
-
-        $stmt->bindValue('month', $numericalMonth);
-
-        return $stmt->execute()->fetchAll();
+        return $qb->getQuery()->getResult();
     }
 
     public function findAllHealthRecords(User $user):array
     {
         $qb = $this->createQueryBuilder('hr');
-
         $qb
             ->innerJoin('hr.pet','p')
             ->innerJoin('p.owner','u')

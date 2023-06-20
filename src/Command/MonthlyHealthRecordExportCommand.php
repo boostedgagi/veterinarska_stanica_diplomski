@@ -45,29 +45,34 @@ class MonthlyHealthRecordExportCommand extends Command
 //        ;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Okay let\'s export all health records scheduled in last month.');
         $output->writeln('- - - - -');
         $numericalLastMonth = number_format(date('m', strtotime('-1 month', strtotime(date('Y-m-01')))));
+        $lastMonthHealthRecords = $this->healthRecordRepo->getLastMonthHealthRecords(7);
 
-        $lastMonthHealthRecords = $this->healthRecordRepo->getLastMonthHealthRecords(4);
-
-        if (count($lastMonthHealthRecords) === 0) {
+        if (count($lastMonthHealthRecords) === 0)
+            {
             $output->writeln('There is no any scheduled health records in last month.');
-        }
+            return Command::SUCCESS;
+            }
         $fileName = sprintf('%s_%s_health_records.csv', $numericalLastMonth, date("Y", time()));
 
-        try {
+        try
+            {
             $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
             $email = new EmailRepository($this->mailer);
             $email->sendMonthlyCSVByMail($filePath);
-
-
-        } catch (Exception $e) {
+            }
+        catch (Exception $e)
+            {
             $output->writeln('Error occurred: ' . $e->getMessage());
             return Command::FAILURE;
-        }
+            }
         $output->writeln('Data successfully exported in ' . $filePath . ' and sent to admin by mail.');
         return Command::SUCCESS;
     }

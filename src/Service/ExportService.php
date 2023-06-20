@@ -20,35 +20,44 @@ class ExportService
      */
     public function exportHealthRecords(array $healthRecords, string $fileName): string
     {
-        try {
-            $path =
+        try
+            {
             $csv = fopen( self::PATH . $fileName, 'w+');
             fputcsv($csv,
                 [
-                    'veterinarian',
-                    'pet',
+                    'id',
+                    'vet name',
+                    'pet name',
+                    'exam name',
                     'start time',
                     'finish time',
-                    'notified',
+                    'notified_week_before',
+                    'notified_day_before',
                     'is made by vet'
                 ]
             );
-            foreach ($healthRecords as $healthRecord){
+            foreach ($healthRecords as $healthRecord)
+                {
                 fputcsv($csv,
                     [
-                        $healthRecord["vet_id"],
-                        $healthRecord["pet_id"],
-                        $healthRecord["started_at"],
-                        $healthRecord["finished_at"],
-                        $healthRecord["notified"]==0 ? 'not notified ' : 'notified',
-                        $healthRecord["made_by_vet"]==0 ? 'scheduled' : 'made by vet'
+                        $healthRecord["id"],
+                        $healthRecord["vetFirstName"],
+                        $healthRecord["petName"],
+                        $healthRecord["examName"],
+                        $healthRecord["startedAt"]->format('Y-m-d H:i:s'),
+                        $healthRecord["finishedAt"]->format('Y-m-d H:i:s'),
+                        $healthRecord["notifiedWeekBefore"]==0 ? 'not notified ' : 'notified',
+                        $healthRecord["notifiedDayBefore"]==0 ? 'not notified ' : 'notified',
+                        $healthRecord["madeByVet"] ? 'made by vet' : 'scheduled'
                     ]
                 );
-            }
+                }
             return self::PATH . $fileName;
-        } catch (Exception $e) {
+            }
+        catch (Exception $e)
+            {
             error_log($e->getMessage());
-        }
+            }
         return 'Error occurred. Try again later.';
     }
 }
