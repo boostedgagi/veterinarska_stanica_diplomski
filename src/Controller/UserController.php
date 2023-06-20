@@ -133,7 +133,7 @@ class UserController extends AbstractController
                 description: 'User data from user form type.',
                 required: true,
                 content: new OA\MediaType(
-                    mediaType:'application/json',
+                    mediaType:OA\JsonContent::class,
                     //comment to comment
                     schema: new OA\Schema(
                         type: UserType::class
@@ -143,7 +143,7 @@ class UserController extends AbstractController
         ,
         responses:[
             new OA\Response(
-                response: Response::HTTP_OK,
+                response: Response::HTTP_CREATED,
                 description: 'Returns updated user with new data.',
                 content: new Model(type: User::class, groups: ['user_showAll'])
             ),
