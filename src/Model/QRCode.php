@@ -33,9 +33,9 @@ class QRCode
 
     private function makeUrl():string
     {
-        $ngrok = $_ENV["NGROK_TUNNEL"];
+        $host = $_ENV["HOST"];
 
-        return $ngrok . "/found_pet?id=" . $this->petId;
+        return $host . "/found_pet?id=" . $this->petId;
     }
 
     public function generateQRCode():string
