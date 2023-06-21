@@ -90,11 +90,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'users_showAll'
-        ]
-    )]
     private ?bool $allowed = null;
 
     #[ORM\Column]
@@ -278,6 +273,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     public function isAllowed(): ?bool
     {
         return $this->allowed;
