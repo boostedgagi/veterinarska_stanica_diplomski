@@ -90,6 +90,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column]
+    #[Groups(
+        [
+            'users_showAll'
+        ]
+    )]
     private ?bool $allowed = null;
 
     #[ORM\Column]
