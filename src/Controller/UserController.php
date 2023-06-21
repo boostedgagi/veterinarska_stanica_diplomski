@@ -203,17 +203,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUser(int $id, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
+    public function showOneUser(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
-        $user = $repo->find($id);
+        if(!$user)
+            {
+            return $this->json("User not found");
+            }
         $userService = new UserService();
 
-        if ($user->getTypeOfUser() === 2) {
-
+        if ($user->getTypeOfUser() === 2)
+            {
             $examinationsCount = $healthRecordRepo->examinationsCount();
             $popularity = $userService->handlePopularity($user, $examinationsCount);
             $user->setPopularity($popularity);
-        }
+            }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 

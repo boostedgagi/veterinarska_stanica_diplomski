@@ -134,21 +134,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 32, nullable: true)]
     #[Groups(
         [
-            'vet_nearby'
+            'vet_nearby',
+            'user_showAll'
         ]
     )]
     private ?string $phone = null;
 
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $latitude = null;
 
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
-    #[Groups(['user_showAll'])]
     private ?string $popularity;
 
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]
