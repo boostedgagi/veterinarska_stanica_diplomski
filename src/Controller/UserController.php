@@ -37,19 +37,19 @@ class UserController extends AbstractController
         $this->em = $entityManager;
     }
 
-//    #[Route('/roleadmin/{id}','POST')]
-//    public function makeadmin(UserRepository $userRepo,int $id):Response
-//    {
-//        $user = $userRepo->find($id);
-//        $user->setRoles(["ROLE_ADMIN"]);
-//
-//
-//        $this->em->persist($user);
-//        $this->em->flush();
-//
-//        return $this->json('proslo',Response::HTTP_OK);
-//    }
-//this method was used to update my user object with ROLE_ADMIN in order to use exact methods with only admin entry, Dragan
+    #[Route('/users/{id}/change_status', requirements: ['id'=>Requirements::NUMERIC], methods: 'POST')]
+    public function allowStatusChange(?User $user):Response
+        {
+            if(!$user)
+                {
+                return $this->json('User not found');
+                }
+            $user->setAllowed(!$user->isAllowed());
+            $this->em->persist($user);
+            $this->em->flush();
+
+            return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_showAll']);
+        }
 
     #[Route('/users', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
