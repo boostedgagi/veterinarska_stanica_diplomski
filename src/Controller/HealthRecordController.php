@@ -56,7 +56,7 @@ class HealthRecordController extends AbstractController
         $madeByVet = $this->isVet($tokenStorage);
         if ($madeByVet) {
             if ($healthRecord->getAtPresent()) {
-                $this->makeHealthRecordNow($healthRecord);
+                $healthRecord = $this->makeHealthRecordNow($healthRecord);
             }
             $healthRecord->setMadeByVet(true);
 
