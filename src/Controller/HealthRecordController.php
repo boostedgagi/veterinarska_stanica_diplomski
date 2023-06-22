@@ -55,7 +55,7 @@ class HealthRecordController extends AbstractController
             return $this->json('Invalid appointment.');
         }
         $madeByVet = $this->isVet($tokenStorage);//this works
-
+        dump($healthRecord);
         if ($madeByVet) {
             if ($healthRecord->getAtPresent()) {
                 $healthRecord = $this->makeHealthRecordNow($healthRecord);
@@ -65,7 +65,7 @@ class HealthRecordController extends AbstractController
         else {
             $healthRecord->setMadeByVet(false);
         }
-//        dd($healthRecord);
+        dump($healthRecord);
         $this->em->persist($healthRecord);
         $this->em->flush();
 
