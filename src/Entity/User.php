@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
+use App\Service\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -466,12 +468,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPopularity(): ?string
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
+    public function getPopularity(HealthRecordRepository $healthRecordRepo,UserService $userService): string | null
     {
-        return $this->popularity;
+        if ($this->getTypeOfUser() === 2)
+            {
+            $examinationsCount = $healthRecordRepo->examinationsCount();
+            return $userService->handlePopularity($this, $examinationsCount);
+            }
+        return null;
     }
 
     /**

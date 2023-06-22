@@ -163,5 +163,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    public function getAllVets():array
+        {
+        $qb = $this->createQueryBuilder('u');
 
+        $qb
+            ->andWhere('u.typeOfUser=2');
+
+        return $qb->getQuery()->getResult();
+        }
 }

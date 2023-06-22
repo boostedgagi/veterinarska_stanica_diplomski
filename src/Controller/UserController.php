@@ -202,14 +202,7 @@ class UserController extends AbstractController
             {
             return $this->json("User not found");
             }
-        $userService = new UserService();
 
-        if ($user->getTypeOfUser() === 2)
-            {
-            $examinationsCount = $healthRecordRepo->examinationsCount();
-            $popularity = $userService->handlePopularity($user, $examinationsCount);
-            $user->setPopularity($popularity);
-            }
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
@@ -381,19 +374,18 @@ class UserController extends AbstractController
         content: new Model(type: User::class,groups: ['user_showAll'])
     )]
     #[Route('/get/vets', methods: 'GET')]
-    public function showAll(Request $request, UserRepository $repo, HealthRecordRepository $healthRecordRepo): Response
+    public function showAll(UserRepository $userRepo): Response
     {
-        $vets = $repo->findAll();
-
-        $examinationsCount = $healthRecordRepo->examinationsCount();
-        $userService = new UserService();
-        foreach ($vets as $vet) {
-            $vetPopularity = $userService->handlePopularity($vet, $examinationsCount);
-            $vet->setPopularity($vetPopularity);
-        }
+        $vets = $userRepo->getAllVets();
 
         return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
+    #[Route('/vet/{id}/health_records',methods:'GET')]
+    public function getVetHealthRecords(?User $vet):Response
+        {
+        $vetHealthRecords = $vet->getHealthRecords();
 
+        return $this->json($vetHealthRecords,Response::HTTP_OK,[],['groups'=>'healthRecord_showAll']);
+        }
 }
