@@ -158,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
-//    private ?string $popularity;
+    private ?string $popularity = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
     #[Groups(
@@ -483,6 +483,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return '';
     }
 
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
+    public function getSth():string
+    {
+//        $healthRecordRepo = new HealthRecordRepository();
+//        $
+        return 'tu sam';
+    }
 //    /**
 //     * @param string|null $popularity
 //     */

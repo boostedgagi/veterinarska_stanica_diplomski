@@ -37,19 +37,18 @@ class UserController extends AbstractController
         $this->em = $entityManager;
     }
 
-    #[Route('/users/{id}/change_status', requirements: ['id'=>Requirements::NUMERIC], methods: 'POST')]
-    public function allowStatusChange(?User $user):Response
-        {
-            if(!$user)
-                {
-                return $this->json('User not found');
-                }
-            $user->setAllowed(!$user->isAllowed());
-            $this->em->persist($user);
-            $this->em->flush();
-
-            return $this->json($user,Response::HTTP_CREATED,[],['groups'=>'user_showAll']);
+    #[Route('/users/{id}/change_status', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
+    public function allowStatusChange(?User $user): Response
+    {
+        if (!$user) {
+            return $this->json('User not found');
         }
+        $user->setAllowed(!$user->isAllowed());
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_showAll']);
+    }
 
     #[Route('/users', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
@@ -120,21 +119,20 @@ class UserController extends AbstractController
     }
 
     #[OA\PUT(
-        description:'Edit user data here.',
-        requestBody:
-            new OA\RequestBody(
-                description: 'User data from user form type.',
-                required: true,
-                content: new OA\MediaType(
-                    mediaType:OA\JsonContent::class,
-                    //comment to comment
-                    schema: new OA\Schema(
-                        type: UserType::class
-                    )
+        description: 'Edit user data here.',
+        requestBody: new OA\RequestBody(
+            description: 'User data from user form type.',
+            required: true,
+            content: new OA\MediaType(
+                mediaType: OA\JsonContent::class,
+                //comment to comment
+                schema: new OA\Schema(
+                    type: UserType::class
                 )
             )
+        )
         ,
-        responses:[
+        responses: [
             new OA\Response(
                 response: Response::HTTP_CREATED,
                 description: 'Returns updated user with new data.',
@@ -148,24 +146,22 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/users/{id}', methods: 'PUT')]
-    public function edit(?User $user, Request $request,UserPasswordHasherInterface $passwordHasher,TokenStorageInterface $tokenStorage): Response
+    public function edit(?User $user, Request $request, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
     {
-        if(!$user){
+        if (!$user) {
             return $this->json('User not found');
         }
         $this->handleJSONForm($request, $user, UserType::class);
-        if($user!==JwtService::getCurrentUser($tokenStorage))
-            {
-                return $this->json("Only user itself can delete his account.");
-            }
-        if ($user->getPlainPassword())
-            {
-                $hashedPassword = $passwordHasher->hashPassword(
-                    $user,
-                    $user->getPlainPassword()
-                );
-                $user->setPassword($hashedPassword);
-            }
+        if ($user !== JwtService::getCurrentUser($tokenStorage)) {
+            return $this->json("Only user itself can delete his account.");
+        }
+        if ($user->getPlainPassword()) {
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $user->getPlainPassword()
+            );
+            $user->setPassword($hashedPassword);
+        }
         $this->em->persist($user);
         $this->em->flush();
 
@@ -198,10 +194,9 @@ class UserController extends AbstractController
     #[Route('/users/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function showOneUser(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
-        if(!$user)
-            {
+        if (!$user) {
             return $this->json("User not found");
-            }
+        }
 
         return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
@@ -279,7 +274,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/get_id', methods: 'GET')]
-    public function getId(Request $request,UserRepository $userRepo): JsonResponse
+    public function getId(Request $request, UserRepository $userRepo): JsonResponse
     {
         $email = $request->query->get('email');
         $id = $userRepo->getId($email);
@@ -337,7 +332,6 @@ class UserController extends AbstractController
             )
         ]
     )]
-
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
     {
@@ -348,44 +342,40 @@ class UserController extends AbstractController
 
         $freeVets = $userRepo->getFreeVets($from, $to);
         $personalVet = JwtService::getCurrentUser($tokenStorage)->getVet();
-        if($personalVet)
-            {
-            $freeVets[] = $this->addNotificationIfVetIsOccupied($personalVet,$freeVets);
-            }
-        else
-            {
+        if ($personalVet) {
+            $freeVets[] = $this->addNotificationIfVetIsOccupied($personalVet, $freeVets);
+        } else {
             $freeVets[] = ['notification' => 'You don\'t have personal vet.'];
-            }
+        }
         return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    private function addNotificationIfVetIsOccupied(User $personalVet, array $freeVets):array
+    private function addNotificationIfVetIsOccupied(User $personalVet, array $freeVets): array
     {
-        if (!in_array($personalVet, $freeVets))
-            {
+        if (!in_array($personalVet, $freeVets)) {
             return $freeVets[] = ['notification' => 'Your vet is occupied in this period of time, try to choose different time period.'];
-            }
+        }
         return $freeVets[] = ['notification' => 'Your vet is free in chosen time range and you can reserve him.'];
     }
 
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns all vets registered on this website.',
-        content: new Model(type: User::class,groups: ['user_showAll'])
+        content: new Model(type: User::class, groups: ['user_showAll'])
     )]
     #[Route('/get/vets', methods: 'GET')]
     public function showAll(UserRepository $userRepo): Response
     {
         $vets = $userRepo->getAllVets();
-
+//        dump($vets[0]);
         return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
     }
 
-    #[Route('/vet/{id}/health_records',methods:'GET')]
-    public function getVetHealthRecords(?User $vet):Response
-        {
+    #[Route('/vet/{id}/health_records', methods: 'GET')]
+    public function getVetHealthRecords(?User $vet): Response
+    {
         $vetHealthRecords = $vet->getHealthRecords();
 
-        return $this->json($vetHealthRecords,Response::HTTP_OK,[],['groups'=>'healthRecord_showAll']);
-        }
+        return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+    }
 }
