@@ -8,7 +8,7 @@ class CancelHealthRecord
 {
     private string $cancelContent;
 
-    private User $canceler;
+    private int $canceler;
 
     /**
      * @return string
@@ -26,18 +26,14 @@ class CancelHealthRecord
         $this->cancelContent = $cancelContent;
     }
 
-    /**
-     * @return User
-     */
-    public function getCanceler(): User
+
+    public function getCanceler(): int
     {
         return $this->canceler;
     }
 
-    /**
-     * @param User $canceler
-     */
-    public function setCanceler(User $canceler): void
+
+    public function setCanceler(int $canceler): void
     {
         $this->canceler = $canceler;
     }

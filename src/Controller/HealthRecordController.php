@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
+use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
 use App\Repository\HealthRecordRepository;
@@ -154,16 +155,17 @@ class HealthRecordController extends AbstractController
             }
 
         $cancel = new CancelHealthRecord();
-        $this->handleJSONForm($request,$cancel,CancelHealthRecord::class);
+        $this->handleJSONForm($request,$cancel,CancelHealthRecordType::class);
 
+        $canceler = $userRepo->find($cancel->getCanceler());
         $now = new DateTime();
         $timeDiff = $healthRecord->getStartedAt()->diff($now);
 
-        if ($timeDiff->h == 0 && $cancel->getCanceler()->getTypeOfUser()===3)
+        if ($timeDiff->h == 0 && $canceler->getTypeOfUser()===User::TYPE_USER)
             {
             return $this->json(['error' => $cancel::getDenyCancelMessage()]);
             }
-        if ($cancel->getCanceler()->getTypeOfUser() === 2)
+        if ($canceler->getTypeOfUser() === 2)
             {
             $email = new EmailRepository($mailer);
             $email->sendCancelMailByVet(

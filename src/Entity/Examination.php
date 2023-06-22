@@ -21,7 +21,8 @@ class Examination
     #[Groups(
         [
             'examination_created',
-            'examination_showAll'
+            'examination_showAll',
+            'healthRecord_showAll'
         ]
     )]
     private ?int $id = null;

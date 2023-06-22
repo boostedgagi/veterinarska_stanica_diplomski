@@ -158,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
-    private ?string $popularity;
+//    private ?string $popularity;
 
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
     #[Groups(
@@ -473,23 +473,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'user_showAll'
         ]
     )]
-    public function getPopularity(HealthRecordRepository $healthRecordRepo,UserService $userService): string | null
+    public function getPopularity(HealthRecordRepository $healthRecordRepo,UserService $userService): string
     {
         if ($this->getTypeOfUser() === 2)
             {
             $examinationsCount = $healthRecordRepo->examinationsCount();
             return $userService->handlePopularity($this, $examinationsCount);
             }
-        return null;
+        return '';
     }
 
-    /**
-     * @param string|null $popularity
-     */
-    public function setPopularity(?string $popularity): void
-    {
-        $this->popularity = $popularity;
-    }
+//    /**
+//     * @param string|null $popularity
+//     */
+//    public function setPopularity(?string $popularity): void
+//    {
+//        $this->popularity = $popularity;
+//    }
 
     public function getVet(): ?self
     {
