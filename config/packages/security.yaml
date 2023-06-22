@@ -42,6 +42,7 @@ security:
          - { path: ^/login_check, roles: PUBLIC_ACCESS }
          - { path: ^/password/, roles: PUBLIC_ACCESS }
          - { path: ^/engage_vet, roles: ROLE_USER }
+         - { path: ^/health_records, roles: ROLE_USER,ROLE_ADMIN }
 when@test:
     security:
         password_hashers:
