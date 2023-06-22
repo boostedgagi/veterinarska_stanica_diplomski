@@ -45,19 +45,21 @@ class HealthRecordController extends AbstractController
      * @throws Exception
      */
     #[Route('/health_records', methods: 'POST')]
-    public function create(Request $request,TokenStorageInterface $tokenStorage): Response
+    public function create(Request $request, TokenStorageInterface $tokenStorage): Response
     {
         $healthRecord = new HealthRecord();
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
-        if(!$healthRecord->checkHolyTrinity())
-            {
+        if (!$healthRecord->checkHolyTrinity()) {
             return $this->json('Invalid appointment.');
-            }
+        }
         $madeByVet = $this->isVet($tokenStorage);
+        if ($madeByVet) {
+            if ($healthRecord->getAtPresent()) {
+                $this->makeHealthRecordNow($healthRecord);
+            }
+            $healthRecord->setMadeByVet(true);
 
-        if ($madeByVet && $healthRecord->getAtPresent()) {
-            $this->makeHealthRecordNow($healthRecord);
         }
         else {
             $healthRecord->setMadeByVet(false);
@@ -76,23 +78,23 @@ class HealthRecordController extends AbstractController
     /**
      * @throws Exception
      */
-    private function makeHealthRecordNow(HealthRecord $healthRecord):HealthRecord
+    private function makeHealthRecordNow(HealthRecord $healthRecord): HealthRecord
     {
         $healthRecord->setMadeByVet(true);
         $healthRecord->setStartedAt(new DateTime());
 
         $examDurationInSeconds = $healthRecord->getExamination()->getDuration() * self::ONE_MINUTE_IN_SECONDS;
 
-        $healthRecord->setFinishedAt(new DateTime('+'.$examDurationInSeconds.'seconds'));
+        $healthRecord->setFinishedAt(new DateTime('+' . $examDurationInSeconds . 'seconds'));
 
         return $healthRecord;
     }
 
     #[Route('/health_records/{id}', methods: 'PUT')]
-    public function edit(Request $request,?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
+    public function edit(Request $request, ?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
     {
-        if(!$healthRecord){
-            return $this->json(["error"=>"Health record not found."]);
+        if (!$healthRecord) {
+            return $this->json(["error" => "Health record not found."]);
         }
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
@@ -105,8 +107,8 @@ class HealthRecordController extends AbstractController
     #[Route('/health_records/{id}', methods: 'GET')]
     public function showOne(?HealthRecord $healthRecord): Response
     {
-        if(!$healthRecord){
-            return $this->json(["error"=>"Health record not found."]);
+        if (!$healthRecord) {
+            return $this->json(["error" => "Health record not found."]);
         }
 
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
@@ -115,8 +117,8 @@ class HealthRecordController extends AbstractController
     #[Route('/health_records/{id}', methods: 'DELETE')]
     public function delete(?HealthRecord $healthRecord): Response
     {
-        if(!$healthRecord){
-            return $this->json(["error"=>"Health record not found."]);
+        if (!$healthRecord) {
+            return $this->json(["error" => "Health record not found."]);
         }
         $this->em->remove($healthRecord);
         $this->em->flush();
@@ -124,54 +126,51 @@ class HealthRecordController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/pets/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getHealthRecords(?Pet $pet): Response
     {
-        if(!$pet){
-            return $this->json(["error"=>"Pet not found."]);
+        if (!$pet) {
+            return $this->json(["error" => "Pet not found."]);
         }
         $petHealthRecords = $pet->getHealthRecords();
 
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
-    #[Route('/users/{id}/health_records',requirements: ['id'=>Requirements::NUMERIC], methods: 'GET')]
-    public function getAllUserHealthRecords(?User $user,HealthRecordRepository $healthRecordRepo): Response
+    #[Route('/users/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function getAllUserHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
-        if(!$user){
-            return $this->json(["error"=>"Health record not found."]);
+        if (!$user) {
+            return $this->json(["error" => "Health record not found."]);
         }
         $allHealthRecords = $healthRecordRepo->findAllHealthRecords($user);
-        
+
         return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
     }
 
     #[Route('/health_records/{id}/cancel', methods: 'POST')]
     public function cancel(Request $request, ?HealthRecord $healthRecord, UserRepository $userRepo, MailerInterface $mailer): Response
     {
-        if(!$healthRecord)
-            {
+        if (!$healthRecord) {
             return $this->json("Health record not found.");
-            }
+        }
 
         $cancel = new CancelHealthRecord();
-        $this->handleJSONForm($request,$cancel,CancelHealthRecordType::class);
+        $this->handleJSONForm($request, $cancel, CancelHealthRecordType::class);
 
         $canceler = $userRepo->find($cancel->getCanceler());
         $now = new DateTime();
         $timeDiff = $healthRecord->getStartedAt()->diff($now);
 
-        if ($timeDiff->h == 0 && $canceler->getTypeOfUser()===User::TYPE_USER)
-            {
+        if ($timeDiff->h == 0 && $canceler->getTypeOfUser() === User::TYPE_USER) {
             return $this->json(['error' => $cancel::getDenyCancelMessage()]);
-            }
-        if ($canceler->getTypeOfUser() === 2)
-            {
+        }
+        if ($canceler->getTypeOfUser() === 2) {
             $email = new EmailRepository($mailer);
             $email->sendCancelMailByVet(
                 $healthRecord->getPet(),
                 $cancel->getCancelContent());
-            }
+        }
         $healthRecord->setStatus($healthRecord::STATUS_CANCELED);
 
         $this->em->persist($healthRecord);
