@@ -33,6 +33,9 @@ class HealthRecordType extends AbstractType
             ])
             ->add('notifiedWeekBefore',null,[
                 'required'=>false
+            ])
+            ->add('atPresent',null,[
+                'required'=>false
             ]);
     }
 

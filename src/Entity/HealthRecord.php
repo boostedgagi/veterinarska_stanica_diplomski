@@ -112,7 +112,7 @@ class HealthRecord
     #[ORM\Column]
     private ?bool $notifiedDayBefore = null;
 
-    private bool $atPresent = false;
+    private ?bool $atPresent = null;
 
     public function __construct()
     {

@@ -50,20 +50,22 @@ class HealthRecordController extends AbstractController
         $healthRecord = new HealthRecord();
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+
         if (!$healthRecord->checkHolyTrinity()) {
             return $this->json('Invalid appointment.');
         }
-        $madeByVet = $this->isVet($tokenStorage);
+        $madeByVet = $this->isVet($tokenStorage);//this works
+
         if ($madeByVet) {
             if ($healthRecord->getAtPresent()) {
                 $healthRecord = $this->makeHealthRecordNow($healthRecord);
             }
             $healthRecord->setMadeByVet(true);
-
         }
         else {
             $healthRecord->setMadeByVet(false);
         }
+//        dd($healthRecord);
         $this->em->persist($healthRecord);
         $this->em->flush();
 
@@ -82,7 +84,7 @@ class HealthRecordController extends AbstractController
     {
         $healthRecord->setMadeByVet(true);
         $healthRecord->setStartedAt(new DateTime());
-
+        $healthRecord->setStatus('active');
         $examDurationInSeconds = $healthRecord->getExamination()->getDuration() * self::ONE_MINUTE_IN_SECONDS;
 
         $healthRecord->setFinishedAt(new DateTime('+' . $examDurationInSeconds . 'seconds'));
