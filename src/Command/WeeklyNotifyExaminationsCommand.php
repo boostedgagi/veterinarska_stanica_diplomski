@@ -47,14 +47,6 @@ class WeeklyNotifyExaminationsCommand extends Command
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-//        $this
-//            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-//        ;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln([
@@ -62,7 +54,7 @@ class WeeklyNotifyExaminationsCommand extends Command
             '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
         ]);
 
-        $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next eek');
+        $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next week');
 
         if(count($examinationsToRemind)===0){
             $output->writeln([
@@ -77,7 +69,7 @@ class WeeklyNotifyExaminationsCommand extends Command
         foreach ($examinationsToRemind as $examination) {
             try {
                 $email = new EmailRepository($this->mailer);
-                //$examination is the HealthRecordType
+
                 $email->notifyUserAboutPetHaircut($this->notifier, $examination);
 
                 $examination->setNotifiedWeekBefore(true);

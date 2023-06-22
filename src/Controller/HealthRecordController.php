@@ -54,8 +54,8 @@ class HealthRecordController extends AbstractController
         if (!$healthRecord->checkHolyTrinity()) {
             return $this->json('Invalid appointment.');
         }
-        $madeByVet = $this->isVet($tokenStorage);//this works
-        dump($healthRecord);
+        $madeByVet = $this->isVet($tokenStorage);
+
         if ($madeByVet) {
             if ($healthRecord->getAtPresent()) {
                 $healthRecord = $this->makeHealthRecordNow($healthRecord);
@@ -65,7 +65,7 @@ class HealthRecordController extends AbstractController
         else {
             $healthRecord->setMadeByVet(false);
         }
-        dump($healthRecord);
+
         $this->em->persist($healthRecord);
         $this->em->flush();
 

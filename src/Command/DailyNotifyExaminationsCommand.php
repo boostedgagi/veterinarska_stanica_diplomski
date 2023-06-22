@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\NotifierInterface;
 #[AsCommand(
     name: 'DailyNotifyExaminationsCommand',
     description: 'Add a short description for your command',
+    aliases: ['notify:examinations:day']
 )]
 class DailyNotifyExaminationsCommand extends Command
 {
@@ -43,14 +44,7 @@ class DailyNotifyExaminationsCommand extends Command
 
         parent::__construct();
     }
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-        //i need to change this command to daily notify
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln([
@@ -59,11 +53,7 @@ class DailyNotifyExaminationsCommand extends Command
         ]);
 
         $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next week');
-//        if(is_string($examinationsToRemind)){
-//            $output->writeln([
-//                $examinationsToRemind
-//            ]);
-//        }
+        
         if(count($examinationsToRemind)===0){
             $output->writeln([
                 'Great! But...',
