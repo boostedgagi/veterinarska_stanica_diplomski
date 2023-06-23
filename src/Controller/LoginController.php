@@ -24,7 +24,7 @@ class LoginController extends AbstractController
     }
 
     #[Route('/take_location', methods: 'POST')]
-    public function login(MobileDetectorInterface $detector, UserRepository $userRepo): JsonResponse
+    public function login(MobileDetectorInterface $detector): JsonResponse
     {
         $logHandler = new LogHandler();
 
@@ -32,11 +32,7 @@ class LoginController extends AbstractController
 
         $this->em->persist($log);
         $this->em->flush();
-        //maybe I should retrieve coordinates from
-        //method from above and patch user object with them in case he will need nearest vet, who knows.
+
         return $this->json(['status'=>'Location taken.'],Response::HTTP_OK);
-//        $user = $userRepo->findAll();
-//
-//        return $this->json($user, Response::HTTP_OK);
     }
 }

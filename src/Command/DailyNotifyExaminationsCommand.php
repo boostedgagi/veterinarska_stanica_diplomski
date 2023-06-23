@@ -53,7 +53,7 @@ class DailyNotifyExaminationsCommand extends Command
         ]);
 
         $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next week');
-        
+
         if(count($examinationsToRemind)===0){
             $output->writeln([
                 'Great! But...',
