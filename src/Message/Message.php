@@ -3,36 +3,106 @@ namespace App\Message;
 
 use App\Entity\User;
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping\PrePersist;
 
 class Message
 {
-    public int $id;
+    public string $sender;
 
-    public User $sender;
-
-    public User $receiver;
+    public string $receiver;
 
     public string $content;
 
     public string $status;
 
-    public DateTimeImmutable $createdAt;
+    public ?DateTimeImmutable $createdAt = null;
 
     /**
-     * @return int
+     * @return User
      */
-    public function getId(): int
+    public function getSender(): string
     {
-        return $this->id;
+        return $this->sender;
     }
 
     /**
-     * @param int $id
+     * @param string $sender
      * @return Message
      */
-    public function setId(int $id): Message
+    public function setSender(string $sender): Message
     {
-        $this->id = $id;
+        $this->sender = $sender;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReceiver(): string
+    {
+        return $this->receiver;
+    }
+
+    /**
+     * @param string $receiver
+     * @return Message
+     */
+    public function setReceiver(string $receiver): Message
+    {
+        $this->receiver = $receiver;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     * @return Message
+     */
+    public function setContent(string $content): Message
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return Message
+     */
+    public function setStatus(string $status): Message
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @return Message
+     */
+    public function setCreatedAt(): Message
+    {
+        $this->createdAt = new DateTimeImmutable();
         return $this;
     }
 }
