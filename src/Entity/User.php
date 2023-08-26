@@ -173,11 +173,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null;
 
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: ContactMessage::class)]
+    private Collection $contactMessagesAsSender;
+
+    #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: ContactMessage::class)]
+    private Collection $contactMessagesAsReceiver;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
         $this->healthRecords = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->contactMessagesAsSender = new ArrayCollection();
+        $this->contactMessagesAsReceiver = new ArrayCollection();
     }
 
 
@@ -555,5 +563,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPlainPassword():string|null
     {
         return $this->plainPassword;
+    }
+
+    /**
+     * @return Collection<int, ContactMessage>
+     */
+    public function getContactMessagesAsSender(): Collection
+    {
+        return $this->contactMessagesAsSender;
+    }
+
+    public function addContactMessagesAsSender(ContactMessage $contactMessagesAsSender): static
+    {
+        if (!$this->contactMessagesAsSender->contains($contactMessagesAsSender)) {
+            $this->contactMessagesAsSender->add($contactMessagesAsSender);
+            $contactMessagesAsSender->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactMessagesAsSender(ContactMessage $contactMessagesAsSender): static
+    {
+        if ($this->contactMessagesAsSender->removeElement($contactMessagesAsSender)) {
+            // set the owning side to null (unless already changed)
+            if ($contactMessagesAsSender->getSender() === $this) {
+                $contactMessagesAsSender->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContactMessage>
+     */
+    public function getContactMessagesAsReceiver(): Collection
+    {
+        return $this->contactMessagesAsReceiver;
+    }
+
+    public function addContactMessagesAsReceiver(ContactMessage $contactMessagesAsReceiver): static
+    {
+        if (!$this->contactMessagesAsReceiver->contains($contactMessagesAsReceiver)) {
+            $this->contactMessagesAsReceiver->add($contactMessagesAsReceiver);
+            $contactMessagesAsReceiver->setReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactMessagesAsReceiver(ContactMessage $contactMessagesAsReceiver): static
+    {
+        if ($this->contactMessagesAsReceiver->removeElement($contactMessagesAsReceiver)) {
+            // set the owning side to null (unless already changed)
+            if ($contactMessagesAsReceiver->getReceiver() === $this) {
+                $contactMessagesAsReceiver->setReceiver(null);
+            }
+        }
+
+        return $this;
     }
 }
