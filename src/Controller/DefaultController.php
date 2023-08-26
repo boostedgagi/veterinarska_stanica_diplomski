@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\ContextGroup;
 use App\Form\MessageType;
 use App\Message\Message;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -21,6 +22,6 @@ class DefaultController extends AbstractController
         $this->handleJSONForm($request,$message,MessageType::class);
         $messageBus->dispatch($message);
 
-        return $this->json(['']);
+        return $this->json('Message sent, please be patient for vet\'s response.',Response::HTTP_OK);
     }
 }

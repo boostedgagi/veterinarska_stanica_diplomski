@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\ContactMessageRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ContactMessageRepository::class)]
@@ -40,6 +43,11 @@ class ContactMessage
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
     public function getSender(): ?User
     {
         return $this->sender;
@@ -52,6 +60,11 @@ class ContactMessage
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
     public function getReceiver(): ?User
     {
         return $this->receiver;
@@ -64,6 +77,11 @@ class ContactMessage
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
     public function getContent(): ?string
     {
         return $this->content;
@@ -76,6 +94,12 @@ class ContactMessage
         return $this;
     }
 
+
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
     public function getStatus(): ?string
     {
         return $this->status;
@@ -88,26 +112,29 @@ class ContactMessage
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
     #[ORM\PrePersist]
-    public function prePersist(\DateTimeImmutable $createdAt): static
+    public function prePersist(): void
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
     #[ORM\PreUpdate]
-    public function preUpdate(?\DateTimeImmutable $updatedAt): static
+    public function preUpdate(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

@@ -17,15 +17,13 @@ class MessageType extends AbstractType
         $builder
             ->add('sender')
             ->add('receiver')
-            ->add('content')
-            ->add('status');
+            ->add('content');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Message::class,
-            'allow_extra_fields'=>true
+            'data_class' => Message::class
         ]);
     }
 }

@@ -13,13 +13,8 @@ class Message
 
     public string $content;
 
-    public string $status;
-
     public ?DateTimeImmutable $createdAt = null;
 
-    /**
-     * @return User
-     */
     public function getSender(): string
     {
         return $this->sender;
@@ -68,24 +63,6 @@ class Message
     public function setContent(string $content): Message
     {
         $this->content = $content;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param string $status
-     * @return Message
-     */
-    public function setStatus(string $status): Message
-    {
-        $this->status = $status;
         return $this;
     }
 
