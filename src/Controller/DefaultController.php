@@ -15,10 +15,11 @@ class DefaultController extends AbstractController
 {
     use FormTrait;
 
-    #[Route('/',methods:Request::METHOD_POST)]
+    #[Route('/message', methods:Request::METHOD_POST)]
     public function default(Request $request,MessageBusInterface $messageBus):Response
     {
         $message = new Message();
+
         $this->handleJSONForm($request,$message,MessageType::class);
         $messageBus->dispatch($message);
 
