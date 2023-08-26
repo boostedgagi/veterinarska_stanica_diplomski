@@ -3,12 +3,11 @@ namespace App\MessageHandler;
 
 use App\Entity\User;
 use App\Message\Message;
-//use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use App\Repository\UserRepository;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-//#[AsMessageHandler]
-class MessageHandler implements MessageHandlerInterface
+#[AsMessageHandler]
+class MessageHandler
 {
     private UserRepository $userRepo;
 
