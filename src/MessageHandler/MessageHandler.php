@@ -5,6 +5,7 @@ namespace App\MessageHandler;
 use App\Entity\ContactMessage;
 use App\Entity\User;
 use App\Message\Message;
+use App\Message\MessageStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use App\Repository\UserRepository;
