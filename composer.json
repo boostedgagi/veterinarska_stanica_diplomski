@@ -59,7 +59,7 @@
         "symfony/phpunit-bridge": "^6.2",
         "symfony/stopwatch": "6.0.*",
         "symfony/web-profiler-bundle": "6.0.*",
-        "zenstruck/foundry": "^1.24"
+        "zenstruck/foundry": "^1.35"
     },
     "config": {
         "allow-plugins": {

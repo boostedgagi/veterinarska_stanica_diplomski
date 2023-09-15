@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d3217902cf2201ca0754170e17d7167",
+    "content-hash": "28d5fea008a917f14361fe1bcdb43cbe",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -11477,16 +11477,16 @@
         },
         {
             "name": "zenstruck/foundry",
-            "version": "v1.33.0",
+            "version": "v1.35.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/foundry.git",
-                "reference": "3c46a2f2aa3ad8a1d74583a28a6be05e8c0a46ee"
+                "reference": "4cb1fed923e8bf0ee6e977be74d3676d431291f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/3c46a2f2aa3ad8a1d74583a28a6be05e8c0a46ee",
-                "reference": "3c46a2f2aa3ad8a1d74583a28a6be05e8c0a46ee",
+                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/4cb1fed923e8bf0ee6e977be74d3676d431291f9",
+                "reference": "4cb1fed923e8bf0ee6e977be74d3676d431291f9",
                 "shasum": ""
             },
             "require": {
@@ -11512,7 +11512,7 @@
                 "doctrine/orm": "^2.9",
                 "matthiasnoback/symfony-dependency-injection-test": "^4.1",
                 "symfony/framework-bundle": "^5.4|^6.0",
-                "symfony/maker-bundle": "^1.30",
+                "symfony/maker-bundle": "^1.49",
                 "symfony/phpunit-bridge": "^5.4|^6.0",
                 "symfony/translation-contracts": "^2.5|^3.0"
             },
@@ -11554,7 +11554,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/foundry/issues",
-                "source": "https://github.com/zenstruck/foundry/tree/v1.33.0"
+                "source": "https://github.com/zenstruck/foundry/tree/v1.35.0"
             },
             "funding": [
                 {
@@ -11562,7 +11562,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-05-23T16:21:57+00:00"
+            "time": "2023-08-10T14:39:33+00:00"
         }
     ],
     "aliases": [],

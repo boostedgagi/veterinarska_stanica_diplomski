@@ -179,6 +179,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: ContactMessage::class)]
     private Collection $contactMessagesAsReceiver;
 
+    #[ORM\OneToMany(mappedBy: 'vet', targetEntity: OnCall::class)]
+    private Collection $onCalls;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
@@ -186,6 +189,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->users = new ArrayCollection();
         $this->contactMessagesAsSender = new ArrayCollection();
         $this->contactMessagesAsReceiver = new ArrayCollection();
+        $this->onCalls = new ArrayCollection();
     }
 
 
@@ -619,6 +623,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($contactMessagesAsReceiver->getReceiver() === $this) {
                 $contactMessagesAsReceiver->setReceiver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OnCall>
+     */
+    public function getOnCalls(): Collection
+    {
+        return $this->onCalls;
+    }
+
+    public function addOnCall(OnCall $onCall): static
+    {
+        if (!$this->onCalls->contains($onCall)) {
+            $this->onCalls->add($onCall);
+            $onCall->setVet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOnCall(OnCall $onCall): static
+    {
+        if ($this->onCalls->removeElement($onCall)) {
+            // set the owning side to null (unless already changed)
+            if ($onCall->getVet() === $this) {
+                $onCall->setVet(null);
             }
         }
 
