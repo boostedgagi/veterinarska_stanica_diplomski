@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OnCallRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: OnCallRepository::class)]
 class OnCall
 {
@@ -26,9 +27,6 @@ class OnCall
     #[ORM\Column]
     private ?int $chatCount = null;
 
-    /**
-     * @param int|null $chatCount
-     */
     public function __construct()
     {
         $this->chatCount = 0;
@@ -56,9 +54,10 @@ class OnCall
         return $this->startedAt;
     }
 
-    public function setStartedAt(\DateTimeImmutable $startedAt): static
+    #[ORM\PrePersist]
+    public function prePersist(): static
     {
-        $this->startedAt = $startedAt;
+        $this->startedAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -68,6 +67,7 @@ class OnCall
         return $this->finishedAt;
     }
 
+    //TODO set this on finish in separate route
     public function setFinishedAt(?\DateTimeImmutable $finishedAt): static
     {
         $this->finishedAt = $finishedAt;

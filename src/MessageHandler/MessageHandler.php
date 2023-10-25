@@ -41,7 +41,4 @@ class MessageHandler
     {
         return $this->userRepo->find($userId);
     }
-
-
-
 }
