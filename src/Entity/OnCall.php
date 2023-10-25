@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\OnCallRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
@@ -19,10 +20,10 @@ class OnCall
     private ?User $vet = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $startedAt = null;
+    private ?DateTimeImmutable $startedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $finishedAt = null;
+    private ?DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column]
     private ?int $chatCount = null;
@@ -49,7 +50,7 @@ class OnCall
         return $this;
     }
 
-    public function getStartedAt(): ?\DateTimeImmutable
+    public function getStartedAt(): ?DateTimeImmutable
     {
         return $this->startedAt;
     }
@@ -57,18 +58,18 @@ class OnCall
     #[ORM\PrePersist]
     public function prePersist(): self
     {
-        $this->startedAt = new \DateTimeImmutable();
+        $this->startedAt = new DateTimeImmutable();
 
         return $this;
     }
 
-    public function getFinishedAt(): ?\DateTimeImmutable
+    public function getFinishedAt(): ?DateTimeImmutable
     {
         return $this->finishedAt;
     }
 
     //TODO set this on finish in separate route
-    public function setFinishedAt(?\DateTimeImmutable $finishedAt): self
+    public function setFinishedAt(?DateTimeImmutable $finishedAt): self
     {
         $this->finishedAt = $finishedAt;
 
