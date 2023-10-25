@@ -18,13 +18,19 @@ class OnCallController extends AbstractController
 {
     use FormTrait;
 
+    #[Route('/', methods:Request::METHOD_POST)]
+    public function default(Request $request,MessageBusInterface $messageBus):Response
+    {
+        return $this->json('Welcome');
+    }
+
     /**
      * This endpoint makes vet on call (postaje dezuran) and able to recieve messages
      * @param Request $request
      * @return Response
      */
     #[Route('/on_call',methods:Request::METHOD_POST)]
-    public function create(Request $request): Response
+    public function createOnCall(Request $request): Response
     {
         $onCall = new OnCall();
 
@@ -33,7 +39,7 @@ class OnCallController extends AbstractController
     }
 
     #[Route('/message', methods:Request::METHOD_POST)]
-    public function default(Request $request,MessageBusInterface $messageBus):Response
+    public function sendMessage(Request $request,MessageBusInterface $messageBus):Response
     {
         $message = new Message();
 
