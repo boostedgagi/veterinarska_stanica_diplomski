@@ -2,6 +2,7 @@ version: '3'
 services:
   mysql:
     image: percona:8.0
+    container_name: mysql_vetShop
     restart: always
     ports:
       - '3326:3306' # 'local_port:port_in_container'
@@ -20,10 +21,10 @@ services:
     links:
       - mysql
     environment:
-      PMA_HOST: eu-cdbr-west-03.cleardb.net
+      PMA_HOST: mysql_vetShop
       PMA_ARBITRARY: 1
-      MYSQL_USERNAME: 'b56af87347d7c7'
-      MYSQL_ROOT_PASSWORD: 'f57784a7'
+      MYSQL_USERNAME: 'admin'
+      MYSQL_ROOT_PASSWORD: 'password'
     restart: always
     ports:
       - "8082:80"
