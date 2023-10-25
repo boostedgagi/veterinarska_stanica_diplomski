@@ -42,7 +42,7 @@ class OnCall
         return $this->vet;
     }
 
-    public function setVet(?User $vet): static
+    public function setVet(?User $vet): self
     {
         $this->vet = $vet;
 
@@ -55,7 +55,7 @@ class OnCall
     }
 
     #[ORM\PrePersist]
-    public function prePersist(): static
+    public function prePersist(): self
     {
         $this->startedAt = new \DateTimeImmutable();
 
@@ -68,7 +68,7 @@ class OnCall
     }
 
     //TODO set this on finish in separate route
-    public function setFinishedAt(?\DateTimeImmutable $finishedAt): static
+    public function setFinishedAt(?\DateTimeImmutable $finishedAt): self
     {
         $this->finishedAt = $finishedAt;
 
@@ -80,7 +80,7 @@ class OnCall
         return $this->chatCount;
     }
 
-    public function setChatCount(int $chatCount): static
+    public function setChatCount(int $chatCount): self
     {
         $this->chatCount = $chatCount;
 
