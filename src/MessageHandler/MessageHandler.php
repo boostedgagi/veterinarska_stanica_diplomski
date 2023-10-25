@@ -27,6 +27,7 @@ class MessageHandler
 
     public function __invoke(Message $message): void
     {
+        //todo refactor move message to contact message constructor
         $contactMessage = (new ContactMessage())
             ->setSender($this->getUser($message->getSender()))
             ->setReceiver($this->getUser($message->getReceiver()))
