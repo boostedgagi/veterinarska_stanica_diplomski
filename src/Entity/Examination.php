@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\ExaminationRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -18,65 +20,22 @@ class Examination
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(
-        [
-            'examination_created',
-            'examination_showAll',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'examination_created',
-            'examination_showAll',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'examination_created',
-            'examination_showAll',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?int $duration = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'examination_created',
-            'examination_showAll',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?int $price = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'examination_created',
-            'examination_showAll'
-        ]
-    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Groups(
-        [
-//            'examination_created',
-            'examination_showAll'
-        ]
-    )]
-    private ?\DateTimeInterface $updatedAt = null;
+    private ?DateTimeInterface $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'examination', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;
@@ -86,11 +45,26 @@ class Examination
         $this->healthRecords = new ArrayCollection();
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_EXAMINATION,
+            ContextGroup::SHOW_EXAMINATION,
+            'healthRecord_showAll'
+        ]
+    )]
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_EXAMINATION,
+            ContextGroup::SHOW_EXAMINATION,
+            'healthRecord_created',
+            'healthRecord_showAll'
+        ]
+    )]
     public function getName(): ?string
     {
         return $this->name;
@@ -103,6 +77,14 @@ class Examination
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_EXAMINATION,
+            ContextGroup::SHOW_EXAMINATION,
+            'healthRecord_created',
+            'healthRecord_showAll'
+        ]
+    )]
     public function getDuration(): ?int
     {
         return $this->duration;
@@ -115,6 +97,14 @@ class Examination
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_EXAMINATION,
+            ContextGroup::SHOW_EXAMINATION,
+            'healthRecord_created',
+            'healthRecord_showAll'
+        ]
+    )]
     public function getPrice(): ?int
     {
         return $this->price;
@@ -127,11 +117,17 @@ class Examination
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_EXAMINATION,
+            ContextGroup::SHOW_EXAMINATION
+        ]
+    )]
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
-
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
@@ -151,8 +147,12 @@ class Examination
         $this->updatedAt = new \DateTimeImmutable();
     }
 
-
-    public function getUpdatedAt(): ?\DateTimeInterface
+    #[Groups(
+        [
+            ContextGroup::SHOW_EXAMINATION
+        ]
+    )]
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
