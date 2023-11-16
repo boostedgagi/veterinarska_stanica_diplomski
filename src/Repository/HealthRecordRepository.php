@@ -44,6 +44,10 @@ class HealthRecordRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     public function examinationsCount(): int
     {
         $qb = $this->createQueryBuilder('hr');
@@ -52,11 +56,14 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function getExaminationsInTimeRange(string $today): array
+    public function getExaminationsInTimeRange(string $range): array
     {
         $now = new DateTime();
-        $deadline = $this->timeRange($today);
-
+        $deadline = $this->timeRange($range);
+        if(!$deadline)
+        {
+            return [];
+        }
         $qb = $this->createQueryBuilder('hr');
         $qb->select('hr')
             ->andWhere('hr.startedAt>=:now')
@@ -68,22 +75,19 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    private function timeRange(string $range): DateTime|string
+    private function timeRange(string $range): ?DateTime
     {
-        if($range === 'today'){
+        if ($range === 'today')
+        {
             return new DateTime('+1 day');
         }
-        else if($range === 'next week'){
+        if ($range === 'next week')
+        {
             return new DateTime('+7 days');
         }
-        else{
-            return 'wrong time range selected';
-        }
+        return null;
     }
 
-    /**
-     * @throws Exception
-     */
     public function getLastMonthHealthRecords(int $numericalLastMonth): array
     {
         $from = new DateTime('- 30 days');
@@ -102,26 +106,26 @@ class HealthRecordRepository extends ServiceEntityRepository
                 'hr.notifiedDayBefore',
                 'hr.madeByVet'
             )
-            ->innerJoin('hr.vet','vet')
-            ->innerJoin('hr.examination','exam')
-            ->innerJoin('hr.pet','pet')
+            ->innerJoin('hr.vet', 'vet')
+            ->innerJoin('hr.examination', 'exam')
+            ->innerJoin('hr.pet', 'pet')
             ->andWhere('hr.startedAt>:from')
-            ->setParameter('from',$from->format('Y-m-d'))
+            ->setParameter('from', $from->format('Y-m-d'))
             ->andWhere('hr.finishedAt<:to')
-            ->setParameter('to',$to->format('Y-m-d'))
-            ->orderBy('hr.startedAt','ASC');
+            ->setParameter('to', $to->format('Y-m-d'))
+            ->orderBy('hr.startedAt', 'ASC');
 
         return $qb->getQuery()->getResult();
     }
 
-    public function findAllHealthRecords(User $user):array
+    public function findAllHealthRecords(User $user): array
     {
         $qb = $this->createQueryBuilder('hr');
         $qb
-            ->innerJoin('hr.pet','p')
-            ->innerJoin('p.owner','u')
+            ->innerJoin('hr.pet', 'p')
+            ->innerJoin('p.owner', 'u')
             ->andWhere('u.id=:id')
-            ->setParameter('id',$user->getId());
+            ->setParameter('id', $user->getId());
 
         return $qb->getQuery()->getResult();
     }

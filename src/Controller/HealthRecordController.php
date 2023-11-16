@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
@@ -26,41 +27,27 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class HealthRecordController extends AbstractController
 {
-    public const ONE_MINUTE_IN_SECONDS = 60;
-
-
     use FormTrait;
 
-    private EntityManagerInterface $em;
-
-    /**
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(
+        private readonly EntityManagerInterface $em
+    )
     {
-        $this->em = $entityManager;
     }
 
     /**
      * @throws Exception
      */
-    #[Route('/health_records', methods: 'POST')]
-    public function create(Request $request, TokenStorageInterface $tokenStorage): Response
+    #[Route('/health_record', methods: 'POST')]
+    public function create(Request $request): Response
     {
         $healthRecord = new HealthRecord();
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
-        if (!$healthRecord->checkHolyTrinity()) {
-            return $this->json('Invalid appointment.');
-        }
-        $madeByVet = $this->isVet($tokenStorage);
-
-        if ($madeByVet) {
-            if ($healthRecord->getAtPresent()) {
-                $healthRecord = $this->makeHealthRecordNow($healthRecord);
-            }
-            $healthRecord->setMadeByVet(true);
+        if ($healthRecord->isMadeByVet() && $healthRecord->getAtPresent())
+        {
+            $healthRecord->setHealthRecordNow();
         }
         else {
             $healthRecord->setMadeByVet(false);
@@ -69,28 +56,10 @@ class HealthRecordController extends AbstractController
         $this->em->persist($healthRecord);
         $this->em->flush();
 
-        return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => 'healthRecord_created']);
+        return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 
-    private function isVet(TokenStorageInterface $tokenStorage): bool
-    {
-        return JwtService::getCurrentUser($tokenStorage)->getTypeOfUser() === 2;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function makeHealthRecordNow(HealthRecord $healthRecord): HealthRecord
-    {
-        $healthRecord->setMadeByVet(true);
-        $healthRecord->setStartedAt(new DateTime());
-        $healthRecord->setStatus('active');
-        $examDurationInSeconds = $healthRecord->getExamination()->getDuration() * self::ONE_MINUTE_IN_SECONDS;
-
-        $healthRecord->setFinishedAt(new DateTime('+' . $examDurationInSeconds . 'seconds'));
-
-        return $healthRecord;
-    }
+    //move this out of this controller
 
     #[Route('/health_records/{id}', methods: 'PUT')]
     public function edit(Request $request, ?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
@@ -129,25 +98,25 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/pets/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function getHealthRecords(?Pet $pet): Response
+    public function petHealthRecords(?Pet $pet): Response
     {
         if (!$pet) {
             return $this->json(["error" => "Pet not found."]);
         }
         $petHealthRecords = $pet->getHealthRecords();
 
-        return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+        return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
     #[Route('/users/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function getAllUserHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
+    public function ownerHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
         if (!$user) {
             return $this->json(["error" => "Health record not found."]);
         }
         $allHealthRecords = $healthRecordRepo->findAllHealthRecords($user);
 
-        return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+        return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
     #[Route('/health_records/{id}/cancel', methods: 'POST')]
@@ -179,5 +148,10 @@ class HealthRecordController extends AbstractController
         $this->em->flush();
 
         return $this->json(['status' => 'Examination successfully canceled.'], Response::HTTP_OK);
+    }
+
+    private function isVet(TokenStorageInterface $tokenStorage): bool
+    {
+        return JwtService::getCurrentUser($tokenStorage)->getTypeOfUser() === 2;
     }
 }

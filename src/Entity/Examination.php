@@ -61,7 +61,7 @@ class Examination
         [
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
-            'healthRecord_created',
+            ContextGroup::CREATE_HEALTH_RECORD,
             'healthRecord_showAll'
         ]
     )]
@@ -81,7 +81,7 @@ class Examination
         [
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
-            'healthRecord_created',
+            ContextGroup::CREATE_HEALTH_RECORD,
             'healthRecord_showAll'
         ]
     )]
@@ -101,7 +101,7 @@ class Examination
         [
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
-            'healthRecord_created',
+            ContextGroup::CREATE_HEALTH_RECORD,
             'healthRecord_showAll'
         ]
     )]

@@ -14,12 +14,14 @@ class HealthRecordType extends AbstractType
     {
         $builder
             ->add('vet',null,[
-                'required'=>false
+                'required'=>true
             ])
             ->add('pet',null,[
                 'required'=>true
             ])
-            ->add('examination')
+            ->add('examination',null,[
+                'required'=>true
+            ])
             ->add('startedAt', DateTimeType::class, [
                 'widget' => 'single_text'
             ])
@@ -28,6 +30,7 @@ class HealthRecordType extends AbstractType
             ])
             ->add('comment')
             ->add('status')
+            ->add('madeByVet')
             ->add('notifiedDayBefore',null,[
                 'required'=>false
             ])

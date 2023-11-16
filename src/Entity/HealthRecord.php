@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\HealthRecordRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
+use OpenApi\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]
@@ -15,89 +18,39 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class HealthRecord
 {
     public const STATUS_CANCELED = 'canceled';
+    public const ONE_MINUTE_IN_SECONDS = 60;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(
-        [
-            'healthRecord_showAll'
-        ]
-    )]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private User $vet;
 
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?Examination $examination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?\DateTimeInterface $startedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?\DateTimeInterface $finishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $comment = null;
 
     #[ORM\Column(length: 64)]
-    #[Groups(
-        [
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $status = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'healthRecord_showAll'
-        ]
-    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -114,15 +67,23 @@ class HealthRecord
 
     private ?bool $atPresent = null;
 
-    public function __construct()
-    {
-    }
-
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getPet(): ?Pet
     {
         return $this->pet;
@@ -135,6 +96,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getExamination(): ?Examination
     {
         return $this->examination;
@@ -147,6 +114,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getComment(): ?string
     {
         return $this->comment;
@@ -159,6 +132,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getStatus(): ?string
     {
         return $this->status;
@@ -171,18 +150,28 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    #[ORM\PrePersist]
+    public function prePersist(): void
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
@@ -195,6 +184,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getVet(): ?User
     {
         return $this->vet;
@@ -207,6 +202,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getStartedAt(): ?\DateTimeInterface
     {
         return $this->startedAt;
@@ -219,6 +220,12 @@ class HealthRecord
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getFinishedAt(): ?\DateTimeInterface
     {
         return $this->finishedAt;
@@ -230,13 +237,6 @@ class HealthRecord
 
         return $this;
     }
-
-    #[ORM\PrePersist]
-    public function prePersist(): void
-    {
-        $this->createdAt = new \DateTimeImmutable();
-    }
-
 
     public function isMadeByVet(): ?bool
     {
@@ -298,4 +298,20 @@ class HealthRecord
         return $this->getVet() && $this->getPet() && $this->getExamination();
     }
 
+    /**
+     * @throws Exception
+     */
+    public function setHealthRecordNow(): HealthRecord
+    {
+        $this
+            ->setMadeByVet(true)
+            ->setStartedAt(new DateTime())
+            ->setStatus('active');
+
+        $examDurationInSeconds = $this->getExamination()->getDuration() * self::ONE_MINUTE_IN_SECONDS;
+
+        $this->setFinishedAt(new DateTime('+' . $examDurationInSeconds . 'seconds'));
+
+        return $this;
+    }
 }

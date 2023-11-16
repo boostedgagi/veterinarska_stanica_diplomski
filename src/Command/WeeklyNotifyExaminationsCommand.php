@@ -26,34 +26,18 @@ use Symfony\Component\Notifier\NotifierInterface;
 )]
 class WeeklyNotifyExaminationsCommand extends Command
 {
-    private MailerInterface $mailer;
-    private NotifierInterface $notifier;
-    private HealthRecordRepository $healthRecRepo;
-    private EntityManagerInterface $em;
-
-    /**
-     * @param MailerInterface $mailer
-     * @param NotifierInterface $notifier
-     * @param HealthRecordRepository $healthRecRepo
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(MailerInterface $mailer, NotifierInterface $notifier, HealthRecordRepository $healthRecRepo, EntityManagerInterface $em)
+    public function __construct(
+        private readonly MailerInterface $mailer,
+        private readonly  NotifierInterface $notifier,
+        private readonly HealthRecordRepository $healthRecRepo,
+        private readonly EntityManagerInterface $em
+    )
     {
-        $this->mailer = $mailer;
-        $this->notifier = $notifier;
-        $this->healthRecRepo = $healthRecRepo;
-        $this->em = $em;
-
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln([
-            'Okay let\'s notify pet owners!',
-            '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-        ]);
-
         $examinationsToRemind = $this->healthRecRepo->getExaminationsInTimeRange('next week');
 
         if(count($examinationsToRemind)===0){
