@@ -23,7 +23,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\EmailRepository;
+use App\Service\TemplatedEmail;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends AbstractController
@@ -69,7 +69,7 @@ class UserController extends AbstractController
         $user->setAllowed(false);
         $user->setTypeOfUser(3);
 
-        $email = new EmailRepository($mailer);
+        $email = new TemplatedEmail($mailer);
 
         $token30minutes = (new ModelToken())->make30MinToken();
         $token = new Token($token30minutes);
@@ -103,7 +103,7 @@ class UserController extends AbstractController
         $vet->setAllowed(true);
         $vet->setTypeOfUser(2);
 
-        $email = new EmailRepository($mailer);
+        $email = new TemplatedEmail($mailer);
 
         $this->em->persist($vet);
         $this->em->flush();

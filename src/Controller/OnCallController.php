@@ -17,13 +17,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class OnCallController extends AbstractController
 {
     use FormTrait;
-
-    #[Route('/', methods:Request::METHOD_GET)]
-    public function default(Request $request,MessageBusInterface $messageBus):Response
-    {
-        return $this->json('Welcome');
-    }
-
     /**
      * This endpoint makes vet on call (postaje dezuran) and able to recieve messages
      * @param Request $request

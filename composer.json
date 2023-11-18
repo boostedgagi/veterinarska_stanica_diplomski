@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.0.2",
+        "php": "8.2.*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "beberlei/doctrineextensions": "dev-master",
@@ -63,6 +63,10 @@
         "zenstruck/foundry": "^1.35"
     },
     "config": {
+        "platform-check": false,
+        "platform": {
+            "php": "8.2.0"
+        },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "symfony/flex": true,
@@ -98,7 +102,6 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
-
         },
         "post-install-cmd": [
             "@auto-scripts"

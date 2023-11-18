@@ -6,40 +6,46 @@ use App\Entity\User;
 
 class CancelHealthRecord
 {
-    private string $cancelContent;
+    private string $cancelMessage;
 
-    private int $canceler;
+    private User $canceler;
 
     /**
      * @return string
      */
-    public function getCancelContent(): string
+    public function getCancelMessage(): string
     {
-        return $this->cancelContent;
+        return $this->cancelMessage;
     }
 
     /**
-     * @param string $cancelContent
+     * @param string $cancelMessage
      */
-    public function setCancelContent(string $cancelContent): void
+    public function setCancelMessage(string $cancelMessage): void
     {
-        $this->cancelContent = $cancelContent;
+        $this->cancelMessage = $cancelMessage;
     }
 
 
-    public function getCanceler(): int
+    public function getCanceler(): User
     {
         return $this->canceler;
     }
 
-
-    public function setCanceler(int $canceler): void
+    public function setCanceler(User $canceler): self
     {
         $this->canceler = $canceler;
     }
 
     public static function getDenyCancelMessage():string
-        {
-        return 'Examination is impossible to cancel less than hour before of its start.';
-        }
+    {
+        return 'Examination is forbidden to cancel less than hour before of its start.';
+    }
+
+    public static function getSuccessfullCancelMessage():string
+    {
+        return 'Examination successfully canceled.';
+    }
+
+
 }

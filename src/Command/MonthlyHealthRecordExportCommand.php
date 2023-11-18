@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\HealthRecord;
 use App\Repository\HealthRecordRepository;
-use App\Service\EmailRepository;
+use App\Service\TemplatedEmail;
 use App\Service\ExportService;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -65,7 +65,7 @@ class MonthlyHealthRecordExportCommand extends Command
         try
             {
             $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
-            $email = new EmailRepository($this->mailer);
+            $email = new TemplatedEmail($this->mailer);
             $email->sendMonthlyCSVByMail($filePath);
             }
         catch (Exception $e)

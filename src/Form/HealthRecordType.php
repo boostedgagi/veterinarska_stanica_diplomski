@@ -22,12 +22,8 @@ class HealthRecordType extends AbstractType
             ->add('examination',null,[
                 'required'=>true
             ])
-            ->add('startedAt', DateTimeType::class, [
-                'widget' => 'single_text'
-            ])
-            ->add('finishedAt', DateTimeType::class, [
-                'widget' => 'single_text'
-            ])
+            ->add('startedAt')
+            ->add('finishedAt')
             ->add('comment')
             ->add('status')
             ->add('madeByVet')

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\PetRepository;
 
 //use DateTime;
@@ -10,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Date;
 
@@ -17,99 +19,34 @@ use Symfony\Component\Validator\Constraints\Date;
 #[ORM\Entity(repositoryClass: PetRepository::class)]
 class Pet
 {
-    #[Groups(
-        [
-            'pet_showByUser',
-            'pet_created',
-            'healthRecord_showAll'
-        ]
-    )]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll',
-            'pet_showByUser',
-            'pet_foundPet',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll',
-            'pet_showByUser',
-            'pet_foundPet',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?\DateTimeImmutable $dateOfBirth = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll',
-            'pet_showByUser',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $animal = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll',
-            'pet_showByUser',
-            'healthRecord_created',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?string $breed = null;
 
     #[ORM\ManyToOne(inversedBy: 'pets')]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll',
-            'pet_foundPet'
-        ]
-    )]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $owner = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showByUser',
-            'pet_showAll'
-        ]
-    )]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(
-        [
-            'pet_created',
-            'pet_showAll'
-        ]
-    )]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class, cascade: ['persist', 'remove'])]
@@ -120,11 +57,28 @@ class Pet
         $this->healthRecords = new ArrayCollection();
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_USER_PETS
+        ]
+    )]
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::FOUND_PET
+        ]
+    )]
     public function getName(): ?string
     {
         return $this->name;
@@ -137,6 +91,17 @@ class Pet
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::FOUND_PET,
+
+        ]
+    )]
     public function getDateOfBirth(): ?\DateTimeImmutable
     {
         return $this->dateOfBirth;
@@ -149,6 +114,15 @@ class Pet
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_USER_PETS
+        ]
+    )]
     public function getAnimal(): ?string
     {
         return $this->animal;
@@ -161,6 +135,15 @@ class Pet
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_USER_PETS
+        ]
+    )]
     public function getBreed(): ?string
     {
         return $this->breed;
@@ -173,6 +156,13 @@ class Pet
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
+            ContextGroup::FOUND_PET
+        ]
+    )]
     public function getOwner(): ?User
     {
         return $this->owner;
@@ -185,17 +175,17 @@ class Pet
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_PET
+        ]
+    )]
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
-
-//    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-//    {
-//        $this->createdAt = $createdAt;
-//
-//        return $this;
-//    }
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
@@ -221,6 +211,12 @@ class Pet
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET
+        ]
+    )]
     public function getImage(): ?string
     {
         return $this->image;

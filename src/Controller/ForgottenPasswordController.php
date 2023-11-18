@@ -6,7 +6,7 @@ use App\Entity\Token;
 use App\Model\Token as ModelToken;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
-use App\Service\EmailRepository;
+use App\Service\TemplatedEmail;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,7 +66,7 @@ class ForgottenPasswordController extends AbstractController
     {
         $data = (object)json_decode($request->getContent(), false);
 
-        $email = new EmailRepository($mailer);
+        $email = new TemplatedEmail($mailer);
 
         $preparedToken = (new ModelToken())->make30MinToken();
 

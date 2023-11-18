@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
 use App\Service\UserService;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,6 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Attributes as OA;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -25,106 +29,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(
-        [
-            'user_created',
-            'user_showAll',
-            'healthRecord_showAll'
-        ]
-    )]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(
-        [
-            'user_created',
-            'user_showAll',
-            'pet_showAll',
-            'pet_foundPet',
-            'pet_created',
-            'healthRecord_created',
-            'healthRecord_showAll',
-            'vet_nearby'
-        ]
-    )]
     private ?string $email = null;
 
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
-//    #[Groups(
-//        [
-//            'user_created'
-//        ]
-//    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'user_created',
-            'user_showAll',
-            'pet_showAll',
-            'pet_created',
-            'healthRecord_created',
-            'healthRecord_showAll',
-            'vet_nearby'
-        ]
-    )]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(
-        [
-            'user_created',
-            'user_showAll',
-            'pet_showAll',
-            'pet_created',
-            'healthRecord_created',
-            'healthRecord_showAll',
-            'vet_nearby'
-        ]
-    )]
     private ?string $lastName = null;
 
     #[ORM\Column]
     private ?bool $allowed = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'user_created',
-            'user_showAll'
-        ]
-    )]
     private ?int $typeOfUser = null;
 
     #[ORM\Column]
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    private ?\DateTimeInterface $updatedAt = null;
+    private ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Pet::class, cascade: ['persist', 'remove'])]
@@ -134,38 +68,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $healthRecords;
 
     #[ORM\Column(length: 32, nullable: true)]
-    #[Groups(
-        [
-            'vet_nearby',
-            'user_showAll'
-        ]
-    )]
     private ?string $phone = null;
 
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $latitude = null;
 
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
     private ?string $popularity = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]
@@ -192,12 +105,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->onCalls = new ArrayCollection();
     }
 
-
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_PET,
+            ContextGroup::FOUND_PET,
+            ContextGroup::CREATE_PET,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_NEARBY_VETS,
+        ]
+    )]
     public function getEmail(): ?string
     {
         return $this->email;
@@ -221,8 +152,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @return array|string[]
      */
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER,
+        ]
+    )]
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -263,6 +200,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_PET,
+            ContextGroup::CREATE_PET,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_NEARBY_VETS
+        ]
+    )]
     public function getFirstName(): ?string
     {
         return $this->firstName;
@@ -275,6 +223,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_PET,
+            ContextGroup::CREATE_PET,
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_NEARBY_VETS
+        ]
+    )]
     public function getLastName(): ?string
     {
         return $this->lastName;
@@ -289,7 +248,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            'user_showAll'
+            ContextGroup::SHOW_USER
         ]
     )]
     public function isAllowed(): ?bool
@@ -304,24 +263,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER
+        ]
+    )]
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER
+        ]
+    )]
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -331,15 +300,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
+    public function isVet(): bool
+    {
+        return $this->getTypeOfUser() === 2;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::CREATE_USER,
+            ContextGroup::SHOW_USER
+        ]
+    )]
     public function getTypeOfUser(): ?int
     {
         return $this->typeOfUser;
@@ -352,11 +332,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isVet():bool
-    {
-        return $this->getTypeOfUser() === 2;
-    }
-
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER
+        ]
+    )]
     public function getImage(): ?string
     {
         return $this->image;
@@ -444,76 +424,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): self
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function getLatitude(): ?string
-    {
-        return $this->latitude;
-    }
-
-    public function setLatitude(?string $latitude): self
-    {
-        $this->latitude = $latitude;
-
-        return $this;
-    }
-
-    public function getLongitude(): ?string
-    {
-        return $this->longitude;
-    }
-
-    public function setLongitude(?string $longitude): self
-    {
-        $this->longitude = $longitude;
-
-        return $this;
-    }
-
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    public function getPopularity(HealthRecordRepository $healthRecordRepo,UserService $userService): string
-    {
-        if ($this->getTypeOfUser() === 2)
-            {
-            $examinationsCount = $healthRecordRepo->examinationsCount();
-            return $userService->handlePopularity($this, $examinationsCount);
-            }
-        return '';
-    }
-
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    public function getSth():string
-    {
-//        $healthRecordRepo = new HealthRecordRepository();
-//        $
-        return 'tu sam';
-    }
-//    /**
-//     * @param string|null $popularity
-//     */
-//    public function setPopularity(?string $popularity): void
-//    {
-//        $this->popularity = $popularity;
-//    }
-
     public function getVet(): ?self
     {
         return $this->vet;
@@ -526,25 +436,95 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    private function isVetSet(?User $vet):null|User
+    #[Groups(
+        [
+            ContextGroup::SHOW_NEARBY_VETS,
+            ContextGroup::SHOW_USER,
+        ]
+    )]
+    public function getPhone(): ?string
     {
-        return $vet ? $vet : null ;
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER,
+        ]
+    )]
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER,
+        ]
+    )]
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): self
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+//    /**
+//     * @param string|null $popularity
+//     */
+//    public function setPopularity(?string $popularity): void
+//    {
+//        $this->popularity = $popularity;
+//    }
+
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
+    public function getPopularity(HealthRecordRepository $healthRecordRepo, UserService $userService): string
+    {
+        if ($this->getTypeOfUser() === 2) {
+            $examinationsCount = $healthRecordRepo->examinationsCount();
+            return $userService->handlePopularity($this, $examinationsCount);
+        }
+        return '';
+    }
+
+    #[Groups(
+        [
+            'user_showAll'
+        ]
+    )]
+    public function getSth(): string
+    {
+//        $healthRecordRepo = new HealthRecordRepository();
+//        $
+        return 'tu sam';
     }
 
     public function getClients(): Collection
     {
         return $this->users;
     }
-
-//    public function addUser(self $user): self
-//    {
-//        if (!$this->users->contains($user)) {
-//            $this->users->add($user);
-//            $user->setVet($this);
-//        }
-//
-//        return $this;
-//    }
 
     public function removeUser(self $user): self
     {
@@ -558,15 +538,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+//    public function addUser(self $user): self
+//    {
+//        if (!$this->users->contains($user)) {
+//            $this->users->add($user);
+//            $user->setVet($this);
+//        }
+//
+//        return $this;
+//    }
+
+    public function getPlainPassword(): string|null
+    {
+        return $this->plainPassword;
+    }
+
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
         return $this;
-    }
-
-    public function getPlainPassword():string|null
-    {
-        return $this->plainPassword;
     }
 
     /**
@@ -657,5 +647,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    private function isVetSet(?User $vet): null|User
+    {
+        return $vet ? $vet : null;
     }
 }

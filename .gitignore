@@ -13,7 +13,7 @@
 /mysqldata
 #/public/qr-codes
 ###< symfony/framework-bundle ###
-db.sql
+
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###

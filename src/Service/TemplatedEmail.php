@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\Token;
 use App\Model\Token as ModelToken;
 use DateTime;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Notification\Notification;
@@ -16,15 +17,16 @@ use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 
-class EmailRepository
+class TemplatedEmail
 {
-    private MailerInterface $mailer;
+    public function __construct(
+        private readonly MailerInterface $mailer
+    )
+    {}
 
-    public function __construct($mailer)
-    {
-        $this->mailer = $mailer;
-    }
-
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function sendWelcomeEmail(User $user, Token $token): void
     {
         $email = (new Email())
@@ -51,7 +53,10 @@ class EmailRepository
         $this->mailer->send($email);
     }
 
-    public function sendMailToNewVet(User $vet,string $password):void
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendMailToNewVet(User $vet, string $password):void
     {
         $email = (new Email())
             ->from('welcome@vetshop.com')
@@ -71,7 +76,10 @@ class EmailRepository
         $this->mailer->send($email);
     }
 
-    public function sendQrCodeWithMail(Pet $pet,string $qrCodePath):void
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendQrCodeWithMail(Pet $pet, string $qrCodePath):void
     {
         $host = $_ENV["HOST"];
 
@@ -92,7 +100,10 @@ class EmailRepository
         $this->mailer->send($email);
     }
 
-    public function sendCancelMailByVet(Pet $pet,string $cancelText):void
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendCancelMailByVet(Pet $pet, string $cancelText):void
     {
         $ngrok = getenv('NGROK_TUNNEL');
 

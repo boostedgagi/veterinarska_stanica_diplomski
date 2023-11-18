@@ -300,8 +300,9 @@ class HealthRecord
 
     /**
      * @throws Exception
+     * @return HealthRecord
      */
-    public function setHealthRecordNow(): HealthRecord
+    public function makeHealthRecordNow(): self
     {
         $this
             ->setMadeByVet(true)

@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\HealthRecord;
 use App\Repository\HealthRecordRepository;
-use App\Service\EmailRepository;
+use App\Service\TemplatedEmail;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PhpParser\Node\Stmt\Return_;
@@ -52,7 +52,7 @@ class WeeklyNotifyExaminationsCommand extends Command
         /** @var HealthRecord $examination */
         foreach ($examinationsToRemind as $examination) {
             try {
-                $email = new EmailRepository($this->mailer);
+                $email = new TemplatedEmail($this->mailer);
 
                 $email->notifyUserAboutPetHaircut($this->notifier, $examination);
 

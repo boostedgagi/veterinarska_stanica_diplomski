@@ -19,12 +19,9 @@ class ExaminationController extends AbstractController
 {
     use FormTrait;
 
-    private EntityManagerInterface $em;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->em = $entityManager;
-    }
+    public function __construct(private readonly EntityManagerInterface $em)
+    {}
 
     #[OA\Get(
         path: '/examination',
@@ -188,6 +185,4 @@ class ExaminationController extends AbstractController
 
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
-
-
 }

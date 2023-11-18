@@ -7,7 +7,7 @@ use App\Form\PetType;
 use App\Form\QRCodeType;
 use App\Model\QRCode;
 use App\Repository\PetRepository;
-use App\Service\EmailRepository;
+use App\Service\TemplatedEmail;
 use App\Service\UploadImage;
 use Container4vugFVx\getPetRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +16,7 @@ use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -99,6 +100,9 @@ class PetController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/qr-code', methods: 'POST')]
     public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
@@ -107,7 +111,8 @@ class PetController extends AbstractController
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
 
         $pet = $petRepo->find($qrCode->getPetId());
-        $email = new EmailRepository($mailer);
+        $email = new TemplatedEmail($mailer);
+
         $email->sendQrCodeWithMail($pet, $qrCode->generateQRCode());
 
         return $this->json("QR code is generated and sent to your mail. :)", Response::HTTP_OK);

@@ -15,8 +15,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ExaminationRepository::class)]
 class Examination
 {
-    private const ONE_HOUR_IN_MINUTES = 60;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,7 +47,7 @@ class Examination
         [
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
-            'healthRecord_showAll'
+            ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
     public function getId(): ?int
@@ -62,7 +60,7 @@ class Examination
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
             ContextGroup::CREATE_HEALTH_RECORD,
-            'healthRecord_showAll'
+            ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
     public function getName(): ?string
@@ -82,7 +80,7 @@ class Examination
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
             ContextGroup::CREATE_HEALTH_RECORD,
-            'healthRecord_showAll'
+            ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
     public function getDuration(): ?int
@@ -102,7 +100,7 @@ class Examination
             ContextGroup::CREATE_EXAMINATION,
             ContextGroup::SHOW_EXAMINATION,
             ContextGroup::CREATE_HEALTH_RECORD,
-            'healthRecord_showAll'
+            ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
     public function getPrice(): ?int
@@ -123,17 +121,17 @@ class Examination
             ContextGroup::SHOW_EXAMINATION
         ]
     )]
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
-        return $this;
-    }
+//    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+//    {
+//        $this->createdAt = $createdAt;
+//
+//        return $this;
+//    }
 
     #[ORM\PrePersist]
     public function prePersist(): void
