@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "8.2.*",
+        "php": ">=8.2.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "beberlei/doctrineextensions": "dev-master",
@@ -15,6 +15,7 @@
         "endroid/qr-code-bundle": "^4.1",
         "gedmo/doctrine-extensions": "^3.11",
         "gesdinet/jwt-refresh-token-bundle": "^1.1",
+        "jms/serializer-bundle": "^5.3",
         "league/csv": "^9.0",
         "lexik/jwt-authentication-bundle": "^2.16",
         "nebkam/symfony-traits": "^4.0",
@@ -59,7 +60,6 @@
         "symfony/maker-bundle": "^1.49",
         "symfony/phpunit-bridge": "^6.2",
         "symfony/stopwatch": "6.0.*",
-        "symfony/web-profiler-bundle": "6.0.*",
         "zenstruck/foundry": "^1.35"
     },
     "config": {
