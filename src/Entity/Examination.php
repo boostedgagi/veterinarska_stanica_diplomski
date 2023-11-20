@@ -194,6 +194,7 @@ class Examination
 
     public function descriptiveLength(): bool
     {
+        //refactor to enum
         if ($this->getDuration() > 60)
             return 'Long';
         if ($this->getDuration() > 30)

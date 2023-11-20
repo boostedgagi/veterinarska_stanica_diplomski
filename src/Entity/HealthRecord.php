@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\ContextGroup;
 use App\Repository\HealthRecordRepository;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -39,10 +41,10 @@ class HealthRecord
     private ?Examination $examination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $startedAt = null;
+    private ?DateTime $startedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $finishedAt = null;
+    private ?\DateTime $finishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -56,13 +58,13 @@ class HealthRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $notifiedWeekBefore = null;
 
     #[ORM\Column]
     private bool $madeByVet;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $notifiedDayBefore = null;
 
     private ?bool $atPresent = null;
@@ -208,12 +210,12 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getStartedAt(): ?\DateTimeInterface
+    public function getStartedAt(): ?DateTime
     {
         return $this->startedAt;
     }
 
-    public function setStartedAt(\DateTimeInterface $startedAt): self
+    public function setStartedAt(DateTime $startedAt): self
     {
         $this->startedAt = $startedAt;
 
@@ -226,12 +228,12 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getFinishedAt(): ?\DateTimeInterface
+    public function getFinishedAt(): ?DateTime
     {
         return $this->finishedAt;
     }
 
-    public function setFinishedAt(\DateTimeInterface $finishedAt): self
+    public function setFinishedAt(DateTime $finishedAt): self
     {
         $this->finishedAt = $finishedAt;
 

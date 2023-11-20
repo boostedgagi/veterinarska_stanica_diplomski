@@ -27,7 +27,7 @@ class UserTest extends TestCase
         self::assertEquals('Korisnikovic',$user->getLastName());
         self::assertSame(3,$user->getTypeOfUser());
         self::assertEquals(true,$user->isAllowed());
-        dump($user->getVet());
+//        dump($user->getVet());
     }
 
     public function testCreateVet():void

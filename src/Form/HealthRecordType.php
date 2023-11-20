@@ -22,20 +22,17 @@ class HealthRecordType extends AbstractType
             ->add('examination',null,[
                 'required'=>true
             ])
-            ->add('startedAt')
-            ->add('finishedAt')
+            ->add('startedAt', DateTimeType::class, [
+                'required' => false,
+                'widget' => 'single_text'
+            ])
+            ->add('finishedAt', DateTimeType::class, [
+                'required' => false,
+                'widget' => 'single_text'
+            ])
             ->add('comment')
             ->add('status')
-            ->add('madeByVet')
-            ->add('notifiedDayBefore',null,[
-                'required'=>false
-            ])
-            ->add('notifiedWeekBefore',null,[
-                'required'=>false
-            ])
-            ->add('atPresent',null,[
-                'required'=>false
-            ]);
+            ->add('madeByVet');
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -6,6 +6,7 @@ use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
+use App\Enum\HealthRecordStatus;
 use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
@@ -179,7 +180,7 @@ class HealthRecordController extends AbstractController
                 $healthRecord->getPet(),
                 $cancel->getCancelMessage());
         }
-        $healthRecord->setStatus($healthRecord::STATUS_CANCELED);
+        $healthRecord->setStatus(HealthRecordStatus::CANCELED->value);
 
         $this->em->persist($healthRecord);
         $this->em->flush();
