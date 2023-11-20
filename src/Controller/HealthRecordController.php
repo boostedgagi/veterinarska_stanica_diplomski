@@ -64,7 +64,11 @@ class HealthRecordController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_NO_CONTENT,
                 description: 'Error'
-            )
+            ),
+            new OA\Response(
+                response: Response::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Unprocessable, date format possibly could be in the bad format.'
+            ),
         ]
     )]
     #[Route('/health_record', methods: 'POST')]
@@ -74,10 +78,11 @@ class HealthRecordController extends AbstractController
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
-        if ($healthRecord->isMadeByVet() && $healthRecord->getAtPresent())
+        if ($healthRecord->isMadeByVet()===true && $healthRecord->getAtPresent()===true)
         {
             $healthRecord->makeHealthRecordNow();
         }
+        //this else maybe could be disposed
         else {
             $healthRecord->setMadeByVet(false);
         }
@@ -88,9 +93,38 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 
-    //move this out of this controller
-
-    #[Route('/health_records/{id}', methods: 'PUT')]
+    #[OA\Put(
+        path: '/health_record/{id}',
+        description: 'Change examination data.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: HealthRecordType::class)
+            )
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns updated examination.',
+                content: new Model(
+                    type: HealthRecord::class,
+                    groups: [ContextGroup::CREATE_HEALTH_RECORD]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Health record with specified ID not found.'
+            )
+        ]
+    )]
+    #[Route('/health_record/{id}', methods: 'PUT')]
     public function edit(Request $request, ?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
     {
         if (!$healthRecord) {
@@ -104,6 +138,31 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 
+    #[OA\Get(
+        path: '/health_record/{id}',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One health record data.',
+                content: new Model(
+                    type: HealthRecord::class,
+                    groups: [ContextGroup::SHOW_HEALTH_RECORD]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Health record with specified ID not found.',
+            )
+        ]
+    )]
     #[Route('/health_record/{id}', methods: 'GET')]
     public function showOne(?HealthRecord $healthRecord): Response
     {
@@ -114,6 +173,27 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
+    #[OA\Delete(
+        path: '/health_record/{id}',
+        description: 'Delete one health record.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Returns empty response.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Examination with specified ID not found.'
+            )
+        ]
+    )]
     #[Route('/health_record/{id}', methods: 'DELETE')]
     public function delete(?HealthRecord $healthRecord): Response
     {

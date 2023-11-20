@@ -19,9 +19,11 @@ class ExaminationController extends AbstractController
 {
     use FormTrait;
 
-
-    public function __construct(private readonly EntityManagerInterface $em)
-    {}
+    public function __construct(
+        private readonly EntityManagerInterface $em
+    )
+    {
+    }
 
     #[OA\Get(
         path: '/examination',
@@ -85,7 +87,7 @@ class ExaminationController extends AbstractController
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: Examination::class)
+                ref: new Model(type: ExaminationType::class)
             )
         ),
         responses: [
@@ -116,11 +118,11 @@ class ExaminationController extends AbstractController
 
     #[OA\Put(
         path: '/examination/{id}',
-        description: 'Change data of examination.',
+        description: 'Change examination data.',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                ref: new Model(type: Examination::class)
+                ref: new Model(type: ExaminationType::class)
             )
         ),
         parameters: [
