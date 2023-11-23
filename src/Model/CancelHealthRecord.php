@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
+use App\ContextGroup;
 use App\Entity\User;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class CancelHealthRecord
 {
@@ -10,22 +12,17 @@ class CancelHealthRecord
 
     private User $canceler;
 
-    /**
-     * @return string
-     */
     public function getCancelMessage(): string
     {
         return $this->cancelMessage;
     }
 
-    /**
-     * @param string $cancelMessage
-     */
-    public function setCancelMessage(string $cancelMessage): void
+    public function setCancelMessage(string $cancelMessage): self
     {
         $this->cancelMessage = $cancelMessage;
-    }
 
+        return $this;
+    }
 
     public function getCanceler(): User
     {
@@ -35,6 +32,8 @@ class CancelHealthRecord
     public function setCanceler(User $canceler): self
     {
         $this->canceler = $canceler;
+
+        return $this;
     }
 
     public static function getDenyCancelMessage():string

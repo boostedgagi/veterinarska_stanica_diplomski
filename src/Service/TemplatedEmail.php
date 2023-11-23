@@ -105,12 +105,10 @@ class TemplatedEmail
      */
     public function sendCancelMailByVet(Pet $pet, string $cancelText):void
     {
-        $ngrok = getenv('NGROK_TUNNEL');
-
         $email = (new Email())
             ->from('cancel@vetshop.com')
             ->to($pet->getOwner()->getEmail())
-            ->subject('Your pet\'s examination is canceled.')
+            ->subject('Examination of your pet is canceled.')
             ->html("
                 <h4 style='font-weight: 500;'>".$cancelText."</h4>
             ");

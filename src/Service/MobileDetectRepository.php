@@ -6,14 +6,10 @@ use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 
 class MobileDetectRepository
 {
-    private MobileDetectorInterface $mobileDetector;
-
-    /**
-     * @param MobileDetectorInterface $mobileDetector
-     */
-    public function __construct(MobileDetectorInterface $mobileDetector)
+    public function __construct(
+        public readonly MobileDetectorInterface $mobileDetector
+    )
     {
-        $this->mobileDetector = $mobileDetector;
     }
 
     public function getDeviceInfo():string

@@ -118,7 +118,7 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findAllHealthRecords(User $user): array
+    public function findAllHealthRecordsForUser(User $user): array
     {
         $qb = $this->createQueryBuilder('hr');
         $qb

@@ -21,4 +21,6 @@ class ContextGroup
     public const CREATE_USER = 'create_user';
     public const SHOW_USER = 'show_user';
     public const SHOW_NEARBY_VETS = 'show_nearby_vets';
+
+    public const CANCEL_HEALTH_RECORD = 'cancel_health_record';
 }

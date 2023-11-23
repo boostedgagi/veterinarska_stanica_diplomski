@@ -206,7 +206,32 @@ class HealthRecordController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pet/{id}/health_record', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    #[OA\Get(
+        path: '/pet/{id}/health_records',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'All health records for one pet.',
+                content: new Model(
+                    type: HealthRecord::class,
+                    groups: [ContextGroup::SHOW_HEALTH_RECORD]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Health record for specified pet not found.',
+            )
+        ]
+    )]
+    #[Route('/pet/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function petHealthRecords(?Pet $pet): Response
     {
         if (!$pet) {
@@ -217,13 +242,13 @@ class HealthRecordController extends AbstractController
         return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
-    #[Route('/users/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/user/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function ownerHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
         if (!$user) {
             return $this->json(["error" => "Health record not found."]);
         }
-        $allHealthRecords = $healthRecordRepo->findAllHealthRecords($user);
+        $allHealthRecords = $healthRecordRepo->findAllHealthRecordsForUser($user);
 
         return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
@@ -231,40 +256,43 @@ class HealthRecordController extends AbstractController
     /**
      * @throws TransportExceptionInterface
      */
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            description: 'Cancel health record here..',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: CancelHealthRecordType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns message.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error'
+            ),
+            new OA\Response(
+                response: Response::HTTP_UNPROCESSABLE_ENTITY,
+                description: 'Unprocessable, date format possibly wrong.'
+            ),
+        ]
+    )]
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
-    public function cancel(Request $request, ?HealthRecord $healthRecord, UserRepository $userRepo, MailerInterface $mailer): Response
+    public function cancel(Request $request, ?HealthRecord $healthRecord,HealthRecordService $healthRecordService): Response
     {
         if (!$healthRecord)
         {
             return $this->json("Health record not found.");
         }
-
         $cancel = new CancelHealthRecord();
         $this->handleJSONForm($request, $cancel, CancelHealthRecordType::class);
 
-        //this should be separated to service
-        $timeDiff = $healthRecord->getStartedAt()->diff(new DateTime());
+        $message = $healthRecordService->cancel($healthRecord,$cancel);
 
-        if (
-            $timeDiff->h === 0 &&
-            $cancel->getCanceler()->getTypeOfUser() === User::TYPE_USER
-        )
-        {
-            return $this->json(['message' => CancelHealthRecord::getDenyCancelMessage()]);
-        }
-        if ($cancel->getCanceler()->getTypeOfUser() === User::TYPE_VET)
-        {
-            $email = new TemplatedEmail($mailer);
-
-            $email->sendCancelMailByVet(
-                $healthRecord->getPet(),
-                $cancel->getCancelMessage());
-        }
-        $healthRecord->setStatus(HealthRecordStatus::CANCELED->value);
-
-        $this->em->persist($healthRecord);
         $this->em->flush();
 
-        return $this->json(['message' => CancelHealthRecord::getSuccessfullCancelMessage()], Response::HTTP_OK);
+        return $this->json(['message' => $message], Response::HTTP_OK);
     }
 }

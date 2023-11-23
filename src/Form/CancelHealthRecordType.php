@@ -2,6 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\User;
+use Doctrine\ORM\Mapping\Entity;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -11,8 +14,10 @@ class CancelHealthRecordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('cancelContent')
-            ->add('canceler')
+            ->add('cancelMessage')
+            ->add('canceler',EntityType::class,[
+                'class' => User::class
+            ])
         ;
     }
 
