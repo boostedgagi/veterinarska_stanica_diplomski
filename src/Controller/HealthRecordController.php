@@ -6,28 +6,22 @@ use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
-use App\Enum\HealthRecordStatus;
 use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
 use App\Repository\HealthRecordRepository;
-use App\Repository\PetRepository;
-use App\Repository\UserRepository;
-use App\Service\TemplatedEmail;
-use App\Service\UserService;
-use DateTime;
+use App\Service\HealthRecordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use OpenApi\Attributes as OA;
 
 class HealthRecordController extends AbstractController
 {

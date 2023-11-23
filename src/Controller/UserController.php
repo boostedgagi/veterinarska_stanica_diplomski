@@ -8,11 +8,12 @@ use App\Model\Token as ModelToken;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
-use App\Service\JwtService;
+use App\Service\LogHandler;
 use App\Service\uploadImage;
 use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -152,7 +153,7 @@ class UserController extends AbstractController
             return $this->json('User not found');
         }
         $this->handleJSONForm($request, $user, UserType::class);
-        if ($user !== JwtService::getCurrentUser($tokenStorage)) {
+        if ($user !== UserService::getCurrentUser($tokenStorage)) {
             return $this->json("Only user itself can delete his account.");
         }
         if ($user->getPlainPassword()) {
@@ -341,7 +342,7 @@ class UserController extends AbstractController
         $to = $queryParams->to;
 
         $freeVets = $userRepo->getFreeVets($from, $to);
-        $personalVet = JwtService::getCurrentUser($tokenStorage)->getVet();
+        $personalVet = UserService::getCurrentUser($tokenStorage)->getVet();
         if ($personalVet) {
             $freeVets[] = $this->addNotificationIfVetIsOccupied($personalVet, $freeVets);
         } else {
@@ -377,5 +378,18 @@ class UserController extends AbstractController
         $vetHealthRecords = $vet->getHealthRecords();
 
         return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+    }
+
+    #[Route('/take_location', methods: 'POST')]
+    public function takeLocation(MobileDetectorInterface $detector): JsonResponse
+    {
+        $logHandler = new LogHandler();
+
+        $log = $logHandler->getMyLoginLocation($detector);
+
+        $this->em->persist($log);
+        $this->em->flush();
+
+        return $this->json(['status'=>'Location taken.'],Response::HTTP_OK);
     }
 }

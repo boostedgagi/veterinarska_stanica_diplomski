@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Service;
 
 use App\Entity\HealthRecord;
 use App\Entity\User;
 use App\Enum\HealthRecordStatus;
 use App\Model\CancelHealthRecord;
-use App\Service\TemplatedEmail;
 use DateTime;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
