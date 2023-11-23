@@ -15,8 +15,8 @@ class ContextGroup
 
     public const CREATE_PET = 'create_pet';
     public const SHOW_PET = 'create_pet';
-    public const FOUND_PET = 'create_pet';
-    public const SHOW_USER_PETS = 'create_pet';
+    public const FOUND_PET = 'found_pet';
+    public const SHOW_USER_PETS = 'show_user_pets';
 
     public const CREATE_USER = 'create_user';
     public const SHOW_USER = 'show_user';

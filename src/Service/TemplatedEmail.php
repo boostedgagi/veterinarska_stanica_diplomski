@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\ApiClient;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
@@ -29,6 +30,8 @@ class TemplatedEmail
      */
     public function sendWelcomeEmail(User $user, Token $token): void
     {
+        $apiUrl = ApiClient::$apiUrl;
+
         $email = (new Email())
             ->from('welcome@vetshop.com')
             ->to($user->getEmail())
@@ -41,7 +44,7 @@ class TemplatedEmail
                 </p>
                 <a 
                     type='button' 
-                    href='http://localhost:8000/verify_account?
+                    href='{$apiUrl}/verify_account?
                         token_id={$token->getId()}&
                         token={$token->getToken()}&
                         expires={$token->getExpires()}&
@@ -81,7 +84,7 @@ class TemplatedEmail
      */
     public function sendQrCodeWithMail(Pet $pet, string $qrCodePath):void
     {
-        $host = $_ENV["HOST"];
+        $host = ApiClient::$apiUrl;
 
         $email = (new Email())
             ->from('yourqrcode@vetshop.com')

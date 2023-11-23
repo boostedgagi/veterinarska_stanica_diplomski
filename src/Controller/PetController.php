@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\ContextGroup;
 use App\Entity\Pet;
 use App\Form\PetType;
 use App\Form\QRCodeType;
@@ -12,6 +13,8 @@ use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Nebkam\SymfonyTraits\FormTrait;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,8 +31,31 @@ class PetController extends AbstractController
     {
     }
 
-
-    #[Route('/pets', methods: 'POST')]
+    #[OA\Post(
+        path:'/pet',
+        requestBody: new OA\RequestBody(
+            description: 'Insert new pet data here,',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: PetType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns created health record.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::CREATE_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error'
+            )
+        ]
+    )]
+    #[Route('/pet', methods: 'POST')]
     public function create(Request $request): Response
     {
         $pet = new Pet();
@@ -39,7 +65,7 @@ class PetController extends AbstractController
         $this->em->persist($pet);
         $this->em->flush();
 
-        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
+        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_PET]);
     }
 
     #[Route('/pet_upload_image/{id}', methods: 'POST')]
@@ -50,10 +76,41 @@ class PetController extends AbstractController
         }
         $uploadImage = new UploadImage($request, $pet, $this->em);
         $uploadImage->upload();
-        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
+        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_PET]);
     }
 
-    #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'PUT')]
+    #[OA\Put(
+        path: '/pet/{id}',
+        description: 'Change pet data.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: PetType::class)
+            )
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns updated pet.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::CREATE_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Pet with specified ID not found.'
+            )
+        ]
+    )]
+    #[Route('/pet/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'PUT')]
     public function edit(?Pet $pet, Request $request): Response
     {
         if(!$pet){
@@ -64,10 +121,31 @@ class PetController extends AbstractController
         $this->em->persist($pet);
         $this->em->flush();
 
-        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => 'pet_created']);
+        return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_PET]);
     }
 
-    #[Route('/pets/{id}', methods: 'DELETE')]
+    #[OA\Delete(
+        path: '/pet/{id}',
+        description: 'Delete one pet.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Returns empty response.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Pet with specified ID not found.'
+            )
+        ]
+    )]
+    #[Route('/pet/{id}', methods: 'DELETE')]
     public function delete(?Pet $pet): Response
     {
         if(!$pet){
@@ -80,30 +158,98 @@ class PetController extends AbstractController
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/pets/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    #[OA\Get(
+        path: '/pet/{id}',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One pet data.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::SHOW_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Pet with specified ID not found.',
+            )
+        ]
+    )]
+    #[Route('/pet/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function show(?Pet $pet): Response
     {
         if(!$pet)
-            {
+        {
             return $this->json('Pet not found.');
-            }
-        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
+        }
+
+        return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
-    #[Route('/pets', methods: 'GET')]
+    #[OA\Get(
+        path: '/pet',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Data for all pets.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::SHOW_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error occurred.',
+            )
+        ]
+    )]
+    #[Route('/pet', methods: 'GET')]
     public function showAllPets(Request $request, PetRepository $repo): Response
     {
         $pets = $repo->findAll();
 
-        return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
+        return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
     /**
      * @throws TransportExceptionInterface
      */
+    #[OA\Post(
+        path:'/qr-code',
+        requestBody: new OA\RequestBody(
+            description: 'Make qr code for pet',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: QRCodeType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns path to qr code, and in background it is being sent by mail to owner.',
+                content: new Model(
+                    type: QRCode::class,
+                    groups: [ContextGroup::CREATE_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error'
+            )
+        ]
+    )]
     #[Route('/qr-code', methods: 'POST')]
     public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
+        //this could be moved to service and queued
         $qrCode = new QRCode($builder);
 
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
@@ -111,19 +257,47 @@ class PetController extends AbstractController
         $pet = $petRepo->find($qrCode->getPetId());
         $email = new TemplatedEmail($mailer);
 
-        $email->sendQrCodeWithMail($pet, $qrCode->generateQRCode());
+        $qrCodePath = $qrCode->generateQRCode();
 
-        return $this->json("QR code is generated and sent to your mail. :)", Response::HTTP_OK);
+        $email->sendQrCodeWithMail($pet, $qrCodePath);
+
+        return $this->json($qrCodePath, Response::HTTP_OK);
     }
 
+    #[OA\Get(
+        path: '/found_pet',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One found pet data.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::SHOW_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Pet is not existing in our database.',
+            )
+        ]
+    )]
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $petRepo): Response
     {
         $pet = $petRepo->find($request->query->get('id'));
         if(!$pet)
             {
-            return $this->json("Pet not existing in our database.");
+            return $this->json("Pet is not existing in our database.",Response::HTTP_NOT_FOUND);
             }
-        return $this->json($pet, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
+
+        return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::FOUND_PET]);
     }
 }

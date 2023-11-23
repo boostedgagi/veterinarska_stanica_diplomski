@@ -40,7 +40,6 @@ class HealthRecordController extends AbstractController
      */
     #[OA\Post(
         requestBody: new OA\RequestBody(
-            description: 'Insert new product data here,measurements are metric.',
             required: true,
             content: new OA\JsonContent(
                 ref: new Model(type: HealthRecordType::class)
@@ -76,7 +75,7 @@ class HealthRecordController extends AbstractController
         {
             $healthRecord->makeHealthRecordNow();
         }
-        //this else maybe could be disposed
+        //this else could be disposed
         else {
             $healthRecord->setMadeByVet(false);
         }

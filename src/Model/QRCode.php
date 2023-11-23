@@ -2,23 +2,17 @@
 
 namespace App\Model;
 
-use App\Entity\Pet;
-use App\Repository\PetRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\ApiClient;
 use Endroid\QrCode\Builder\BuilderInterface;
 
 class QRCode
 {
     private int $petId;
 
-    private BuilderInterface $builder;
-
-    /**
-     * @param BuilderInterface $builder
-     */
-    public function __construct(BuilderInterface $builder)
+    public function __construct(
+        private readonly BuilderInterface $builder
+    )
     {
-        $this->builder = $builder;
     }
 
     public function setPetId(int $petId): void
@@ -33,20 +27,24 @@ class QRCode
 
     private function makeUrl():string
     {
-        $host = $_ENV["HOST"];
 
-        return $host . "/found_pet?id=" . $this->petId;
+        return ApiClient::$apiUrl . "/found_pet?id=" . $this->petId;
     }
 
     public function generateQRCode():string
     {
         $url = $this->makeUrl();
         $possibleQRCode = $this->builder->data($url)->build();
-        $qrCodePath = 'qr-codes/' . uniqid('', true) . '.png';
 
+        $qrCodePath = $this->makeFilePath();
         $possibleQRCode->saveToFile($qrCodePath);
 
         return $qrCodePath;
+    }
+
+    private function makeFilePath():string
+    {
+        return 'public/qr-codes/'.$this->getPetId().'/' . uniqid('', true) . '.png';
     }
 
 }
