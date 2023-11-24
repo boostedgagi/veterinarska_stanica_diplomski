@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\ContextGroup;
 use App\Entity\User;
 use App\Entity\Token;
 use App\Model\Token as ModelToken;
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -31,13 +33,13 @@ class UserController extends AbstractController
 {
     use FormTrait;
 
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $entityManager;
     }
 
+    /*
+     * should remove this endpoint at all
+     */
     #[Route('/users/{id}/change_status', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
     public function allowStatusChange(?User $user): Response
     {
@@ -51,12 +53,16 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_showAll']);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/users', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
+
         if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
@@ -172,10 +178,11 @@ class UserController extends AbstractController
     #[Route('/users/{id}', methods: 'DELETE')]
     public function deleteUser(User $vet,): Response
     {
+        // todo set on delete null on User->get users
         if ($vet->getTypeOfUser() === User::TYPE_VET) {
             /** @var User $client */
             foreach ($vet->getClients() as $client) {
-                $client->setVet($vet);
+                $client->setVet(null);
             }
         }
         $this->em->remove($vet);
@@ -207,80 +214,77 @@ class UserController extends AbstractController
     {
         $pets = $user->getPets();
 
-        return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showByUser']);
+        return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
     }
 
     #[Route('/user_upload_image/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
-    public function uploadProfileImage(Request $request, UserRepository $repo, int $id): Response
+    public function uploadProfileImage(Request $request, UserRepository $repo, User $user): Response
     {
-        $user = $repo->find($id);
-
         $uploadImage = new UploadImage($request, $user, $this->em);
 
         $uploadImage->upload();
 
-        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function getVetPetsData(UserRepository $repo, int $id): Response
+    public function getVetPetsData(UserRepository $repo,User $vet): Response
     {
-        $vet = $repo->find($id);
-
         $vetUsers = $vet->getClients();
+
         $pets = [];
         foreach ($vetUsers as $vetUser) {
             if ($vetUser->getPets() !== null) {
                 $pets[] = $vetUser->getPets();
             }
         }
-        return $this->json($pets, Response::HTTP_OK, [], ['groups' => 'pet_showAll']);
+        return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
-    #[Route('/engage_vet', methods: 'POST')]
-    public function engageVet(Request $request, UserRepository $repo): Response
-    {
-        $data = json_decode($request->getContent(), false);
+//    #[Route('/engage_vet', methods: 'POST')]
+//    public function engageVet(Request $request, UserRepository $repo): Response
+//    {
+//        $data = json_decode($request->getContent(), false);
+//
+//        //this can also be done by handling only vet because user_id can be found by jwtService's method
+//        $user = $repo->find($data->user_id);
+//        $vet = $repo->find($data->vet_id);
+//
+//        if ($vet->isVet() && !$user->isVet()) {
+//
+//            $user->setVet($vet);
+//
+//            $this->em->persist($user);
+//            $this->em->flush();
+//
+//            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+//        }
+//        return $this->json(['error' => 'someone is lying'], Response::HTTP_OK);
+//    }
 
-        //this can also be done by handling only vet because user_id can be found by jwtService's method
-        $user = $repo->find($data->user_id);
-        $vet = $repo->find($data->vet_id);
+//    #[Route('/users/{id}/change_type', methods: 'PATCH')]
+//    public function changeTypeOfUser(Request $request, User $user): Response
+//    {
+//        $data = json_decode($request->getContent(), false);
+//
+//        if ($data->typeOfUser && in_array($data->typeOfUser, [User::TYPE_ADMIN, User::TYPE_VET, User::TYPE_USER])) {
+//
+//            $user->setTypeOfUser($data->typeOfUser);
+//
+//            $this->em->persist($user);
+//            $this->em->flush();
+//            return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
+//        }
+//        return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
+//    }
 
-        if ($vet->isVet() && !$user->isVet()) {
-
-            $user->setVet($vet);
-
-            $this->em->persist($user);
-            $this->em->flush();
-
-            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
-        }
-        return $this->json(['error' => 'someone is lying'], Response::HTTP_OK);
-    }
-
-    #[Route('/users/{id}/change_type', methods: 'PATCH')]
-    public function changeTypeOfUser(Request $request, User $user): Response
-    {
-        $data = json_decode($request->getContent(), false);
-
-        if ($data->typeOfUser && in_array($data->typeOfUser, [User::TYPE_ADMIN, User::TYPE_VET, User::TYPE_USER])) {
-
-            $user->setTypeOfUser($data->typeOfUser);
-
-            $this->em->persist($user);
-            $this->em->flush();
-            return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
-        }
-        return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
-    }
-
-    #[Route('/get_id', methods: 'GET')]
-    public function getId(Request $request, UserRepository $userRepo): JsonResponse
-    {
-        $email = $request->query->get('email');
-        $id = $userRepo->getId($email);
-        return $this->json($id, Response::HTTP_OK);
-    }
+//    #[Route('/get_id', methods: 'GET')]
+//    public function getId(Request $request, UserRepository $userRepo): JsonResponse
+//    {
+//        $email = $request->query->get('email');
+//        $id = $userRepo->getId($email);
+//        return $this->json($id, Response::HTTP_OK);
+//    }
 
     /**
      * @param UserRepository $userRepo
@@ -359,17 +363,12 @@ class UserController extends AbstractController
         return $freeVets[] = ['notification' => 'Your vet is free in chosen time range and you can reserve him.'];
     }
 
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns all vets registered on this website.',
-        content: new Model(type: User::class, groups: ['user_showAll'])
-    )]
     #[Route('/get/vets', methods: 'GET')]
     public function showAll(UserRepository $userRepo): Response
     {
         $vets = $userRepo->getAllVets();
-//        dump($vets[0]);
-        return $this->json($vets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
+
+        return $this->json($vets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
     #[Route('/vet/{id}/health_records', methods: 'GET')]
@@ -377,7 +376,7 @@ class UserController extends AbstractController
     {
         $vetHealthRecords = $vet->getHealthRecords();
 
-        return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => 'healthRecord_showAll']);
+        return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
     #[Route('/take_location', methods: 'POST')]
@@ -390,6 +389,6 @@ class UserController extends AbstractController
         $this->em->persist($log);
         $this->em->flush();
 
-        return $this->json(['status'=>'Location taken.'],Response::HTTP_OK);
+        return $this->json("",Response::HTTP_OK);
     }
 }

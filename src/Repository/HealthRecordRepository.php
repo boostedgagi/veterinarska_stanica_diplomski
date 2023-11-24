@@ -48,7 +48,7 @@ class HealthRecordRepository extends ServiceEntityRepository
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
-    public function examinationsCount(): int
+    public function allHealthRecordCount(): int
     {
         $qb = $this->createQueryBuilder('hr');
         $qb->select('count(hr.id) numberOfExaminations');

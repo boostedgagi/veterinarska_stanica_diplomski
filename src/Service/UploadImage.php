@@ -2,28 +2,21 @@
 
 namespace App\Service;
 
+use App\Entity\Pet;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class UploadImage
 {
-
-    private Request $request;
-    private object $entity;
-    private EntityManagerInterface $em;
-
-    /**
-     * @param Request $request
-     * @param object $entity
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(Request $request, object $entity, EntityManagerInterface $em)
+    public function __construct(
+        private readonly Request $request,
+        private readonly User|Pet $entity,
+        private readonly EntityManagerInterface $em
+    )
     {
-        $this->request = $request;
-        $this->entity = $entity;
-        $this->em = $em;
     }
 
     public function upload(): void
@@ -42,13 +35,14 @@ class UploadImage
             try {
                 $uploadedFile = $image->move($uploadPath, $newFileName);
                 $imagePath = $uploadedFile->getPathName();
+
                 $this->entity->setImage($imagePath);
 
                 $this->em->persist($this->entity);
                 $this->em->flush();
 
                 unset($uploadedFile);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 error_log($e->getMessage());
             }
 

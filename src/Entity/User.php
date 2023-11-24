@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -76,7 +78,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
-    private ?string $popularity = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
     private ?self $vet = null;
@@ -94,6 +95,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: OnCall::class)]
     private Collection $onCalls;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $popularity = null;
 
     public function __construct()
     {
@@ -487,39 +491,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-//    /**
-//     * @param string|null $popularity
-//     */
+
 //    public function setPopularity(?string $popularity): void
 //    {
 //        $this->popularity = $popularity;
 //    }
-
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    public function getPopularity(HealthRecordRepository $healthRecordRepo, UserService $userService): string
-    {
-        if ($this->getTypeOfUser() === 2) {
-            $examinationsCount = $healthRecordRepo->examinationsCount();
-            return $userService->handlePopularity($this, $examinationsCount);
-        }
-        return '';
-    }
-
-    #[Groups(
-        [
-            'user_showAll'
-        ]
-    )]
-    public function getSth(): string
-    {
-//        $healthRecordRepo = new HealthRecordRepository();
-//        $
-        return 'tu sam';
-    }
+//
+//    public function getPopularity(HealthRecordRepository $healthRecordRepo, UserService $userService): string
+//    {
+//        if ($this->getTypeOfUser() === self::TYPE_VET)
+//        {
+//            $allHealthRecordCount = $healthRecordRepo->allHealthRecordCount();
+//
+//            return $userService->handlePopularity($this, $allHealthRecordCount);
+//        }
+//        return '';
+//    }
 
     public function getClients(): Collection
     {
@@ -652,5 +639,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private function isVetSet(?User $vet): null|User
     {
         return $vet ? $vet : null;
+    }
+
+    public function getPopularity(): ?string
+    {
+        return $this->popularity;
+    }
+
+    public function setPopularity(?string $popularity): static
+    {
+        $this->popularity = $popularity;
+
+        return $this;
     }
 }

@@ -10,8 +10,8 @@ class UserService
 {
     public function handlePopularity(User $vet, int $examinationsCount):string
     {
-        $numberOfVetExaminations = count($vet->getHealthRecords());
-        $percentage = 100 * $numberOfVetExaminations / $examinationsCount;
+        $countOfVetExaminations = count($vet->getHealthRecords());
+        $percentage = 100 * $countOfVetExaminations / $examinationsCount;
 
         return number_format((float)$percentage, 2, '.', '') . '%';
     }
