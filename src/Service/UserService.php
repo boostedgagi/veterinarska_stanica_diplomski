@@ -8,10 +8,10 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class UserService
 {
-    public function handlePopularity(User $vet, int $examinationsCount):string
+    public static function calculateVetPopularity(User $vet, int $allExaminationsCount):string
     {
-        $countOfVetExaminations = count($vet->getHealthRecords());
-        $percentage = 100 * $countOfVetExaminations / $examinationsCount;
+        $vetExaminationsCount = count($vet->getHealthRecords());
+        $percentage = 100 * $vetExaminationsCount / $allExaminationsCount;
 
         return number_format((float)$percentage, 2, '.', '') . '%';
     }

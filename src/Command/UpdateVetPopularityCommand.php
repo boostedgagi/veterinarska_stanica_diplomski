@@ -2,6 +2,13 @@
 
 namespace App\Command;
 
+use App\Entity\User;
+use App\Repository\HealthRecordRepository;
+use App\Repository\UserRepository;
+use App\Service\UserService;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,22 +19,39 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'UpdateVetPopularity',
-    description: 'Updates vet popularity every ',
+    description: 'Updates vet popularity every once specified by someone.',
     aliases: ['vet:popularity:update'],
 )]
 class UpdateVetPopularityCommand extends Command
 {
-    protected function configure(): void
+    public function __construct(
+        private readonly HealthRecordRepository $healthRecordRepo,
+        private readonly UserRepository         $userRepo,
+        private readonly EntityManagerInterface $em
+    )
     {
-//        $this
-//            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-//        ;
+        parent::__construct();
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $vets = $this->userRepo->getAllVets();
 
+        $allHealthRecordCount = $this->healthRecordRepo->allHealthRecordCount();
+
+        /**
+         * @var $vet User
+         */
+        foreach ($vets as $vet)
+        {
+            $popularity = UserService::calculateVetPopularity($vet, $allHealthRecordCount);
+            $vet->setPopularity($popularity);
+        }
+        $this->em->flush();
 
         return Command::SUCCESS;
     }

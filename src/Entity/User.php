@@ -492,22 +492,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-//    public function setPopularity(?string $popularity): void
-//    {
-//        $this->popularity = $popularity;
-//    }
-//
-//    public function getPopularity(HealthRecordRepository $healthRecordRepo, UserService $userService): string
-//    {
-//        if ($this->getTypeOfUser() === self::TYPE_VET)
-//        {
-//            $allHealthRecordCount = $healthRecordRepo->allHealthRecordCount();
-//
-//            return $userService->handlePopularity($this, $allHealthRecordCount);
-//        }
-//        return '';
-//    }
-
     public function getClients(): Collection
     {
         return $this->users;
@@ -572,7 +556,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $contactMessagesAsSender->setSender(null);
             }
         }
-
         return $this;
     }
 
@@ -638,9 +621,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private function isVetSet(?User $vet): null|User
     {
-        return $vet ? $vet : null;
+        return $vet ?: null;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER
+        ]
+    )]
     public function getPopularity(): ?string
     {
         return $this->popularity;
