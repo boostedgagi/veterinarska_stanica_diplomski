@@ -28,6 +28,9 @@ class OnCall
     #[ORM\Column]
     private ?int $chatCount = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $chatId = null;
+
     public function __construct()
     {
         $this->chatCount = 0;
@@ -84,6 +87,18 @@ class OnCall
     public function setChatCount(int $chatCount): self
     {
         $this->chatCount = $chatCount;
+
+        return $this;
+    }
+
+    public function getChatId(): ?string
+    {
+        return $this->chatId;
+    }
+
+    public function setChatId(?string $chatId): static
+    {
+        $this->chatId = $chatId;
 
         return $this;
     }

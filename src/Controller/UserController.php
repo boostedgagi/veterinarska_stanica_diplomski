@@ -37,22 +37,6 @@ class UserController extends AbstractController
     {
     }
 
-    /*
-     * should remove this endpoint at all
-     */
-    #[Route('/users/{id}/change_status', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
-    public function allowStatusChange(?User $user): Response
-    {
-        if (!$user) {
-            return $this->json('User not found');
-        }
-        $user->setAllowed(!$user->isAllowed());
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_showAll']);
-    }
-
     /**
      * @throws TransportExceptionInterface
      */
@@ -62,20 +46,16 @@ class UserController extends AbstractController
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
-
+        if(!$user->getPlainPassword()){
+            return $this->json("Password not valid.");
+        }
         if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
                 $plainPassword
             );
             $user->setPassword($hashedPassword);
-        } else if (!$user->getPlainPassword()) {
-            return $this->json('Invalid password');
         }
-        $user->setRoles(["ROLE_USER"]);
-        $user->setAllowed(false);
-        $user->setTypeOfUser(3);
-
         $email = new TemplatedEmail($mailer);
 
         $token30minutes = (new ModelToken())->make30MinToken();
@@ -241,55 +221,6 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
-//    #[Route('/engage_vet', methods: 'POST')]
-//    public function engageVet(Request $request, UserRepository $repo): Response
-//    {
-//        $data = json_decode($request->getContent(), false);
-//
-//        //this can also be done by handling only vet because user_id can be found by jwtService's method
-//        $user = $repo->find($data->user_id);
-//        $vet = $repo->find($data->vet_id);
-//
-//        if ($vet->isVet() && !$user->isVet()) {
-//
-//            $user->setVet($vet);
-//
-//            $this->em->persist($user);
-//            $this->em->flush();
-//
-//            return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
-//        }
-//        return $this->json(['error' => 'someone is lying'], Response::HTTP_OK);
-//    }
-
-//    #[Route('/users/{id}/change_type', methods: 'PATCH')]
-//    public function changeTypeOfUser(Request $request, User $user): Response
-//    {
-//        $data = json_decode($request->getContent(), false);
-//
-//        if ($data->typeOfUser && in_array($data->typeOfUser, [User::TYPE_ADMIN, User::TYPE_VET, User::TYPE_USER])) {
-//
-//            $user->setTypeOfUser($data->typeOfUser);
-//
-//            $this->em->persist($user);
-//            $this->em->flush();
-//            return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_created']);
-//        }
-//        return $this->json(['error' => 'type of user not valid'], Response::HTTP_OK);
-//    }
-
-//    #[Route('/get_id', methods: 'GET')]
-//    public function getId(Request $request, UserRepository $userRepo): JsonResponse
-//    {
-//        $email = $request->query->get('email');
-//        $id = $userRepo->getId($email);
-//        return $this->json($id, Response::HTTP_OK);
-//    }
-
-    /**
-     * @param UserRepository $userRepo
-     * @return JsonResponse
-     */
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {

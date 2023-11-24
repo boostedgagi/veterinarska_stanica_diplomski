@@ -107,6 +107,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contactMessagesAsSender = new ArrayCollection();
         $this->contactMessagesAsReceiver = new ArrayCollection();
         $this->onCalls = new ArrayCollection();
+        $this->setAllowed(false);
+        $this->setTypeOfUser(3);
     }
 
     #[Groups(
