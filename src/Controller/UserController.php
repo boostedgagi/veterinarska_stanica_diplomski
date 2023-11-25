@@ -87,8 +87,8 @@ class UserController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        $event = new UserRegisterEvent($user);
-        $this->eventDispatcher->addSubscriber(new RegisterEventSubscriber($mailer,$user,$this->em));
+        $event = new UserRegisterEvent($user,$mailer,$this->em);
+        $this->eventDispatcher->addSubscriber(new RegisterEventSubscriber());
         $this->eventDispatcher->dispatch($event, UserRegisterEvent::NAME);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
