@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\ContextGroup;
 use App\Entity\User;
 use App\Entity\Token;
+use App\Event\UserRegisterEvent;
+use App\EventSubscriber\RegisterEventSubscriber;
 use App\Model\Token as ModelToken;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
@@ -18,6 +20,7 @@ use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,14 +36,38 @@ class UserController extends AbstractController
 {
     use FormTrait;
 
-    public function __construct(private readonly EntityManagerInterface $em)
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly EventDispatcherInterface $eventDispatcher
+    )
     {
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     */
-    #[Route('/users', methods: 'POST')]
+    #[OA\Post(
+        path:'/user',
+        requestBody: new OA\RequestBody(
+            description: 'Register',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: UserType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns registered user.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::CREATE_USER]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error'
+            )
+        ]
+    )]
+    #[Route('/user', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $user = new User();
@@ -56,20 +83,15 @@ class UserController extends AbstractController
             );
             $user->setPassword($hashedPassword);
         }
-        $email = new TemplatedEmail($mailer);
-
-        $token30minutes = (new ModelToken())->make30MinToken();
-        $token = new Token($token30minutes);
 
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->em->persist($token);
-        $this->em->flush();
+        $event = new UserRegisterEvent($user);
+        $this->eventDispatcher->addSubscriber(new RegisterEventSubscriber($mailer,$user,$this->em));
+        $this->eventDispatcher->dispatch($event, UserRegisterEvent::NAME);
 
-        $email->sendWelcomeEmail($user, $token);
-
-        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
     #[Route('/make_vet', methods: 'POST')]
