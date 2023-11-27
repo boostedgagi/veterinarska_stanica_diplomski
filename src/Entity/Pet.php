@@ -61,7 +61,8 @@ class Pet
         [
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
-            ContextGroup::SHOW_USER_PETS
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getId(): ?int
@@ -76,7 +77,8 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_USER_PETS,
-            ContextGroup::FOUND_PET
+            ContextGroup::FOUND_PET,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getName(): ?string
@@ -99,6 +101,7 @@ class Pet
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_USER_PETS,
             ContextGroup::FOUND_PET,
+            ContextGroup::SHOW_VET
 
         ]
     )]
@@ -120,7 +123,8 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getAnimal(): ?string
@@ -141,7 +145,8 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getBreed(): ?string
@@ -160,7 +165,8 @@ class Pet
         [
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::FOUND_PET
+            ContextGroup::FOUND_PET,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getOwner(): ?User
@@ -179,7 +185,8 @@ class Pet
         [
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_USER_PETS,
-            ContextGroup::SHOW_PET
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -214,7 +221,8 @@ class Pet
     #[Groups(
         [
             ContextGroup::CREATE_PET,
-            ContextGroup::SHOW_PET
+            ContextGroup::SHOW_PET,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getImage(): ?string

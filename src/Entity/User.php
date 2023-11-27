@@ -115,7 +115,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             ContextGroup::CREATE_USER,
             ContextGroup::SHOW_USER,
-            ContextGroup::SHOW_HEALTH_RECORD
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getId(): ?int
@@ -133,6 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getEmail(): ?string
@@ -164,6 +166,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             ContextGroup::CREATE_USER,
             ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getRoles(): array
@@ -214,7 +217,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_PET,
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_NEARBY_VETS
+            ContextGroup::SHOW_NEARBY_VETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getFirstName(): ?string
@@ -237,7 +241,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_PET,
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_NEARBY_VETS
+            ContextGroup::SHOW_NEARBY_VETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getLastName(): ?string
@@ -254,7 +259,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function isAllowed(): ?bool
@@ -271,7 +277,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getCreatedAt(): ?DateTimeImmutable
@@ -288,7 +295,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getUpdatedAt(): ?DateTimeInterface
@@ -340,7 +348,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getImage(): ?string
@@ -358,7 +367,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            'pet_showByUser'
+            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getPets(): Collection
@@ -388,20 +398,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getHealthRecord(): ?HealthRecord
-    {
-        return $this->healthRecord;
-    }
-
-    public function setHealthRecord(?HealthRecord $healthRecord): self
-    {
-        $this->healthRecord = $healthRecord;
-
-        return $this;
-    }
-
     /**
-     * @return Collection<int, HealthRecord>
+     * @return Collection
      */
     public function getHealthRecords(): Collection
     {

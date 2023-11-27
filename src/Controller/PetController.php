@@ -185,7 +185,7 @@ class PetController extends AbstractController
         ]
     )]
     #[Route('/pet/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function show(?Pet $pet): Response
+    public function showOne(?Pet $pet): Response
     {
         if(!$pet)
         {

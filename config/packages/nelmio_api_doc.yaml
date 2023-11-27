@@ -4,6 +4,12 @@ nelmio_api_doc:
             title: vetShopBackEnd
             description: This is app that offers scheduling appointments for pet health care.
             version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
     areas:
         path_patterns:
                 - ^/

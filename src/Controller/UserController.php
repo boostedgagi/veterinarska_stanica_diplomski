@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\ContextGroup;
+use App\Entity\HealthRecord;
+use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\Token;
 use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
+use App\Form\LoginType;
 use App\Model\Token as ModelToken;
 use App\Form\UserType;
 use App\Repository\HealthRecordRepository;
@@ -19,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,6 +35,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmail;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 
 class UserController extends AbstractController
 {
@@ -121,6 +126,7 @@ class UserController extends AbstractController
             )
         ]
     )]
+    #[Security(name:'Bearer')]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -152,6 +158,7 @@ class UserController extends AbstractController
     }
 
     #[OA\PUT(
+        path:'/user/{id}',
         description: 'Edit user data here.',
         requestBody: new OA\RequestBody(
             description: 'User data from user form type.',
@@ -163,8 +170,7 @@ class UserController extends AbstractController
                     type: UserType::class
                 )
             )
-        )
-        ,
+        ),
         responses: [
             new OA\Response(
                 response: Response::HTTP_CREATED,
@@ -178,7 +184,7 @@ class UserController extends AbstractController
             ),
         ]
     )]
-    #[Route('/users/{id}', methods: 'PUT')]
+    #[Route('/user/{id}', methods: 'PUT')]
     public function edit(?User $user, Request $request, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
     {
         if (!$user) {
@@ -186,7 +192,7 @@ class UserController extends AbstractController
         }
         $this->handleJSONForm($request, $user, UserType::class);
         if ($user !== UserService::getCurrentUser($tokenStorage)) {
-            return $this->json("Only user itself can delete his account.");
+            return $this->json("Only user itself can edit his account.");
         }
         if ($user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
@@ -201,50 +207,170 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
-
-    #[Route('/users/{id}', methods: 'DELETE')]
-    public function deleteUser(User $vet,): Response
+    #[OA\Delete(
+        path: '/user/{id}',
+        description: 'Delete one user.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')),
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Returns empty response.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User with specified ID not found.'
+            )
+        ]
+    )]
+    #[Route('/user/{id}', methods: 'DELETE')]
+    public function deleteUser(User $vet): Response
     {
-        // todo set on delete null on User->get users
-        if ($vet->getTypeOfUser() === User::TYPE_VET) {
-            /** @var User $client */
-            foreach ($vet->getClients() as $client) {
-                $client->setVet(null);
-            }
-        }
+        //on delete set null option set on the vet property by adding attribute called JoinColumn
+
         $this->em->remove($vet);
         $this->em->flush();
 
         return $this->json("", Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/users', methods: 'GET')]
-    public function showAllUsers(Request $request, UserRepository $repo): Response
+    #[OA\Get(
+        path: '/user',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Get all examinations.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::SHOW_USER]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error occurred.',
+            )
+        ]
+    )]
+    #[Route('/user', methods: 'GET')]
+    public function showAllUsers(UserRepository $repo): Response
     {
         $allUsers = $repo->findAll();
 
-        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
+        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
-    #[Route('/users/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUser(?User $user, HealthRecordRepository $healthRecordRepo): Response
+    #[OA\Get(
+        path: '/user/{id}',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One health record data.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::SHOW_USER]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User with specified ID not found.',
+            )
+        ]
+    )]
+    #[Route('/user/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function showOne(?User $user): Response
     {
         if (!$user) {
             return $this->json("User not found");
         }
 
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
-    #[Route('/users/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUserPets(User $user, UserRepository $repo): Response
+    #[OA\Get(
+        path: '/user/{id}/pets',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Show all pets of one user.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::SHOW_USER_PETS]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User with specified ID not found.',
+            )
+        ]
+    )]
+    #[Route('/user/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function showOneUserPets(User $user): Response
     {
         $pets = $user->getPets();
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
     }
 
-    #[Route('/user_upload_image/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
+    #[OA\Post(
+        path: '/user/{id}/upload_image',
+        description: 'Upload main image for user.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'image',
+                            type: 'file',
+                            format: 'binary'
+                        )
+                    ]
+                )
+            )
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'User\'s ID.',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns path of the uploaded image.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Could return string if file has errors.',
+            ),
+        ]
+    )]
+    #[Route('/user/{id}/upload_image', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
     public function uploadProfileImage(Request $request, User $user): Response
     {
         $uploadImage = new UploadImage($request, $user, $this->em);
@@ -254,8 +380,34 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
+    #[OA\Get(
+        path: '/vets/{id}/pets',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One vet pets data.',
+                content: new Model(
+                    type: Pet::class,
+                    groups: [ContextGroup::SHOW_PET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Vet with specified ID not found.',
+            )
+        ]
+    )]
+    #[Security(name:'Bearer')]
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function getVetPetsData(UserRepository $repo,User $vet): Response
+    public function getVetPetsData(User $vet): Response
     {
         $vetUsers = $vet->getClients();
 
@@ -268,6 +420,27 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
+    #[OA\Post(
+        path:'/login_check',
+        requestBody: new OA\RequestBody(
+            description: 'Login',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: LoginType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns logged in user.',
+                content: new OA\JsonContent()
+            ),
+            new OA\Response(
+                response: Response::HTTP_UNAUTHORIZED,
+                description: 'Wrong credentials.'
+            )
+        ]
+    )]
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {
@@ -318,11 +491,13 @@ class UserController extends AbstractController
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
     {
+        //todo check if this is working as it should be and try to make potential refactor
         $queryParams = (object)$request->query->all();
 
         $from = $queryParams->from;
         $to = $queryParams->to;
 
+        // todo move to service
         $freeVets = $userRepo->getFreeVets($from, $to);
         $personalVet = UserService::getCurrentUser($tokenStorage)->getVet();
         if ($personalVet) {
@@ -341,14 +516,57 @@ class UserController extends AbstractController
         return $freeVets[] = ['notification' => 'Your vet is free in chosen time range and you can reserve him.'];
     }
 
-    #[Route('/get/vets', methods: 'GET')]
+    #[OA\Get(
+        path: '/vets',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Data for all vets.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::SHOW_VET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error occurred.',
+            )
+        ]
+    )]
+    #[Route('/vets', methods: 'GET')]
     public function showAll(UserRepository $userRepo): Response
     {
         $vets = $userRepo->getAllVets();
 
-        return $this->json($vets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
+        return $this->json($vets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
 
+
+    #[OA\Get(
+        path: '/vets/{id}/health_records',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Health records by one vet.',
+                content: new Model(
+                    type: HealthRecord::class,
+                    groups: [ContextGroup::SHOW_HEALTH_RECORD]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'Vet with specified ID not found.',
+            )
+        ]
+    )]
     #[Route('/vet/{id}/health_records', methods: 'GET')]
     public function getVetHealthRecords(?User $vet): Response
     {
@@ -357,7 +575,17 @@ class UserController extends AbstractController
         return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
-    #[Route('/take_location', methods: 'POST')]
+    #[OA\Post(
+        path: '/log',
+        description: 'Send empty POST request and we\'ll take you location',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns nothing at all.',
+            )
+        ]
+    )]
+    #[Route('/log', methods: 'POST')]
     public function takeLocation(MobileDetectorInterface $detector): JsonResponse
     {
         $logHandler = new LogHandler();
