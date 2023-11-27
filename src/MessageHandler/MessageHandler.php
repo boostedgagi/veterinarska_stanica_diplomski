@@ -23,9 +23,12 @@ class MessageHandler
 
     public function __invoke(Message $message): void
     {
+        $sender = $this->getUser($message->getSender());
+        $receiver = $this->getUser($message->getReceiver());
+
         $contactMessage = new ContactMessage(
-            $this->getUser($message->getSender()),
-            $this->getUser($message->getReceiver()),
+            $sender,
+            $receiver,
             $message->getContent(),
             ContactMessageStatus::SENT->value,
             $message->getChatId()

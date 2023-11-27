@@ -156,15 +156,19 @@ class ContactMessage
         $this->createdAt = new DateTimeImmutable();
     }
 
+    #[Groups(
+        [
+            ContextGroup::CONTACT_MESSAGE_SENT
+        ]
+    )]
     public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    #[ORM\PreUpdate]
-    public function preUpdate(?DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(): self
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = new DateTimeImmutable();
 
         return $this;
     }

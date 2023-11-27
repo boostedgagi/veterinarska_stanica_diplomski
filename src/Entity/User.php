@@ -218,7 +218,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::CONTACT_MESSAGE_SENT
         ]
     )]
     public function getFirstName(): ?string
@@ -242,7 +243,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::CONTACT_MESSAGE_SENT
         ]
     )]
     public function getLastName(): ?string
@@ -349,7 +351,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             ContextGroup::SHOW_USER,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::CONTACT_MESSAGE_SENT
         ]
     )]
     public function getImage(): ?string
