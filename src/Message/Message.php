@@ -26,7 +26,7 @@ class Message
      * @param string $sender
      * @return Message
      */
-    public function setSender(string $sender): Message
+    public function setSender(string $sender): self
     {
         $this->sender = $sender;
         return $this;
@@ -44,7 +44,7 @@ class Message
      * @param string $receiver
      * @return Message
      */
-    public function setReceiver(string $receiver): Message
+    public function setReceiver(string $receiver): self
     {
         $this->receiver = $receiver;
         return $this;
@@ -62,7 +62,7 @@ class Message
      * @param string $content
      * @return Message
      */
-    public function setContent(string $content): Message
+    public function setContent(string $content): self
     {
         $this->content = $content;
         return $this;
@@ -79,7 +79,7 @@ class Message
     /**
      * @return Message
      */
-    public function setCreatedAt(): Message
+    public function setCreatedAt(): self
     {
         $this->createdAt = new DateTimeImmutable();
         return $this;
@@ -97,11 +97,12 @@ class Message
      * @param string $chatId
      * @return Message
      */
-    public function setChatId(string $chatId): Message
+    public function setChatId(string $chatId): self
     {
         $this->chatId = $chatId;
         return $this;
     }
+
 
 
 }

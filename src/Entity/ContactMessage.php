@@ -41,6 +41,31 @@ class ContactMessage
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $chatId = null;
 
+
+    /**
+     * @param User|null $sender
+     * @param User|null $receiver
+     * @param string|null $content
+     * @param string|null $status
+     * @param string|null $chatId
+     */
+    public function __construct(
+        ?User $sender,
+        ?User $receiver,
+        ?string $content,
+        ?string $status,
+        ?string $chatId
+    )
+    {
+        $this->sender = $sender;
+        $this->receiver = $receiver;
+        $this->content = $content;
+        $this->status = $status;
+        $this->createdAt = new DateTimeImmutable();
+        $this->chatId = $chatId;
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;

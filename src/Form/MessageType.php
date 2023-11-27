@@ -18,7 +18,7 @@ class MessageType extends AbstractType
             ->add('sender')
             ->add('receiver')
             ->add('content')
-            ->add('chat_id');
+            ->add('chatId');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
