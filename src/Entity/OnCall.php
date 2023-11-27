@@ -25,15 +25,8 @@ class OnCall
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $finishedAt = null;
 
-    #[ORM\Column]
-    private ?int $chatCount = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $chatId = null;
-
     public function __construct()
     {
-        $this->chatCount = 0;
     }
 
     public function getId(): ?int
@@ -79,27 +72,4 @@ class OnCall
         return $this;
     }
 
-    public function getChatCount(): ?int
-    {
-        return $this->chatCount;
-    }
-
-    public function setChatCount(int $chatCount): self
-    {
-        $this->chatCount = $chatCount;
-
-        return $this;
-    }
-
-    public function getChatId(): ?string
-    {
-        return $this->chatId;
-    }
-
-    public function setChatId(?string $chatId): static
-    {
-        $this->chatId = $chatId;
-
-        return $this;
-    }
 }

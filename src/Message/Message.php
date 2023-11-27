@@ -13,6 +13,8 @@ class Message
 
     public string $content;
 
+    public string $chatId;
+
     public ?DateTimeImmutable $createdAt = null;
 
     public function getSender(): string
@@ -82,4 +84,24 @@ class Message
         $this->createdAt = new DateTimeImmutable();
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getChatId(): string
+    {
+        return $this->chatId;
+    }
+
+    /**
+     * @param string $chatId
+     * @return Message
+     */
+    public function setChatId(string $chatId): Message
+    {
+        $this->chatId = $chatId;
+        return $this;
+    }
+
+
 }

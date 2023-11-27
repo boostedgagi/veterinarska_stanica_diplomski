@@ -7,6 +7,7 @@ use App\Entity\OnCall;
 use App\Form\MessageType;
 use App\Form\OnCallType;
 use App\Message\Message;
+use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,6 @@ class OnCallController extends AbstractController
 {
     use FormTrait;
     /**
-     * This endpoint makes vet on call (postaje dezuran) and able to recieve messages
      * @param Request $request
      * @return Response
      */
@@ -39,6 +39,15 @@ class OnCallController extends AbstractController
         $this->handleJSONForm($request,$message,MessageType::class);
         $messageBus->dispatch($message);
 
-        return $this->json('Message sent, please be patient for vet\'s response.',ContextGroup::CONTACT_MESSAGE_SENT);
+        return $this->json($message,ContextGroup::CONTACT_MESSAGE_SENT);
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/message/make_hash', methods:Request::METHOD_GET)]
+    public function provideInitialHash():Response
+    {
+        return $this->json(hash('sha256',random_int(1,100)));
     }
 }

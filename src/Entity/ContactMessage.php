@@ -38,6 +38,9 @@ class ContactMessage
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $chatId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +140,18 @@ class ContactMessage
     public function preUpdate(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getChatId(): ?string
+    {
+        return $this->chatId;
+    }
+
+    public function setChatId(?string $chatId): static
+    {
+        $this->chatId = $chatId;
 
         return $this;
     }
