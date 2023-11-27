@@ -78,8 +78,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
-
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'users')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $vet = null;
 
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]
@@ -617,6 +617,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $onCall->setVet(null);
             }
         }
+
+        return $this;
+    }
+
+    public function makeVet():self
+    {
+        $this->setRoles(["ROLE_VET"]);
+        $this->setAllowed(true);
+        $this->setTypeOfUser(2);
 
         return $this;
     }

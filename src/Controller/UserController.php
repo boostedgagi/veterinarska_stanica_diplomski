@@ -94,7 +94,34 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
-    #[Route('/make_vet', methods: 'POST')]
+    /**
+     * @throws TransportExceptionInterface
+     */
+    #[OA\Post(
+        path:'/vets/make_new',
+        requestBody: new OA\RequestBody(
+            description: 'Make new vet',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: UserType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns new vet\'s data.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::CREATE_USER]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NO_CONTENT,
+                description: 'Error'
+            )
+        ]
+    )]
+    #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
         $vet = new User();
@@ -104,22 +131,19 @@ class UserController extends AbstractController
         $plainPassword = $this->makeTemporaryPasswordForVet($vet);
         $hashedPassword = $passwordHasher->hashPassword(
             $vet,
-            $plainPassword
+            $this->makeTemporaryPasswordForVet($vet)
         );
 
         $vet->setPassword($hashedPassword);
-        $vet->setRoles(["ROLE_VET"]);
-        $vet->setAllowed(true);
-        $vet->setTypeOfUser(2);
-
-        $email = new TemplatedEmail($mailer);
+        $vet->makeVet();
 
         $this->em->persist($vet);
         $this->em->flush();
 
+        $email = new TemplatedEmail($mailer);
         $email->sendMailToNewVet($vet, $plainPassword);
 
-        return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+        return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
     private function makeTemporaryPasswordForVet(User $user): string
@@ -177,6 +201,7 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
 
+
     #[Route('/users/{id}', methods: 'DELETE')]
     public function deleteUser(User $vet,): Response
     {
@@ -220,7 +245,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/user_upload_image/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
-    public function uploadProfileImage(Request $request, UserRepository $repo, User $user): Response
+    public function uploadProfileImage(Request $request, User $user): Response
     {
         $uploadImage = new UploadImage($request, $user, $this->em);
 

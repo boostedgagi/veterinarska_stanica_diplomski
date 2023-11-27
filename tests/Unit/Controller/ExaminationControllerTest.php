@@ -13,6 +13,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExaminationControllerTest extends WebTestCase
 {
+    public function testIndex(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h2', 'Give your feedback');
+    }
+
     public function testGetOneExamination(): void
     {
         $client = static::createClient();

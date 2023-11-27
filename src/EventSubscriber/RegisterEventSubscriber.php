@@ -20,6 +20,11 @@ class RegisterEventSubscriber implements EventSubscriberInterface
         ];
     }
 
+    public function onKernelController():void
+    {
+        // ...
+    }
+
     /**
      * @throws TransportExceptionInterface
      */
