@@ -9,6 +9,7 @@ use App\Enum\ContactMessageStatus;
 use App\Form\MessageType;
 use App\Form\OnCallType;
 use App\Message\Message;
+use App\Repository\OnCallRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -42,7 +43,9 @@ class OnCallController extends AbstractController
         $onCall = new OnCall();
 
         $this->handleJSONForm($request, $onCall, OnCallType::class);
-        return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL_CREATED]);
+        $this->em->persist($onCall);
+        $this->em->flush();
+        return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL]);
     }
 
     #[OA\Post(
@@ -104,5 +107,13 @@ class OnCallController extends AbstractController
         $this->em->flush();
 
         return $this->json($contactMessage, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CONTACT_MESSAGE_SENT]);
+    }
+
+    #[Route('/active_vets',methods: Request::METHOD_GET)]
+    public function getOnCallVet(OnCallRepository $onCallRepo): Response
+    {
+        $activeVets = $onCallRepo->getActiveVets();
+
+        return $this->json($activeVets, Response::HTTP_OK, [], ['groups' => ContextGroup::ON_CALL]);
     }
 }

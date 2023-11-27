@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\ContextGroup;
 use App\Repository\OnCallRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Context;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: OnCallRepository::class)]
@@ -34,6 +37,11 @@ class OnCall
         return $this->id;
     }
 
+    #[Groups(
+        [
+            ContextGroup::ON_CALL
+        ]
+    )]
     public function getVet(): ?User
     {
         return $this->vet;

@@ -116,7 +116,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_USER,
             ContextGroup::SHOW_USER,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::ON_CALL
         ]
     )]
     public function getId(): ?int
@@ -134,7 +135,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::ON_CALL
         ]
     )]
     public function getEmail(): ?string
@@ -219,7 +221,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_VET,
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::ON_CALL
         ]
     )]
     public function getFirstName(): ?string
@@ -244,7 +247,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_VET,
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::ON_CALL
         ]
     )]
     public function getLastName(): ?string
@@ -352,7 +356,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             ContextGroup::SHOW_USER,
             ContextGroup::SHOW_VET,
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::ON_CALL
         ]
     )]
     public function getImage(): ?string

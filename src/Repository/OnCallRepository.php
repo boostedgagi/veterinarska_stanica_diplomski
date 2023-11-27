@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\OnCall;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,4 +64,24 @@ class OnCallRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+
+    public function getActiveVets():?array
+    {
+        $qb = $this->createQueryBuilder('o');
+
+        $last24hours = new DateTime('- 1 day');
+        $now = new DateTime();
+
+        $qb
+            ->select('vet.id','vet.email','vet.firstName','vet.lastName')
+            ->innerJoin('o.vet','vet')
+            ->andWhere('o.startedAt between :last24hours and :now')
+            ->setParameter('last24hours',$last24hours)
+            ->setParameter('now',$now)
+            ->andWhere('o.finishedAt is NULL')
+            ->orderBy('RAND()');
+
+        return $qb->getQuery()->getResult();
+    }
 }
