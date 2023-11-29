@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 
@@ -60,6 +61,7 @@ class HealthRecordRepository extends ServiceEntityRepository
     {
         $now = new DateTime();
         $deadline = $this->timeRange($range);
+//        dd($deadline);
         if(!$deadline)
         {
             return [];
@@ -70,18 +72,23 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->setParameter('now', $now)
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline', $deadline)
-            ->andWhere('hr.notifiedWeekBefore = 0');
+            ->andWhere('hr.notifiedWeekBefore is NULL');
 
         return $qb->getQuery()->getResult();
     }
 
+//    private function handleNotifiedByTimeRange(QueryBuilder $qb,string $timeRange):QueryBuilder
+//    {
+//        if($timeRange)
+//    }
+
     private function timeRange(string $range): ?DateTime
     {
-        if ($range === 'today')
+        if ($range === "today")
         {
             return new DateTime('+1 day');
         }
-        if ($range === 'next week')
+        if ($range === "next_week")
         {
             return new DateTime('+7 days');
         }
