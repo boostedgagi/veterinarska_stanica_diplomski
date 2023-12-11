@@ -166,7 +166,7 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::FOUND_PET,
-            ContextGroup::SHOW_VET
+//            ContextGroup::SHOW_VET
         ]
     )]
     public function getOwner(): ?User

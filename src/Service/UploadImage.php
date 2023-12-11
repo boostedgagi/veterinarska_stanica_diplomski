@@ -7,16 +7,20 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
 use Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
 class UploadImage
 {
+    private Filesystem $fs;
     public function __construct(
         private readonly Request $request,
         private readonly User|Pet $entity,
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
+
     )
     {
+        $this->fs = new Filesystem();
     }
 
     public function upload(): void
@@ -25,7 +29,7 @@ class UploadImage
 
         $image = $this->request->files->get('image');
         if($this->entity->getImage()!==null){
-            unlink($this->entity->getImage());
+            $this->fs->remove($this->entity->getImage());
         }
         if ($image) {
             $extension = $image->guessExtension();

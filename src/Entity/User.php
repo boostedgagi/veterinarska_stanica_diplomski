@@ -117,7 +117,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_USER,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_VET,
-            ContextGroup::ON_CALL
+            ContextGroup::ON_CALL,
+            ContextGroup::ME
         ]
     )]
     public function getId(): ?int
@@ -643,7 +644,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_VET
         ]
     )]
     public function getPopularity(): ?string

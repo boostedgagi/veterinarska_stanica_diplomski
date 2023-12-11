@@ -6,16 +6,13 @@ use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
-use App\Entity\Token;
 use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\LoginType;
-use App\Model\Token as ModelToken;
 use App\Form\UserType;
-use App\Repository\HealthRecordRepository;
 use App\Repository\UserRepository;
 use App\Service\LogHandler;
-use App\Service\uploadImage;
+use App\Service\UploadImage;
 use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -290,7 +287,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user/{id}', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOne(?User $user): Response
+    public function showOneUser(?User $user): Response
     {
         if (!$user) {
             return $this->json("User not found");
@@ -330,6 +327,14 @@ class UserController extends AbstractController
         $pets = $user->getPets();
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
+    }
+
+    #[Route('/me', methods: 'GET')]
+    public function getCurrentUser(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ContextGroup::ME]);
     }
 
     #[OA\Post(
@@ -378,6 +383,37 @@ class UserController extends AbstractController
         $uploadImage->upload();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
+    }
+
+    #[OA\Get(
+        path: '/vet/{id}',
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'One vet data.',
+                content: new Model(
+                    type: User::class,
+                    groups: [ContextGroup::SHOW_VET]
+                )
+            ),
+            new OA\Response(
+                response: Response::HTTP_NOT_FOUND,
+                description: 'User with specified ID not found.',
+            )
+        ]
+    )]
+    #[Route('/vet/{id}')]
+    public function showOneVet(User $vet,UserRepository $userRepo):Response
+    {
+        return $this->json($vet,Response::HTTP_OK,[],['groups'=>ContextGroup::SHOW_VET]);
     }
 
     #[OA\Get(
@@ -534,7 +570,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vets', methods: 'GET')]
-    public function showAll(UserRepository $userRepo): Response
+    public function showAllVets(UserRepository $userRepo): Response
     {
         $vets = $userRepo->getAllVets();
 
