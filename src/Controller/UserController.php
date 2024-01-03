@@ -32,6 +32,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmail;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 
 class UserController extends AbstractController
@@ -321,20 +322,20 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Route('/user/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUserPets(User $user): Response
+    #[Security(name:'Bearer')]
+    #[Route('/my_pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    public function showOneUserPets(#[CurrentUser] User $user): Response
     {
         $pets = $user->getPets();
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
     }
 
+    #[Security(name:'Bearer')]
     #[Route('/me', methods: 'GET')]
-    public function getCurrentUser(Request $request): JsonResponse
+    public function getCurrentUser(#[CurrentUser] User $user): JsonResponse
     {
-        $user = $this->getUser();
-
-        return $this->json($user, Response::HTTP_OK, [], ['groups' => ContextGroup::ME]);
+        return $this->json($user, Response::HTTP_OK,[],['groups'=>ContextGroup::ME]);
     }
 
     #[OA\Post(

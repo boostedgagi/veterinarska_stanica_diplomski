@@ -8,6 +8,7 @@
 /var/
 /vendor/
 /.env
+/.env.test
 #/public/exports
 /.idea
 /mysqldata

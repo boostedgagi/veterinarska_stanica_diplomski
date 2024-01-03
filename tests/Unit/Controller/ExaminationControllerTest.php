@@ -4,6 +4,9 @@ namespace App\Tests\Unit\Controller;
 
 use App\ApiClient;
 use App\Entity\Examination;
+use App\Repository\ExaminationRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use JsonException;
 use Nebkam\FluentTest\RequestBuilder;
 use PHPUnit\Framework\TestCase;
@@ -13,31 +16,39 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExaminationControllerTest extends WebTestCase
 {
-    public function testIndex(): void
-    {
-        $client = static::createClient();
-        $client->request('GET', '/');
+    private KernelBrowser $client;
 
-        self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h2', 'Give your feedback');
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
     }
 
-    public function testGetOneExamination(): void
+    public function testGet(): void
     {
-        $client = static::createClient();
+        $this->client->request('GET', '/examination');
 
-        $examination = new Examination();
-        $examination
-            ->setName('pregled')
-            ->setDuration(60)
-            ->setPrice(1000);
+        self::assertResponseIsSuccessful();
+    }
 
-        $response = RequestBuilder::create($client)
+    public function testCreate(): void
+    {
+        $examination = [
+            'name' => 'Test examination',
+            'duration' => 60,
+            'price' => 900,
+        ];
+
+        $response = RequestBuilder::create($this->client)
             ->setMethod(Request::METHOD_POST)
-            ->setUri(ApiClient::$apiUrl.'/examination/')
+            ->setUri('/examination')
             ->setJsonContent($examination)
             ->getResponse();
 
-        dump($response->getJsonContent());
+        $createdExamination = $response->getJsonContent();
+        self::assertEquals('Test examination',$createdExamination["name"]);
+        self::assertEquals(60,$createdExamination["duration"]);
+        self::assertEquals(900,$createdExamination["price"]);
+
+        self::assertResponseIsSuccessful();
     }
 }

@@ -137,7 +137,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_VET,
-            ContextGroup::ON_CALL
+            ContextGroup::ON_CALL,
+            ContextGroup::ME
         ]
     )]
     public function getEmail(): ?string
@@ -223,7 +224,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
-            ContextGroup::ON_CALL
+            ContextGroup::ON_CALL,
+            ContextGroup::ME
         ]
     )]
     public function getFirstName(): ?string
@@ -249,7 +251,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
-            ContextGroup::ON_CALL
+            ContextGroup::ON_CALL,
+            ContextGroup::ME
         ]
     )]
     public function getLastName(): ?string
@@ -338,7 +341,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             ContextGroup::CREATE_USER,
-            ContextGroup::SHOW_USER
+            ContextGroup::SHOW_USER,
+            ContextGroup::ME
         ]
     )]
     public function getTypeOfUser(): ?int

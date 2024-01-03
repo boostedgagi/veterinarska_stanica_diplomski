@@ -169,7 +169,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $qb
             ->andWhere('u.typeOfUser=2')
-            ->orderBy('u.popularity','asc');
+            ->orderBy('u.popularity','desc');
 
         return $qb->getQuery()->getResult();
         }

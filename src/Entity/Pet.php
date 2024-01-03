@@ -222,7 +222,8 @@ class Pet
         [
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_USER_PETS
         ]
     )]
     public function getImage(): ?string

@@ -12,6 +12,18 @@ services:
       - MYSQL_DATABASE=vet_shop
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=password
+  mysql_test:
+    image: percona:8.0
+    container_name: mysql_test_vetShop
+    restart: always
+    ports:
+      - '3336:3306' # 'local_port:port_in_container'
+    environment:
+      - MYSQL_ROOT_PASSWORD=MYSQL_RANDOM_ROOT_PASSWORD
+#      - DB_HOST=127.0.0.1
+      - MYSQL_DATABASE=vet_shop_test
+      - MYSQL_USER=admintest
+      - MYSQL_PASSWORD=passwordtest
 #  mailer:
 #    image: schickling/mailcatcher
 #    ports: [ 1025, 1080 ]
