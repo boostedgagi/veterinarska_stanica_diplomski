@@ -72,7 +72,7 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->setParameter('now', $now)
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline', $deadline)
-            ->andWhere('hr.notifiedWeekBefore is NULL');
+            ->andWhere('hr.notifiedWeekBefore = 0');
 
         return $qb->getQuery()->getResult();
     }

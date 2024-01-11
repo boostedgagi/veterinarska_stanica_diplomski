@@ -59,13 +59,13 @@ class HealthRecord
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $notifiedWeekBefore = null;
+    private ?bool $notifiedWeekBefore = false;
 
     #[ORM\Column]
     private bool $madeByVet;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $notifiedDayBefore = null;
+    private ?bool $notifiedDayBefore = false;
 
     private ?bool $atPresent = null;
 

@@ -16,6 +16,7 @@
         "gedmo/doctrine-extensions": "^3.11",
         "gesdinet/jwt-refresh-token-bundle": "^1.1",
         "jms/serializer-bundle": "^5.3",
+        "knplabs/knp-paginator-bundle": "^6.2",
         "league/csv": "^9.0",
         "lexik/jwt-authentication-bundle": "^2.16",
         "nebkam/symfony-traits": "^4.0",

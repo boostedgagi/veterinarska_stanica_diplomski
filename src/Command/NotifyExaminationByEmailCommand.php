@@ -57,7 +57,7 @@ class NotifyExaminationByEmailCommand extends Command
                 $email = new TemplatedEmail($this->mailer);
 
                 $email->notifyUserAboutPetHaircut($this->notifier, $healthRecord);
-
+                dump('trebalo bi da salje');
                 $healthRecord->setNotifiedWeekBefore(true);
 
                 $this->em->persist($healthRecord);
