@@ -10,12 +10,14 @@ use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\LoginType;
 use App\Form\UserType;
+use App\Model\PaginatedResult;
 use App\Repository\UserRepository;
 use App\Service\LogHandler;
 use App\Service\UploadImage;
 use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -40,14 +42,14 @@ class UserController extends AbstractController
     use FormTrait;
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface   $em,
         private readonly EventDispatcherInterface $eventDispatcher
     )
     {
     }
 
     #[OA\Post(
-        path:'/user',
+        path: '/user',
         requestBody: new OA\RequestBody(
             description: 'Register',
             required: true,
@@ -76,7 +78,7 @@ class UserController extends AbstractController
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
-        if(!$user->getPlainPassword()){
+        if (!$user->getPlainPassword()) {
             return $this->json("Password not valid.");
         }
         if ($plainPassword = $user->getPlainPassword()) {
@@ -90,7 +92,7 @@ class UserController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        $event = new UserRegisterEvent($user,$mailer,$this->em);
+        $event = new UserRegisterEvent($user, $mailer, $this->em);
         $this->eventDispatcher->addSubscriber(new RegisterEventSubscriber());
         $this->eventDispatcher->dispatch($event, UserRegisterEvent::NAME);
 
@@ -101,7 +103,7 @@ class UserController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[OA\Post(
-        path:'/vets/make_new',
+        path: '/vets/make_new',
         requestBody: new OA\RequestBody(
             description: 'Make new vet',
             required: true,
@@ -124,7 +126,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name:'Bearer')]
+    #[Security(name: 'Bearer')]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -156,7 +158,7 @@ class UserController extends AbstractController
     }
 
     #[OA\PUT(
-        path:'/user/{id}',
+        path: '/user/{id}',
         description: 'Edit user data here.',
         requestBody: new OA\RequestBody(
             description: 'User data from user form type.',
@@ -203,6 +205,13 @@ class UserController extends AbstractController
         $this->em->flush();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+    }
+
+    #[Security(name: 'Bearer')]
+    #[Route('/me', methods: 'GET')]
+    public function getCurrentUser(#[CurrentUser] User $user): JsonResponse
+    {
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ContextGroup::ME]);
     }
 
     #[OA\Delete(
@@ -322,20 +331,13 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name:'Bearer')]
+    #[Security(name: 'Bearer')]
     #[Route('/my_pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function showOneUserPets(#[CurrentUser] User $user): Response
     {
         $pets = $user->getPets();
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
-    }
-
-    #[Security(name:'Bearer')]
-    #[Route('/me', methods: 'GET')]
-    public function getCurrentUser(#[CurrentUser] User $user): JsonResponse
-    {
-        return $this->json($user, Response::HTTP_OK,[],['groups'=>ContextGroup::ME]);
     }
 
     #[OA\Post(
@@ -412,9 +414,9 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vet/{id}')]
-    public function showOneVet(User $vet,UserRepository $userRepo):Response
+    public function showOneVet(User $vet, UserRepository $userRepo): Response
     {
-        return $this->json($vet,Response::HTTP_OK,[],['groups'=>ContextGroup::SHOW_VET]);
+        return $this->json($vet, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
 
     #[OA\Get(
@@ -442,7 +444,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name:'Bearer')]
+    #[Security(name: 'Bearer')]
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(User $vet): Response
     {
@@ -458,7 +460,7 @@ class UserController extends AbstractController
     }
 
     #[OA\Post(
-        path:'/login_check',
+        path: '/login_check',
         requestBody: new OA\RequestBody(
             description: 'Login',
             required: true,
@@ -571,11 +573,23 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vets', methods: 'GET')]
-    public function showAllVets(UserRepository $userRepo): Response
+    public function showAllVets(Request $request, UserRepository $userRepo, PaginatorInterface $paginator): Response
     {
-        $vets = $userRepo->getAllVets();
+        $allVetsQuery = $userRepo->getQueryOfAllVets();
 
-        return $this->json($vets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
+        $pagination = $paginator->paginate(
+            $allVetsQuery, /* query NOT result */
+            $request->query->getInt('page'), /*page number*/
+            $request->query->getInt('limit') /*limit per page*/
+        );
+
+        $paginatedResult = new PaginatedResult(
+            $pagination->getItems(),
+            $pagination->getCurrentPageNumber(),
+            $pagination->getTotalItemCount()
+        );
+
+        return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
 
 
@@ -632,6 +646,6 @@ class UserController extends AbstractController
         $this->em->persist($log);
         $this->em->flush();
 
-        return $this->json("",Response::HTTP_OK);
+        return $this->json("", Response::HTTP_OK);
     }
 }

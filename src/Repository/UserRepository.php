@@ -7,7 +7,9 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -163,7 +165,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    public function getAllVets():array
+    public function getQueryOfAllVets(): Query
         {
         $qb = $this->createQueryBuilder('u');
 
@@ -171,6 +173,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->andWhere('u.typeOfUser=2')
             ->orderBy('u.popularity','desc');
 
-        return $qb->getQuery()->getResult();
+            return $qb->getQuery();
         }
+
+    public function getAllVets():array
+    {
+        return $this->getQueryOfAllVets()->getResult();
+    }
+
+
 }

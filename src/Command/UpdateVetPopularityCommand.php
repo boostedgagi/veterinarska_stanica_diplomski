@@ -39,7 +39,8 @@ class UpdateVetPopularityCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $vets = $this->userRepo->getAllVets();
+//        $vets = $this->userRepo->getAllVets();
+        //should separate this and retrieve only ids
 
         $allHealthRecordCount = $this->healthRecordRepo->allHealthRecordCount();
 
