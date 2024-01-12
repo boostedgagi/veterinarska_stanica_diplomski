@@ -57,8 +57,8 @@ class PaginatedResult
      */
     #[Groups(
         [
-            ContextGroup::SHOW_VET,
-            ContextGroup::SHOW_HEALTH_RECORD,
+//            ContextGroup::SHOW_VET,
+//            ContextGroup::SHOW_HEALTH_RECORD,
         ]
     )]
     public function getItemsCount(): int

@@ -247,7 +247,6 @@ class HealthRecordController extends AbstractController
             $pagination->getTotalItemCount()
         );
 
-
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
