@@ -32,7 +32,9 @@ class PaginatedResult
      */
     #[Groups(
         [
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_HEALTH_RECORD,
+
         ]
     )]
     public function getItems(): array
@@ -55,7 +57,8 @@ class PaginatedResult
      */
     #[Groups(
         [
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_HEALTH_RECORD,
         ]
     )]
     public function getItemsCount(): int
@@ -78,7 +81,8 @@ class PaginatedResult
      */
     #[Groups(
         [
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_HEALTH_RECORD,
         ]
     )]
     public function getCurrentPageNumber(): int
@@ -101,7 +105,8 @@ class PaginatedResult
      */
     #[Groups(
         [
-            ContextGroup::SHOW_VET
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_HEALTH_RECORD,
         ]
     )]
     public function getTotalItemsCount(): int

@@ -9,10 +9,13 @@ use App\Entity\User;
 use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
+use App\Model\PaginatedResult;
 use App\Repository\HealthRecordRepository;
 use App\Service\HealthRecordService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
+use Knp\Component\Pager\PaginatorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
@@ -225,14 +228,27 @@ class HealthRecordController extends AbstractController
         ]
     )]
     #[Route('/pet/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function petHealthRecords(?Pet $pet): Response
+    public function petHealthRecords(Request $request,?Pet $pet,PaginatorInterface $paginator): Response
     {
         if (!$pet) {
             return $this->json(["error" => "Pet not found."]);
         }
         $petHealthRecords = $pet->getHealthRecords();
 
-        return $this->json($petHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
+        $pagination = $paginator->paginate(
+            $petHealthRecords,
+            $request->query->getInt('page'),
+            $request->query->getInt('limit')
+        );
+
+        $paginatedResult = new PaginatedResult(
+            $pagination->getItems(),
+            $pagination->getCurrentPageNumber(),
+            $pagination->getTotalItemCount()
+        );
+
+
+        return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
     #[Route('/user/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]

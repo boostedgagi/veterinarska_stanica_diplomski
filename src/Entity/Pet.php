@@ -238,9 +238,6 @@ class Pet
         return $this;
     }
 
-    /**
-     * @return Collection<int, HealthRecord>
-     */
     public function getHealthRecords(): Collection
     {
         return $this->healthRecords;
