@@ -11,8 +11,10 @@ use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\LoginType;
 use App\Form\UserType;
 use App\Model\PaginatedResult;
+use App\Model\PaginationQueryParams;
 use App\Repository\UserRepository;
 use App\Service\LogHandler;
+use App\Service\PaginationService;
 use App\Service\UploadImage;
 use App\Service\UserService;
 use Doctrine\DBAL\Exception;
@@ -322,7 +324,7 @@ class UserController extends AbstractController
                 description: 'Show all pets of one user.',
                 content: new Model(
                     type: User::class,
-                    groups: [ContextGroup::SHOW_USER_PETS]
+                    groups: [ContextGroup::SHOW_MY_PETS]
                 )
             ),
             new OA\Response(
@@ -333,11 +335,24 @@ class UserController extends AbstractController
     )]
     #[Security(name: 'Bearer')]
     #[Route('/my_pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showOneUserPets(#[CurrentUser] User $user): Response
+    public function showMyPets(Request $request,#[CurrentUser] User $user,PaginatorInterface $paginator): Response
     {
-        $pets = $user->getPets();
+        $myPets = $user->getPets();
+        $queryParams = new PaginationQueryParams($request);
 
-        return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER_PETS]);
+        $pagination = $paginator->paginate(
+            $myPets,
+            $queryParams->page,
+            $queryParams->limit
+        );
+
+        $paginatedResult = new PaginatedResult(
+            $pagination->getItems(),
+            $pagination->getCurrentPageNumber(),
+            $pagination->getTotalItemCount()
+        );
+
+        return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_MY_PETS]);
     }
 
     #[OA\Post(

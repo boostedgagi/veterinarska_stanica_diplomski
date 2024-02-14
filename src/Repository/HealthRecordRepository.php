@@ -57,11 +57,11 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function getExaminationsInTimeRange(string $range): array
+    public function getHealthRecordsInTimeRange(string $range): array
     {
         $now = new DateTime();
         $deadline = $this->timeRange($range);
-//        dd($deadline);
+
         if(!$deadline)
         {
             return [];
@@ -76,11 +76,6 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
-//    private function handleNotifiedByTimeRange(QueryBuilder $qb,string $timeRange):QueryBuilder
-//    {
-//        if($timeRange)
-//    }
 
     private function timeRange(string $range): ?DateTime
     {

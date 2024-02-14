@@ -10,6 +10,7 @@ use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
 use App\Model\PaginatedResult;
+use App\Model\PaginationQueryParams;
 use App\Repository\HealthRecordRepository;
 use App\Service\HealthRecordService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -227,18 +228,19 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
-    #[Route('/pet/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/pet/{id}/health_record', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function petHealthRecords(Request $request,?Pet $pet,PaginatorInterface $paginator): Response
     {
         if (!$pet) {
             return $this->json(["error" => "Pet not found."]);
         }
         $petHealthRecords = $pet->getHealthRecords();
+        $queryParams = new PaginationQueryParams($request);
 
         $pagination = $paginator->paginate(
             $petHealthRecords,
-            $request->query->getInt('page'),
-            $request->query->getInt('limit')
+            $queryParams->page,
+            $queryParams->limit
         );
 
         $paginatedResult = new PaginatedResult(

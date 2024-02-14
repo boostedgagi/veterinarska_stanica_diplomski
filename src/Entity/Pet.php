@@ -61,7 +61,7 @@ class Pet
         [
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -76,7 +76,7 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::FOUND_PET,
             ContextGroup::SHOW_VET
         ]
@@ -99,7 +99,7 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::FOUND_PET,
             ContextGroup::SHOW_VET
 
@@ -123,7 +123,7 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -145,7 +145,7 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -184,7 +184,7 @@ class Pet
     #[Groups(
         [
             ContextGroup::CREATE_PET,
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_VET
         ]
@@ -223,7 +223,7 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_VET,
-            ContextGroup::SHOW_USER_PETS
+            ContextGroup::SHOW_MY_PETS
         ]
     )]
     public function getImage(): ?string

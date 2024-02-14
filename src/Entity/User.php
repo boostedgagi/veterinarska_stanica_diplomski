@@ -380,7 +380,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(
         [
-            ContextGroup::SHOW_USER_PETS,
+            ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -457,6 +457,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
     public function getPhone(): ?string

@@ -44,15 +44,14 @@ class NotifyExaminationByEmailCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $timeRange = $input->getOption('time-range');
+        $scheduledHealthRecords = $this->healthRecRepo->getHealthRecordsInTimeRange($timeRange);
 
-        $healthRecordsToNotify = $this->healthRecRepo->getExaminationsInTimeRange($timeRange);
-//        dd(count($healthRecordsToNotify));
-        if(count($healthRecordsToNotify)===0)
+        if(count($scheduledHealthRecords)===0)
         {
             return Command::SUCCESS;
         }
         /** @var HealthRecord $healthRecord */
-        foreach ($healthRecordsToNotify as $healthRecord) {
+        foreach ($scheduledHealthRecords as $healthRecord) {
             try {
                 $email = new TemplatedEmail($this->mailer);
 

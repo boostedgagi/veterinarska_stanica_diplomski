@@ -27,14 +27,11 @@ class PaginatedResult
         $this->totalItemsCount = $totalItemsCount;
     }
 
-    /**
-     * @return array
-     */
     #[Groups(
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
-
+            ContextGroup::SHOW_MY_PETS
         ]
     )]
     public function getItems(): array
@@ -57,8 +54,8 @@ class PaginatedResult
      */
     #[Groups(
         [
-//            ContextGroup::SHOW_VET,
-//            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_VET,
+            ContextGroup::SHOW_HEALTH_RECORD,
         ]
     )]
     public function getItemsCount(): int
@@ -83,6 +80,7 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_MY_PETS
         ]
     )]
     public function getCurrentPageNumber(): int
@@ -107,6 +105,7 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_MY_PETS
         ]
     )]
     public function getTotalItemsCount(): int
