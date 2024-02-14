@@ -13,7 +13,7 @@ class UserService
         $vetExaminationsCount = count($vet->getHealthRecords());
         $percentage = 100 * $vetExaminationsCount / $allExaminationsCount;
 
-        return number_format((float)$percentage, 2, '.', '') . '%';
+        return number_format((float)$percentage, 2, '.', '');
     }
 
     public static function getCurrentUser(TokenStorageInterface $tokenStorage):?User

@@ -342,7 +342,7 @@ class UserController extends AbstractController
     #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC,'limit'=>Requirements::NUMERIC], methods: 'GET')]
     public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
-        //put some attention in query params, soemthing not working as it should be
+        //put some attention in query params, something not working as it should be
         $myPets = $user->getPets();
 
         $paginationService = new PaginationService($paginator, $request, $myPets);
