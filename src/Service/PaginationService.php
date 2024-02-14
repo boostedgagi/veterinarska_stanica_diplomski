@@ -28,9 +28,7 @@ class PaginationService
         $this->paginator = $paginator;
         $this->request = $request;
         $this->recordCollection = $recordCollection;
-
     }
-
 
     private function paginate():PaginationInterface{
 

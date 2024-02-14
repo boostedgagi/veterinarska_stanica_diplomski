@@ -309,11 +309,16 @@ class UserController extends AbstractController
     }
 
     #[OA\Get(
-        path: '/user/{id}/pets',
+        path: '/my_pets?page={page}&limit={limit}',
         parameters: [
             new OA\Parameter(
-                name: 'id',
-                in: 'path',
+                name: 'page',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            ), new OA\Parameter(
+                name: 'limit',
+                in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'number')
             )
@@ -334,9 +339,10 @@ class UserController extends AbstractController
         ]
     )]
     #[Security(name: 'Bearer')]
-    #[Route('/my_pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function showMyPets(Request $request,#[CurrentUser] User $user,PaginatorInterface $paginator): Response
+    #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC,'limit'=>Requirements::NUMERIC], methods: 'GET')]
+    public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
+        //put some attention in query params, soemthing not working as it should be
         $myPets = $user->getPets();
 
         $paginationService = new PaginationService($paginator, $request, $myPets);
