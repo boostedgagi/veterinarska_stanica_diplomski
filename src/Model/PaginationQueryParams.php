@@ -3,11 +3,14 @@
 namespace App\Model;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class PaginationQueryParams
 {
+    #[Assert\NotBlank]
     public int $page;
 
+    #[Assert\NotBlank]
     public int $limit;
 
     /**

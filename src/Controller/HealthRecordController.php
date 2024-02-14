@@ -13,6 +13,7 @@ use App\Model\PaginatedResult;
 use App\Model\PaginationQueryParams;
 use App\Repository\HealthRecordRepository;
 use App\Service\HealthRecordService;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
@@ -23,6 +24,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -232,23 +234,27 @@ class HealthRecordController extends AbstractController
     public function petHealthRecords(Request $request,?Pet $pet,PaginatorInterface $paginator): Response
     {
         if (!$pet) {
-            return $this->json(["error" => "Pet not found."]);
+//            return $this->json(["error" => "Pet not found."]);
+            throw new NotFoundHttpException('Pet not found');
+
         }
         $petHealthRecords = $pet->getHealthRecords();
-        $queryParams = new PaginationQueryParams($request);
+//        $queryParams = new PaginationQueryParams($request);
 
-        $pagination = $paginator->paginate(
-            $petHealthRecords,
-            $queryParams->page,
-            $queryParams->limit
-        );
+//        $pagination = $paginator->paginate(
+//            $petHealthRecords,
+//            $queryParams->page,
+//            $queryParams->limit
+//        );
 
-        $paginatedResult = new PaginatedResult(
-            $pagination->getItems(),
-            $pagination->getCurrentPageNumber(),
-            $pagination->getTotalItemCount()
-        );
+//        $paginatedResult = new PaginatedResult(
+//            $pagination->getItems(),
+//            $pagination->getCurrentPageNumber(),
+//            $pagination->getTotalItemCount()
+//        );
 
+        $paginationService = new PaginationService($paginator, $request, $petHealthRecords);
+        $paginatedResult = $paginationService->getPaginatedResult();
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 

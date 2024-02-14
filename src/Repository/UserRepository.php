@@ -13,6 +13,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use function get_class;
 
 
 /**
@@ -30,15 +31,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    public function save(User $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
     public function remove(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
@@ -54,7 +46,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
         $user->setPassword($newHashedPassword);
@@ -62,13 +54,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
+    public function save(User $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
 
-    public function findUserIdByMail(string $email):array
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function findUserIdByMail(string $email): array
     {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u.id as user_id')
             ->andWhere('u.email=:email')
-            ->setParameter('email',$email);
+            ->setParameter('email', $email);
 
         return $qb->getQuery()->getResult();
     }
@@ -112,46 +112,46 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $nearbyVets->fetchAll();
     }
 
-    public function getOccupiedVetsInTimeRange($from,$to):array
+    public function getFreeVets($from, $to): array
+    {
+        $occupiedVets = $this->getOccupiedVetsInTimeRange($from, $to);
+        return $this->excludeOccupiedVets($occupiedVets);
+    }
+
+    public function getOccupiedVetsInTimeRange($from, $to): array
     {
         $qb = $this->createQueryBuilder('u');
 
-        $qb->innerJoin('u.healthRecords','hr')
+        $qb->innerJoin('u.healthRecords', 'hr')
             ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
             ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
             ->orWhere('u.id not in (hr.vet)')
-            ->setParameter('from',$from)
-            ->setParameter('to',$to);
+            ->setParameter('from', $from)
+            ->setParameter('to', $to);
 
         return $qb->getQuery()->getResult();
     }
 
-    private function occupiedVetsIds(array $occupiedVets):array
-    {
-        $occupiedVetsIDs = [];
-
-        foreach($occupiedVets as $occupiedVet){
-            $occupiedVetsIDs[] = $occupiedVet->getId();
-        }
-        return $occupiedVetsIDs;
-    }
-
-    public function excludeOccupiedVets(array $occupiedVets):array
+    public function excludeOccupiedVets(array $occupiedVets): array
     {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u')
             ->andWhere('u.id not in (:occupiedVetsIDs)')
-            ->setParameter('occupiedVetsIDs',$this->occupiedVetsIDs($occupiedVets))
+            ->setParameter('occupiedVetsIDs', $this->occupiedVetsIDs($occupiedVets))
             ->andWhere('u.typeOfUser=2')
             ->orderBy('u.id');
 
         return $qb->getQuery()->getResult();
     }
 
-    public function getFreeVets($from,$to):array
+    private function occupiedVetsIds(array $occupiedVets): array
     {
-        $occupiedVets = $this->getOccupiedVetsInTimeRange($from,$to);
-        return $this->excludeOccupiedVets($occupiedVets);
+        $occupiedVetsIDs = [];
+
+        foreach ($occupiedVets as $occupiedVet) {
+            $occupiedVetsIDs[] = $occupiedVet->getId();
+        }
+        return $occupiedVetsIDs;
     }
 
     public function getId(string $email)
@@ -160,26 +160,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $qb
             ->select('u.id')
             ->andWhere('u.email=:email')
-            ->setParameter('email',$email);
+            ->setParameter('email', $email);
 
         return $qb->getQuery()->getResult();
     }
 
-    public function getQueryOfAllVets(): Query
-        {
+    public function allVets(): array
+    {
         $qb = $this->createQueryBuilder('u');
 
         $qb
             ->andWhere('u.typeOfUser=2')
-            ->orderBy('u.popularity','desc');
+            ->orderBy('u.popularity', 'desc');
 
-            return $qb->getQuery();
-        }
-
-    public function getAllVets():array
-    {
-        return $this->getQueryOfAllVets()->getResult();
+        return $qb->getQuery()->getResult();
     }
-
-
 }

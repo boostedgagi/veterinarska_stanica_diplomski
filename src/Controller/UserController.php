@@ -338,19 +338,9 @@ class UserController extends AbstractController
     public function showMyPets(Request $request,#[CurrentUser] User $user,PaginatorInterface $paginator): Response
     {
         $myPets = $user->getPets();
-        $queryParams = new PaginationQueryParams($request);
 
-        $pagination = $paginator->paginate(
-            $myPets,
-            $queryParams->page,
-            $queryParams->limit
-        );
-
-        $paginatedResult = new PaginatedResult(
-            $pagination->getItems(),
-            $pagination->getCurrentPageNumber(),
-            $pagination->getTotalItemCount()
-        );
+        $paginationService = new PaginationService($paginator, $request, $myPets);
+        $paginatedResult = $paginationService->getPaginatedResult();
 
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_MY_PETS]);
     }
@@ -590,19 +580,10 @@ class UserController extends AbstractController
     #[Route('/vets', methods: 'GET')]
     public function showAllVets(Request $request, UserRepository $userRepo, PaginatorInterface $paginator): Response
     {
-        $allVetsQuery = $userRepo->getQueryOfAllVets();
+        $allVets = $userRepo->allVets();
 
-        $pagination = $paginator->paginate(
-            $allVetsQuery, /* query NOT result */
-            $request->query->getInt('page'), /*page number*/
-            $request->query->getInt('limit') /*limit per page*/
-        );
-
-        $paginatedResult = new PaginatedResult(
-            $pagination->getItems(),
-            $pagination->getCurrentPageNumber(),
-            $pagination->getTotalItemCount()
-        );
+        $paginationService = new PaginationService($paginator, $request, $allVets);
+        $paginatedResult = $paginationService->getPaginatedResult();
 
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
