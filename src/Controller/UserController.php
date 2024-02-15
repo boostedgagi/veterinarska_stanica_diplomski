@@ -136,14 +136,14 @@ class UserController extends AbstractController
 
         $this->handleJSONForm($request, $vet, UserType::class);
 
-        $plainPassword = $this->makeTemporaryPasswordForVet($vet);
+        $plainPassword = UserService::makeVetTemporaryPassword($vet);
         $hashedPassword = $passwordHasher->hashPassword(
             $vet,
-            $this->makeTemporaryPasswordForVet($vet)
+            $plainPassword
         );
 
         $vet->setPassword($hashedPassword);
-        $vet->makeVet();
+        $vet->setAdditionalVetData();
 
         $this->em->persist($vet);
         $this->em->flush();
@@ -152,11 +152,6 @@ class UserController extends AbstractController
         $email->sendMailToNewVet($vet, $plainPassword);
 
         return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::SHOW_USER]);
-    }
-
-    private function makeTemporaryPasswordForVet(User $user): string
-    {
-        return strtolower($user->getFirstName()) . strtolower($user->getPhone()) . strtolower($user->getLastName());
     }
 
     #[OA\PUT(

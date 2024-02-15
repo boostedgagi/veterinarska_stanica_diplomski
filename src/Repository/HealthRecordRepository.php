@@ -56,11 +56,13 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
-
+    /**
+     * @return HealthRecord[]
+     */
     public function getHealthRecordsInTimeRange(string $range): array
     {
         $now = new DateTime();
-        $deadline = $this->timeRange($range);
+        $deadline = $this->convertTextInputToRange($range);
 
         if(!$deadline)
         {
@@ -77,7 +79,7 @@ class HealthRecordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    private function timeRange(string $range): ?DateTime
+    private function convertTextInputToRange(string $range): ?DateTime
     {
         if ($range === "today")
         {

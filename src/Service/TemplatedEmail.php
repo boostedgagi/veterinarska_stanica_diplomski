@@ -69,7 +69,7 @@ class TemplatedEmail
                 <p>
                     Hi {$vet->getFirstName()}!<br>
                     Our administrator made you a personal account!<br>
-                    It will be your job account where you will be notified about your examinations, etc.<br>
+                    It will be your job account where you will be notified about your scheduled examinations, etc.<br>
                     Your email is {$vet->getEmail()}, and password is $password and we suggest to change it after first log in.<br><br>
                     Kind regards,<br>
                     Your VetShop
@@ -121,18 +121,14 @@ class TemplatedEmail
 
     public function notifyUserAboutPetHaircut(NotifierInterface $notifier,HealthRecord $healthRecord):void
     {
-
         $pet = $healthRecord->getPet();
 
-        $date = $healthRecord->getStartedAt();
-        $resultDate = $date->format('Y-m-d H:i:s');
-        $examination = $healthRecord->getExamination();
         $notification = (new Notification('Reminder from VetShop',['email']))
             ->content("Hi ".$pet->getOwner()->getFirstName()."!
             
             We are notifying you that your pet named ".$pet->getName().",
-             have ".$examination->getName()." in the ".$resultDate.".
-            Examination is ".$examination->getDuration()." minutes long.
+            have ".$healthRecord->getExamination()->getName()." in the ".$healthRecord->getStartedAt()->format('Y-m-d H:i:s').".
+            Examination is ".$healthRecord->getExamination()->getDuration()." minutes long.
             See you then!
             
             Your VetShop!");
@@ -146,7 +142,10 @@ class TemplatedEmail
         $notifier->send($notification,$recipient);
     }
 
-    public function sendPasswordRequest(int $tokenId,ModelToken $token):void
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendPasswordRequest(int $tokenId, ModelToken $token):void
     {
         $ngrok = getenv('NGROK_TUNNEL');
         $email = (new Email())
@@ -158,7 +157,11 @@ class TemplatedEmail
                 Reset it by click on this button here!</p>
                 <a 
                     type='button' 
-                    href='http://localhost:8000/password/make_new?token_id={$tokenId}&token={$token->getToken()}&expires={$token->getExpires()}&email={$token->getEmailAddress()}'
+                    href='http://localhost:8000/password/make_new?
+                    token_id={$tokenId}&
+                    token={$token->getToken()}&
+                    expires={$token->getExpires()}&
+                    email={$token->getEmailAddress()}'
                 >
                     Reset password
                 </a>
@@ -167,6 +170,9 @@ class TemplatedEmail
         $this->mailer->send($email);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function sendMonthlyCSVByMail(string $CSVPath):void
     {
         $email = (new Email())

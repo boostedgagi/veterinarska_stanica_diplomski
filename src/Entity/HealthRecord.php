@@ -58,16 +58,22 @@ class HealthRecord
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $notifiedWeekBefore = false;
+    #[ORM\Column()]
+    private ?bool $notifiedWeekBefore;
 
     #[ORM\Column]
     private bool $madeByVet;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $notifiedDayBefore = false;
+    #[ORM\Column()]
+    private ?bool $notifiedDayBefore;
 
     private ?bool $atPresent = null;
+
+    public function __construct()
+    {
+        $this->notifiedWeekBefore = false;
+        $this->notifiedDayBefore = false;
+    }
 
     #[Groups(
         [

@@ -96,8 +96,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: OnCall::class)]
     private Collection $onCalls;
 
-    #[ORM\Column(length: 10, nullable: true)]
-    private ?string $popularity = null;
+    #[ORM\Column(nullable: true)]
+    private ?float $popularity = null;
 
     public function __construct()
     {
@@ -633,7 +633,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function makeVet():self
+    public function setAdditionalVetData():self
     {
         $this->setRoles(["ROLE_VET"]);
         $this->setAllowed(true);
