@@ -44,29 +44,30 @@ class NotifyExaminationByEmailCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $timeRange = $input->getOption('time-range');
-        $scheduledHealthRecords = $this->healthRecRepo->getHealthRecordsInTimeRange($timeRange);
+        $scheduledHealthRecords = $this->healthRecRepo->timeRangeHealthRecords($timeRange);
+
         if (count($scheduledHealthRecords) === 0) {
             return Command::SUCCESS;
         }
 
         foreach ($scheduledHealthRecords as $healthRecord) {
-            try {
-                $email = new TemplatedEmail($this->mailer);
+            $email = new TemplatedEmail($this->mailer);
 
-                $email->notifyUserAboutPetHaircut($this->notifier, $healthRecord);
+            $this->setNotifiedByRange($healthRecord,$timeRange);
+            $email->notifyUserAboutPetHaircut($this->notifier, $healthRecord);
 
-                if ($timeRange == NotifyingTimeRange::NEXT_DAY->value) {
-                    $healthRecord->setNotifiedDayBefore(true);
-                }
-                else if ($timeRange == NotifyingTimeRange::NEXT_WEEK->value) {
-                    $healthRecord->setNotifiedWeekBefore(true);
-                }
-
-                $this->em->flush();
-            } catch (Exception $exception) {
-                return Command::FAILURE;
-            }
+            $this->em->flush();
         }
         return Command::SUCCESS;
+    }
+
+    private function setNotifiedByRange(HealthRecord $healthRecord, string $timeRange): void
+    {
+        if ($timeRange === NotifyingTimeRange::NEXT_DAY->value) {
+            $healthRecord->setNotifiedDayBefore(true);
+        }
+        else if ($timeRange === NotifyingTimeRange::NEXT_WEEK->value) {
+            $healthRecord->setNotifiedWeekBefore(true);
+        }
     }
 }

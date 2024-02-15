@@ -60,7 +60,7 @@ class HealthRecordRepository extends ServiceEntityRepository
     /**
      * @return HealthRecord[]
      */
-    public function getHealthRecordsInTimeRange(string $range): array
+    public function timeRangeHealthRecords(string $range): array
     {
         $now = new DateTime();
         $deadline = $this->convertTextInputToRange($range);
@@ -75,7 +75,6 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->setParameter('now', $now)
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline', $deadline);
-//            ->andWhere('hr.notifiedWeekBefore = false');
 
         if($range===NotifyingTimeRange::NEXT_WEEK->value){
             $qb->andWhere('hr.notifiedWeekBefore = false');
