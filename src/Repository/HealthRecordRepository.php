@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\HealthRecord;
+use App\Enum\NotifyingTimeRange;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
@@ -73,8 +74,15 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->andWhere('hr.startedAt>=:now')
             ->setParameter('now', $now)
             ->andWhere('hr.finishedAt<:deadline')
-            ->setParameter('deadline', $deadline)
-            ->andWhere('hr.notifiedWeekBefore = 0');
+            ->setParameter('deadline', $deadline);
+//            ->andWhere('hr.notifiedWeekBefore = false');
+
+        if($range===NotifyingTimeRange::NEXT_WEEK->value){
+            $qb->andWhere('hr.notifiedWeekBefore = false');
+        }
+        else if($range===NotifyingTimeRange::NEXT_DAY->value){
+            $qb->andWhere('hr.notifiedDayBefore = false');
+        }
 
         return $qb->getQuery()->getResult();
     }

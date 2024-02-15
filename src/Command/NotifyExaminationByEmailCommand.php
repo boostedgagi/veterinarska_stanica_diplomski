@@ -54,16 +54,14 @@ class NotifyExaminationByEmailCommand extends Command
                 $email = new TemplatedEmail($this->mailer);
 
                 $email->notifyUserAboutPetHaircut($this->notifier, $healthRecord);
-                if ($timeRange === NotifyingTimeRange::NEXT_DAY->value) {
+
+                if ($timeRange == NotifyingTimeRange::NEXT_DAY->value) {
                     $healthRecord->setNotifiedDayBefore(true);
-                    dump('dan');
                 }
-                else if ($timeRange === NotifyingTimeRange::NEXT_WEEK) {
+                else if ($timeRange == NotifyingTimeRange::NEXT_WEEK->value) {
                     $healthRecord->setNotifiedWeekBefore(true);
-                    dump('nedelja');
                 }
 
-                $this->em->persist($healthRecord);
                 $this->em->flush();
             } catch (Exception $exception) {
                 return Command::FAILURE;
