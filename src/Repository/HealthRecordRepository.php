@@ -99,7 +99,7 @@ class HealthRecordRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function getLastMonthHealthRecords(int $numericalLastMonth): array
+    public function getLastMonthHealthRecords(): array
     {
         $from = new DateTime('- 30 days');
         $to = new DateTime();

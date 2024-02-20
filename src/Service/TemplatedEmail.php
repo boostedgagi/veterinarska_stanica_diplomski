@@ -178,8 +178,8 @@ class TemplatedEmail
         $email = (new Email())
             ->from('export@vetshop.com')
             ->to('dragan.02jelic@gmail.com')
-            ->subject('Monthly report of done examinations.')
-            ->text('You can download it from attachment and print it with minimal changes required.')
+            ->subject('Monthly report of all examinations.')
+            ->text('You can download monthly report from the attachment and print it with minimal changes required.')
             ->addPart(new DataPart(new File($CSVPath)));
 
         $this->mailer->send($email);

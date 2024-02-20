@@ -14,6 +14,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 
@@ -24,56 +26,28 @@ use Symfony\Component\Mailer\MailerInterface;
 )]
 class MonthlyHealthRecordExportCommand extends Command
 {
-    private HealthRecordRepository $healthRecordRepo;
-    private ExportService $exportService;
-    private MailerInterface $mailer;
-
-    public function __construct(HealthRecordRepository $healthRecordRepo, ExportService $exportService,MailerInterface $mailer)
+    public function __construct(
+        public readonly HealthRecordRepository $healthRecordRepo,
+        public readonly ExportService          $exportService,
+        public readonly MailerInterface        $mailer
+    )
     {
-        $this->healthRecordRepo = $healthRecordRepo;
-        $this->exportService = $exportService;
-        $this->mailer = $mailer;
-
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-//        $this
-//            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-//        ;
-    }
-
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws TransportExceptionInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('Okay let\'s export all health records scheduled in last month.');
-        $output->writeln('- - - - -');
-        $numericalLastMonth = number_format(date('m', strtotime('-1 month', strtotime(date('Y-m-01')))));
         $lastMonthHealthRecords = $this->healthRecordRepo->getLastMonthHealthRecords(7);
 
-        if (count($lastMonthHealthRecords) === 0)
-            {
-            $output->writeln('There is no any scheduled health records in last month.');
-            return Command::SUCCESS;
-            }
-        $fileName = sprintf('%s_%s_health_records.csv', $numericalLastMonth, date("Y", time()));
+        $fileName = sprintf('%s_%s_health_records.csv', date('n'), date("Y", time()));
 
-        try
-            {
-            $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
-            $email = new TemplatedEmail($this->mailer);
-            $email->sendMonthlyCSVByMail($filePath);
-            }
-        catch (Exception $e)
-            {
-            $output->writeln('Error occurred: ' . $e->getMessage());
-            return Command::FAILURE;
-            }
-        $output->writeln('Data successfully exported in ' . $filePath . ' and sent to admin by mail.');
+        $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
+        $email = new TemplatedEmail($this->mailer);
+        $email->sendMonthlyCSVByMail($filePath);
+
         return Command::SUCCESS;
     }
 }

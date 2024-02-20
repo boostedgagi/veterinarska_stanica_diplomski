@@ -20,9 +20,8 @@ class ExportService
      */
     public function exportHealthRecords(array $healthRecords, string $fileName): string
     {
-        try
-            {
-            $csv = fopen( self::PATH . $fileName, 'w+');
+        try {
+            $csv = fopen(self::PATH . $fileName, 'w+');
             fputcsv($csv,
                 [
                     'id',
@@ -36,8 +35,7 @@ class ExportService
                     'is made by vet'
                 ]
             );
-            foreach ($healthRecords as $healthRecord)
-                {
+            foreach ($healthRecords as $healthRecord) {
                 fputcsv($csv,
                     [
                         $healthRecord["id"],
@@ -46,18 +44,17 @@ class ExportService
                         $healthRecord["examName"],
                         $healthRecord["startedAt"]->format('Y-m-d H:i:s'),
                         $healthRecord["finishedAt"]->format('Y-m-d H:i:s'),
-                        $healthRecord["notifiedWeekBefore"]==0 ? 'not notified ' : 'notified',
-                        $healthRecord["notifiedDayBefore"]==0 ? 'not notified ' : 'notified',
+                        $healthRecord["notifiedWeekBefore"] == 0 ? 'not notified ' : 'notified',
+                        $healthRecord["notifiedDayBefore"] == 0 ? 'not notified ' : 'notified',
                         $healthRecord["madeByVet"] ? 'made by vet' : 'scheduled'
                     ]
                 );
-                }
+            }
             return self::PATH . $fileName;
-            }
-        catch (Exception $e)
-            {
+        }
+        catch (Exception $e) {
             error_log($e->getMessage());
-            }
-        return 'Error occurred. Try again later.';
+        }
+        return "";
     }
 }

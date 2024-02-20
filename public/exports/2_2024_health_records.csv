@@ -1,0 +1,5 @@
+id,"vet name","pet name","exam name","start time","finish time",notified_week_before,notified_day_before,"is made by vet"
+57,Sabina,Trystan,"Weight monitoring","2024-02-16 22:27:45","2024-01-11 23:27:45",notified,notified,scheduled
+62,Robb,Lea,"Nail trimming","2024-02-16 22:37:45","2024-01-11 23:27:45",notified,notified,scheduled
+69,Clinton,Lea,"Ear inspection","2024-02-16 22:37:45","2024-01-11 23:27:45",notified,notified,scheduled
+73,Easton,Trystan,"Nail trimming","2024-02-16 22:37:45","2024-01-11 23:27:45",notified,notified,scheduled
