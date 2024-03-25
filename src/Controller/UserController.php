@@ -304,7 +304,7 @@ class UserController extends AbstractController
     }
 
     #[OA\Get(
-        path: '/my_pets?page={page}&limit={limit}',
+        path: '/my_pets',
         parameters: [
             new OA\Parameter(
                 name: 'page',
@@ -563,6 +563,19 @@ class UserController extends AbstractController
 
     #[OA\Get(
         path: '/vets',
+        parameters: [
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            ), new OA\Parameter(
+                name: 'limit',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,

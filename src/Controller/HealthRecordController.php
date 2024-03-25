@@ -209,8 +209,13 @@ class HealthRecordController extends AbstractController
         path: '/pet/{id}/health_records',
         parameters: [
             new OA\Parameter(
-                name: 'id',
-                in: 'path',
+                name: 'page',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            ), new OA\Parameter(
+                name: 'limit',
+                in: 'query',
                 required: true,
                 schema: new OA\Schema(type: 'number')
             )
@@ -234,27 +239,14 @@ class HealthRecordController extends AbstractController
     public function petHealthRecords(Request $request,?Pet $pet,PaginatorInterface $paginator): Response
     {
         if (!$pet) {
-//            return $this->json(["error" => "Pet not found."]);
             throw new NotFoundHttpException('Pet not found');
-
         }
+
         $petHealthRecords = $pet->getHealthRecords();
-//        $queryParams = new PaginationQueryParams($request);
-
-//        $pagination = $paginator->paginate(
-//            $petHealthRecords,
-//            $queryParams->page,
-//            $queryParams->limit
-//        );
-
-//        $paginatedResult = new PaginatedResult(
-//            $pagination->getItems(),
-//            $pagination->getCurrentPageNumber(),
-//            $pagination->getTotalItemCount()
-//        );
 
         $paginationService = new PaginationService($paginator, $request, $petHealthRecords);
         $paginatedResult = $paginationService->getPaginatedResult();
+
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 

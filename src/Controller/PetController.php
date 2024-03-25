@@ -256,10 +256,9 @@ class PetController extends AbstractController
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
 
         $pet = $petRepo->find($qrCode->getPetId());
-        $email = new TemplatedEmail($mailer);
-
         $qrCodePath = $qrCode->generateQRCode();
 
+        $email = new TemplatedEmail($mailer);
         $email->sendQrCodeWithMail($pet, $qrCodePath);
 
         return $this->json($qrCodePath, Response::HTTP_OK);

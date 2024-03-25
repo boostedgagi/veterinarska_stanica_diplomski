@@ -133,10 +133,8 @@ class TemplatedEmail
             
             Your VetShop!");
 
-        $user = $pet->getOwner();
-
         $recipient = new Recipient(
-            $user->getEmail()
+            $pet->getOwner()->getEmail()
         );
 
         $notifier->send($notification,$recipient);
