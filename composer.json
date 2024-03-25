@@ -54,6 +54,7 @@
         "willdurand/geocoder-bundle": "^5.0"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^7.3",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "nebkam/fluent-test": "^4.1",
         "phpunit/phpunit": "^9.5",
@@ -117,7 +118,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "6.2.*"
         }
     }
