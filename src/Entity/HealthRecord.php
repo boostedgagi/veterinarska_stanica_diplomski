@@ -269,12 +269,13 @@ class HealthRecord
     /**
      * @param bool|null $notifiedWeekBefore
      */
-    public function setNotifiedWeekBefore(?bool $notifiedWeekBefore): void
+    public function setNotifiedWeekBefore(?bool $notifiedWeekBefore): self
     {
         $this->notifiedWeekBefore = $notifiedWeekBefore;
+        return $this;
     }
 
-    public function isNotifiedDayBefore(): ?bool
+    public function getNotifiedDayBefore(): ?bool
     {
         return $this->notifiedDayBefore;
     }
@@ -288,10 +289,12 @@ class HealthRecord
 
     /**
      * @param string|null $atPresent
+     * @return HealthRecord
      */
-    public function setAtPresent(?string $atPresent): void
+    public function setAtPresent(?string $atPresent): self
     {
         $this->atPresent = $atPresent;
+        return $this;
     }
 
     /**
