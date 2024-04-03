@@ -48,8 +48,6 @@ class UserTest extends BaseTestCase
 
     public function testCreatedVet():void
     {
-
-
         self::assertEquals('Marko',$this->mockVet->getFirstName());
         self::assertEquals('Milosevic',$this->mockVet->getLastName());
         self::assertSame(2,$this->mockVet->getTypeOfUser());
