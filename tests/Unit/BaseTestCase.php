@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig;
 
 class BaseTestCase extends KernelTestCase
@@ -22,6 +23,24 @@ class BaseTestCase extends KernelTestCase
         DatabasePrimer::prime($kernel);
 
         $this->em = $kernel->getContainer()->get('doctrine')->getManager();
+    }
+
+    protected function makeMockUser(string $email = null,User $vet = null): User
+    {
+        $user = (new User())
+            ->setEmail($email ?: 'marko.patarcic27@gmail.com')
+            ->setFirstName('Marko')
+            ->setLastName('Patarcic')
+            ->setPassword('$2y$13$VOvCoCQGCdorKogJAwAkgeidOOLXcPwETGQuc/rlLse6.Vm7fs5AK')
+            ->setTypeOfUser(User::TYPE_USER)
+            ->setAllowed(1)
+            ->setPhone('0643387626')
+            ->setVet($vet);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
     }
 
     /**
