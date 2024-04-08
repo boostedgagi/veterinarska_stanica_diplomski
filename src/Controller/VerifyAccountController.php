@@ -25,7 +25,7 @@ class VerifyAccountController extends AbstractController
     {
         $queryParams = (object)$request->query->all();
 
-        $savedToken = $verifyRepo->findTokenByTokenValue($queryParams->token);
+        $savedToken = $verifyRepo->findOneByValue($queryParams->token);
 //        dump($queryParams);
 //        dd($savedToken);
         if ($savedToken->token && ($savedToken->expires > strtotime(date('Y-m-d h:i:s')))) {

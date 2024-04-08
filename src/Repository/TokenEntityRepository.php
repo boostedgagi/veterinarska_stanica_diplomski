@@ -42,7 +42,7 @@ class TokenEntityRepository extends ServiceEntityRepository
         }
     }
 
-    public function findTokenByTokenValue(string $token):SavedToken
+    public function findOneByValue(string $token):SavedToken
     {
         $qb = $this->createQueryBuilder('va');
         $qb

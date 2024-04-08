@@ -36,12 +36,12 @@ class ForgottenPasswordController extends AbstractController
     {
         $data = json_decode($request->getContent(), false);
 
-        $token = $verifyRepo->findTokenByTokenValue($data->token);
+        $token = $verifyRepo->findOneByValue($data->token);
         if (!$token) {
             return $this->json('Token is not valid.', Response::HTTP_OK);
         }
 
-        $user = $userRepo->findBy(['email'=>$data->email]);
+        $user = $userRepo->findOneBy(['email'=>$data->email]);
 
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
@@ -57,7 +57,6 @@ class ForgottenPasswordController extends AbstractController
 
             $user->setPassword($hashedPassword);
 
-            $this->em->persist($user);
             $this->em->flush();
 
             $this->em->remove($tokenObj);
