@@ -8,7 +8,7 @@ use App\Form\PetType;
 use App\Form\QRCodeType;
 use App\Model\QRCode;
 use App\Repository\PetRepository;
-use App\Service\TemplatedEmail;
+use App\Service\TemplatedEmailService;
 use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
@@ -258,7 +258,7 @@ class PetController extends AbstractController
         $pet = $petRepo->find($qrCode->getPetId());
         $qrCodePath = $qrCode->generateQRCode();
 
-        $email = new TemplatedEmail($mailer);
+        $email = new TemplatedEmailService($mailer);
         $email->sendQrCodeWithMail($pet, $qrCodePath);
 
         return $this->json($qrCodePath, Response::HTTP_OK);

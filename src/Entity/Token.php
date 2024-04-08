@@ -24,8 +24,6 @@ class Token
 
     public function __construct()
     {
-        $this->token = md5(uniqid('', true) . random_int(10, 100));
-        $this->expires = strtotime(date('Y-m-d h:i:s')) + (Helper::ONE_HOUR_IN_SECONDS / 2);
     }
 
     public function getId(): ?int

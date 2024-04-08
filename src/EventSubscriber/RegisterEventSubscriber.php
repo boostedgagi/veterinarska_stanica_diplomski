@@ -4,7 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Token;
 use App\Event\UserRegisterEvent;
-use App\Service\TemplatedEmail;
+use App\Service\TemplatedEmailService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -35,7 +35,7 @@ class RegisterEventSubscriber implements EventSubscriberInterface
         $event->em->persist($token);
         $event->em->flush();
 
-        $email = new TemplatedEmail($event->mailer);
+        $email = new TemplatedEmailService($event->mailer);
         $email->sendWelcomeEmail($event->user, $token);
     }
 }

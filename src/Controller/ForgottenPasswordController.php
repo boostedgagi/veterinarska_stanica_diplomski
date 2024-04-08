@@ -3,20 +3,27 @@
 namespace App\Controller;
 
 use App\Entity\Token;
+use App\Factory\TokenFactory;
+use App\Form\RequestNewPasswordType;
+use App\Model\RequestNewPassword;
 use App\Model\Token as ModelToken;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
-use App\Service\TemplatedEmail;
+use App\Service\TemplatedEmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ForgottenPasswordController extends AbstractController
 {
+    use FormTrait;
+
     private EntityManagerInterface $em;
 
     public function __construct(EntityManagerInterface $em)
@@ -34,8 +41,7 @@ class ForgottenPasswordController extends AbstractController
             return $this->json('Token is not valid.', Response::HTTP_OK);
         }
 
-        $userData = $userRepo->findUserIdByMail($data->email);
-        $user = $userRepo->find($userData[0]['user_id']);
+        $user = $userRepo->findBy(['email'=>$data->email]);
 
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
@@ -61,29 +67,29 @@ class ForgottenPasswordController extends AbstractController
         return $this->json('Something wrong happened, try again later.', Response::HTTP_OK);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/password/request_new', methods: 'POST')]
-    public function requestPasswordRenewal(Request $request, MailerInterface $mailer,UserRepository $userRepo): Response
+    public function requestNewPassword(Request $request, MailerInterface $mailer,UserRepository $userRepo): Response
     {
-        $data = (object)json_decode($request->getContent(), false);
+        $requestNewPassword = new RequestNewPassword();
+        $this->handleJSONForm($request,$requestNewPassword,RequestNewPasswordType::class);
 
-        $email = new TemplatedEmail($mailer);
-
-        $preparedToken = (new ModelToken())->make30MinToken();
-
-        $userData = $userRepo->findUserIdByMail($data->email);
-        $user = $userRepo->find($userData[0]['user_id']);
+        $user = $userRepo->findBy(['email'=>$requestNewPassword->email]);
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
         }
 
-        $token = new Token($preparedToken);
+        $tokenFactory = new TokenFactory($this->em);
+        $token = $tokenFactory->save();
+        $email = new TemplatedEmailService($mailer);
 
         $this->em->persist($token);
         $this->em->flush();
 
-        $preparedToken->setEmailAddress($data->email);
-        $email->sendPasswordRequest($token->getId(),$preparedToken);
+        $email->sendPasswordRequest($token,$requestNewPassword->email);
 
-        return $this->json(['status' => 'Email with password renewal request is sent. Check your mail!'], Response::HTTP_OK);
+        return $this->json([],Response::HTTP_CREATED);
     }
 }

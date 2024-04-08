@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Entity\HealthRecord;
 use App\Enum\NotifyingTimeRange;
 use App\Repository\HealthRecordRepository;
-use App\Service\TemplatedEmail;
+use App\Service\TemplatedEmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -51,10 +51,10 @@ class NotifyExaminationByEmailCommand extends Command
         }
 
         foreach ($scheduledHealthRecords as $healthRecord) {
-            $email = new TemplatedEmail($this->mailer);
+            $email = new TemplatedEmailService($this->mailer);
 
             $this->setNotifiedByRange($healthRecord,$timeRange);
-            $email->notifyUserAboutPetHaircut($this->notifier, $healthRecord);
+            $email->notifyUserAboutAppointment($this->notifier, $healthRecord);
 
             $this->em->flush();
         }

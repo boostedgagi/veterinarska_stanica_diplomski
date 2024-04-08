@@ -34,7 +34,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\TemplatedEmail;
+use App\Service\TemplatedEmailService;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -148,7 +148,7 @@ class UserController extends AbstractController
         $this->em->persist($vet);
         $this->em->flush();
 
-        $email = new TemplatedEmail($mailer);
+        $email = new TemplatedEmailService($mailer);
         $email->sendMailToNewVet($vet, $plainPassword);
 
         return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::SHOW_USER]);

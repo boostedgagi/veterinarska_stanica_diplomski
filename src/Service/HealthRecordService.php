@@ -29,7 +29,7 @@ class HealthRecordService
         }
         if ($cancel->getCanceler()->getTypeOfUser() === User::TYPE_VET)
         {
-            $email = new TemplatedEmail($this->mailer);
+            $email = new TemplatedEmailService($this->mailer);
 
             //this should be enqueued
             $email->sendCancelMailByVet(
