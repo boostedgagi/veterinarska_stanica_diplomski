@@ -42,17 +42,15 @@ class TokenEntityRepository extends ServiceEntityRepository
         }
     }
 
-    public function findOneByValue(string $token):SavedToken
+    public function findOneByValue(string $token):array
     {
         $qb = $this->createQueryBuilder('va');
         $qb
             ->select('va.token token,va.expires expires')
             ->andWhere('va.token = :token')
             ->setParameter('token',$token);
-        if(!$qb->getQuery()->getResult()){
-            exit('Token not found.');
-        }
-        return $this->hydrate($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult()[0];
     }
 
     public function getExpiredTokens():array
@@ -64,15 +62,6 @@ class TokenEntityRepository extends ServiceEntityRepository
             ->setParameter('now',$now);
 
         return $qb->getQuery()->getResult();
-    }
-
-    private function hydrate(array $results):SavedToken
-    {
-        $savedToken = new SavedToken();
-        foreach($results[0] as $key=>$value){
-            $savedToken->resolveAndFillVariable($key,$value);
-        }
-        return $savedToken;
     }
 
 //    /**

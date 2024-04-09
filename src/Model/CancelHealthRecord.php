@@ -10,8 +10,6 @@ class CancelHealthRecord
 {
     private string $cancelMessage;
 
-    private User $canceler;
-
     public function getCancelMessage(): string
     {
         return $this->cancelMessage;
@@ -20,18 +18,6 @@ class CancelHealthRecord
     public function setCancelMessage(string $cancelMessage): self
     {
         $this->cancelMessage = $cancelMessage;
-
-        return $this;
-    }
-
-    public function getCanceler(): User
-    {
-        return $this->canceler;
-    }
-
-    public function setCanceler(User $canceler): self
-    {
-        $this->canceler = $canceler;
 
         return $this;
     }

@@ -250,9 +250,7 @@ class PetController extends AbstractController
     #[Route('/qr-code', methods: 'POST')]
     public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer, BuilderInterface $builder): Response
     {
-        //this could be moved to service and queued
         $qrCode = new QRCode($builder);
-
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
 
         $pet = $petRepo->find($qrCode->getPetId());

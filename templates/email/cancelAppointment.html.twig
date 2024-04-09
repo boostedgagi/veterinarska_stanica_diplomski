@@ -38,16 +38,16 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hi {{ healthRecord.pet.owner.firstName }}</h1>
-        <p>We are notifying you that your pet named {{ healthRecord.pet.name }},
-            will have {{ healthRecord.examination.name }} on {{ healthRecord.startedAt|date("Y-m-d H:i:s") }}.
-            Examination is {{ healthRecord.examination.duration }} minutes long.</p>
-        <p>See you then!</p><br>
-        <p>Your VetShop!</p>
-    </div>
-    <div class="footer">
-        This is an automated message. Please do not reply.
-    </div>
+<div class="container">
+    <h3>
+        We are very sorry but your scheduled appointment in vetShop is canceled.<br>
+        Here you can read what is the reason of cancellation.
+    </h3>
+    <p style='font-weight: 500;'>{{ cancelText }}</p>
+</div>
+
+<div class="footer">
+    This is an automated message. Please do not reply.
+</div>
 </body>
 </html>

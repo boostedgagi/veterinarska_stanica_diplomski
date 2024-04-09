@@ -7,14 +7,11 @@ use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\Token;
-use App\Model\Token as ModelToken;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
-use Symfony\Component\Notifier\NotifierInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
 
 class TemplatedEmailService
 {
@@ -31,26 +28,15 @@ class TemplatedEmailService
     {
         $apiUrl = ApiClient::$apiUrl;
 
-        $email = (new Email())
-            ->from('welcome@vetshop.com')
+        $email = (new TemplatedEmail())
             ->to($user->getEmail())
-            ->subject('Welcome to the vetShop')
-            ->html("
-                <p>
-                    Hi {$user->getFirstName()}!<br>
-                    We are very glad that you are our new member!<br>
-                    Please verify your account by clicking on this button:
-                </p>
-                <a 
-                    type='button' 
-                    href='{$apiUrl}/verify_account?
-                        token_id={$token->getId()}&
-                        token={$token->getToken()}&
-                        expires={$token->getExpires()}&
-                        user_id={$user->getId()}'
-                >
-                    Verify
-                </a>");
+            ->subject('Welcome to the vetShop.')
+            ->htmlTemplate('email/welcome.html.twig')
+            ->context([
+                'user'=>$user,
+                'token'=>$token,
+                'apiUrl'=>ApiClient::$apiUrl
+            ]);
 
         $this->mailer->send($email);
     }
@@ -60,20 +46,15 @@ class TemplatedEmailService
      */
     public function sendMailToNewVet(User $vet, string $password): void
     {
-        $email = (new Email())
+        $email = (new TemplatedEmail())
             ->from('welcome@vetshop.com')
             ->to($vet->getEmail())
             ->subject('Welcome to the vetShop')
-            ->html("
-                <p>
-                    Hi {$vet->getFirstName()}!<br>
-                    Our administrator made you a personal account!<br>
-                    It will be your job account where you will be notified about your scheduled examinations, etc.<br>
-                    Your email is {$vet->getEmail()}, and password is $password and we suggest to change it after first log in.<br><br>
-                    Kind regards,<br>
-                    Your VetShop
-                </p>
-                ");
+            ->htmlTemplate('email/welcomeNewVet.html.twig')
+            ->context([
+                'vet'=>$vet,
+                'password'=>$password
+            ]);
 
         $this->mailer->send($email);
     }
@@ -83,21 +64,14 @@ class TemplatedEmailService
      */
     public function sendQrCodeWithMail(Pet $pet, string $qrCodePath): void
     {
-        $host = ApiClient::$apiUrl;
-
-        $email = (new Email())
-            ->from('yourqrcode@vetshop.com')
+        $email = (new TemplatedEmail())
             ->to($pet->getOwner()->getEmail())
-            ->subject('We made qr code just for your pet!')
-            ->html("
-                <h4 style='font-weight: 500;'>This qr code is supposed to be located in your pet's necklace<br>
-                    and also to be scanned if your pet is lost and been found after.</h4>
-                <img 
-                    src=" . $host . '/' . $qrCodePath . "
-                    height='140px' 
-                    width='140px' 
-                    alt='qr-code'>
-            ");
+            ->subject('Your pet\'s QR code.')
+            ->htmlTemplate('email/qrCode.html.twig')
+            ->context([
+                'qrCode' => $qrCodePath,
+                'host' => ApiClient::$apiUrl
+            ]);
 
         $this->mailer->send($email);
     }
@@ -107,13 +81,11 @@ class TemplatedEmailService
      */
     public function sendCancelMailByVet(Pet $pet, string $cancelText): void
     {
-        $email = (new Email())
+        $email = (new TemplatedEmail())
             ->from('cancel@vetshop.com')
             ->to($pet->getOwner()->getEmail())
             ->subject('Examination of your pet is canceled.')
-            ->html("
-                <h4 style='font-weight: 500;'>" . $cancelText . "</h4>
-            ");
+            ->htmlTemplate('email/cancelAppointment.html.twig');
 
         $this->mailer->send($email);
     }
@@ -121,21 +93,23 @@ class TemplatedEmailService
     /**
      * @throws TransportExceptionInterface
      */
-    public function notifyUserAboutAppointment(NotifierInterface $notifier, HealthRecord $healthRecord): void
+    public function notifyUserAboutAppointment(HealthRecord $healthRecord): void
     {
         $pet = $healthRecord->getPet();
-        $notification = (new TemplatedEmail())
+
+        $email = (new TemplatedEmail())
             ->to($pet->getOwner()->getEmail())
+            ->subject('Appointment notification')
             ->htmlTemplate('email/scheduledAppointment.html.twig')
             ->context(['healthRecord' => $healthRecord]);
 
-        $this->mailer->send($notification);
+        $this->mailer->send($email);
     }
 
     /**
      * @throws TransportExceptionInterface
      */
-    public function sendPasswordRequest(Token $token,string $emailAddress): void
+    public function sendPasswordRequest(Token $token, string $emailAddress): void
     {
         $email = (new TemplatedEmail())
             ->to($emailAddress)
@@ -143,7 +117,7 @@ class TemplatedEmailService
             ->htmlTemplate('email/passwordRenewalRequest.html.twig')
             ->context([
                 'token' => $token,
-                'emailAddress'=>$emailAddress
+                'emailAddress' => $emailAddress
             ]);
 
         $this->mailer->send($email);

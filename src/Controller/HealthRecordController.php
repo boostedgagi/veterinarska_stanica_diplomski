@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class HealthRecordController extends AbstractController
 {
@@ -288,7 +289,7 @@ class HealthRecordController extends AbstractController
         ]
     )]
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
-    public function cancel(Request $request, ?HealthRecord $healthRecord,HealthRecordService $healthRecordService): Response
+    public function cancel(Request $request, ?HealthRecord $healthRecord,HealthRecordService $healthRecordService,#[CurrentUser] $canceler): Response
     {
         if (!$healthRecord)
         {
@@ -297,7 +298,7 @@ class HealthRecordController extends AbstractController
         $cancel = new CancelHealthRecord();
         $this->handleJSONForm($request, $cancel, CancelHealthRecordType::class);
 
-        $message = $healthRecordService->cancel($healthRecord,$cancel);
+        $message = $healthRecordService->cancel($healthRecord,$cancel,$canceler);
 
         $this->em->flush();
 

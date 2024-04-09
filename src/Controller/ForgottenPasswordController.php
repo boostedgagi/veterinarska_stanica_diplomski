@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Token;
 use App\Factory\TokenFactory;
+use App\Form\NewPasswordEnvelopeType;
 use App\Form\RequestNewPasswordType;
+use App\Model\NewPasswordEnvelope;
 use App\Model\RequestNewPassword;
-use App\Model\Token as ModelToken;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
 use App\Service\TemplatedEmailService;
@@ -34,36 +34,33 @@ class ForgottenPasswordController extends AbstractController
     #[Route('/password/make_new', methods: 'POST')]
     public function renewForgottenPassword(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher): Response
     {
-        $data = json_decode($request->getContent(), false);
+        $newPasswordEnvelope = new NewPasswordEnvelope();
+        $this->handleJSONForm($request,$newPasswordEnvelope,NewPasswordEnvelopeType::class);
 
-        $token = $verifyRepo->findOneByValue($data->token);
+        $token = $verifyRepo->findOneByValue($newPasswordEnvelope->token);
         if (!$token) {
             return $this->json('Token is not valid.', Response::HTTP_OK);
         }
 
-        $user = $userRepo->findOneBy(['email'=>$data->email]);
-
+        $user = $userRepo->findOneBy(['email'=>$newPasswordEnvelope->email]);
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
         }
 
-        if ($token[0]['token'] && ($token[0]['expires'] > strtotime(date('Y-m-d h:i:s')))) {
-            $tokenObj = $verifyRepo->find($data->token_id);
+        if ($token['token'] && ($token['expires'] > strtotime(date('Y-m-d h:i:s')))) {
+            $tokenObj = $verifyRepo->find($newPasswordEnvelope->token_id);
 
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
-                $data->password
+                $newPasswordEnvelope->password
             );
-
             $user->setPassword($hashedPassword);
-
-            $this->em->flush();
 
             $this->em->remove($tokenObj);
             $this->em->flush();
-            return $this->json('You changed your password!', Response::HTTP_OK);
+            return $this->json([], Response::HTTP_OK);
         }
-        return $this->json('Something wrong happened, try again later.', Response::HTTP_OK);
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -82,11 +79,11 @@ class ForgottenPasswordController extends AbstractController
 
         $tokenFactory = new TokenFactory($this->em);
         $token = $tokenFactory->save();
-        $email = new TemplatedEmailService($mailer);
 
         $this->em->persist($token);
         $this->em->flush();
 
+        $email = new TemplatedEmailService($mailer);
         $email->sendPasswordRequest($token,$requestNewPassword->email);
 
         return $this->json([],Response::HTTP_CREATED);

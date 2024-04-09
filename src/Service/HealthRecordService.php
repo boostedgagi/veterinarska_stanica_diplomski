@@ -19,15 +19,15 @@ class HealthRecordService
     /**
      * @throws TransportExceptionInterface
      */
-    public function cancel(HealthRecord $healthRecord, CancelHealthRecord $cancel): ?string
+    public function cancel(HealthRecord $healthRecord, CancelHealthRecord $cancel,User $canceler): ?string
     {
         $timeDiff = $healthRecord->getStartedAt()->diff(new DateTime());
 
-        if ($timeDiff->h === 0 && $cancel->getCanceler()->getTypeOfUser() === User::TYPE_USER)
+        if ($timeDiff->h === 0 && $canceler->getTypeOfUser() === User::TYPE_USER)
         {
             return CancelHealthRecord::getDenyCancelMessage();
         }
-        if ($cancel->getCanceler()->getTypeOfUser() === User::TYPE_VET)
+        if ($canceler->getTypeOfUser() === User::TYPE_VET)
         {
             $email = new TemplatedEmailService($this->mailer);
 

@@ -38,16 +38,19 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hi {{ healthRecord.pet.owner.firstName }}</h1>
-        <p>We are notifying you that your pet named {{ healthRecord.pet.name }},
-            will have {{ healthRecord.examination.name }} on {{ healthRecord.startedAt|date("Y-m-d H:i:s") }}.
-            Examination is {{ healthRecord.examination.duration }} minutes long.</p>
-        <p>See you then!</p><br>
-        <p>Your VetShop!</p>
-    </div>
-    <div class="footer">
-        This is an automated message. Please do not reply.
-    </div>
+<div class="container">
+    <p>
+        Hi {{ vet.getFirstName() }}!<br>
+        Our administrator made you a personal account!<br>
+        It will be your job account where you will be notified about your scheduled examinations, etc.<br>
+        Your email is {{ vet.getEmail() }}, and password is {{ password }} and we suggest to change it after first log
+        in.<br><br>
+        Kind regards,<br>
+        Your VetShop
+    </p>
+</div>
+<div class="footer">
+    This is an automated message. Please do not reply.
+</div>
 </body>
 </html>

@@ -4,6 +4,7 @@ namespace App\Model;
 
 use App\ApiClient;
 use Endroid\QrCode\Builder\BuilderInterface;
+use PHPUnit\Util\Filesystem;
 
 class QRCode
 {
@@ -27,7 +28,6 @@ class QRCode
 
     private function makeUrl():string
     {
-
         return ApiClient::$apiUrl . "/found_pet?id=" . $this->petId;
     }
 
@@ -35,7 +35,6 @@ class QRCode
     {
         $url = $this->makeUrl();
         $possibleQRCode = $this->builder->data($url)->build();
-
         $qrCodePath = $this->makeFilePath();
         $possibleQRCode->saveToFile($qrCodePath);
 
@@ -44,7 +43,7 @@ class QRCode
 
     private function makeFilePath():string
     {
-        return 'public/qr-codes/'.$this->getPetId().'/' . uniqid('', true) . '.png';
+        return 'public/qr-codes/'. uniqid('', true) . '.png';
     }
 
 }
