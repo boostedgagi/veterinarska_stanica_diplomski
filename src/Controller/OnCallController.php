@@ -94,6 +94,7 @@ class OnCallController extends AbstractController
     #[Route('/message/make_hash', methods: Request::METHOD_GET)]
     public function provideInitialHash(): Response
     {
+        //could be refactored to factory class
         return $this->json(hash('sha256', random_int(1, 100)));
     }
 

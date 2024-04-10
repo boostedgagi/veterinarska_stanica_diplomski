@@ -243,7 +243,11 @@ class HealthRecordController extends AbstractController
             throw new NotFoundHttpException('Pet not found');
         }
 
-        $petHealthRecords = $pet->getHealthRecords();
+        /**
+         * Very important notice is that every collection of data that we want to paginate,
+         * needs to be in array format, otherwise just first page of data will be paginated correctly
+         */
+        $petHealthRecords = $pet->getHealthRecords()->toArray();
 
         $paginationService = new PaginationService($paginator, $request, $petHealthRecords);
         $paginatedResult = $paginationService->getPaginatedResult();

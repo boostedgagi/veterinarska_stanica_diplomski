@@ -338,7 +338,7 @@ class UserController extends AbstractController
     public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
         //put some attention in query params, something not working as it should be
-        $myPets = $user->getPets();
+        $myPets = $user->getPets()->toArray();
 
         $paginationService = new PaginationService($paginator, $request, $myPets);
         $paginatedResult = $paginationService->getPaginatedResult();

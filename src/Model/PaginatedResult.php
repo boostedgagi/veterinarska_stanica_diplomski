@@ -122,6 +122,4 @@ class PaginatedResult
         $this->totalItemsCount = $totalItemsCount;
         return $this;
     }
-
-
 }
