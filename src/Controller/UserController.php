@@ -75,8 +75,12 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer,#[CurrentUser] User $currentUser): Response
     {
+        if($currentUser->getTypeOfUser()!==User::TYPE_ADMIN){
+            return $this->json('You are not enabled to do this.',Response::HTTP_FORBIDDEN);
+        }
+
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
@@ -233,11 +237,10 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user/{id}', methods: 'DELETE')]
-    public function deleteUser(User $vet): Response
+    public function deleteUser(User $user): Response
     {
-        //on delete set null option set on the vet property by adding attribute called JoinColumn
 
-        $this->em->remove($vet);
+        $this->em->remove($user);
         $this->em->flush();
 
         return $this->json("", Response::HTTP_NO_CONTENT);
@@ -263,7 +266,7 @@ class UserController extends AbstractController
     #[Route('/user', methods: 'GET')]
     public function showAllUsers(UserRepository $repo): Response
     {
-        $allUsers = $repo->findAll();
+        $allUsers = $repo->findAll();//also paginate in free time
 
         return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
@@ -337,7 +340,6 @@ class UserController extends AbstractController
     #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC,'limit'=>Requirements::NUMERIC], methods: 'GET')]
     public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
-        //put some attention in query params, something not working as it should be
         $myPets = $user->getPets()->toArray();
 
         $paginationService = new PaginationService($paginator, $request, $myPets);
@@ -497,7 +499,7 @@ class UserController extends AbstractController
     #[Route('/vets/nearby', methods: 'GET')]
     public function nearbyVets(Request $request, UserRepository $userRepo): Response
     {
-        //need to think about enabling this route to public access
+        //to be killed in near future
         $queryParams = (object)$request->query->all();
         $distance = $queryParams->distance;
         $latitude = $queryParams->latitude;
