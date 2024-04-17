@@ -10,6 +10,8 @@ use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\LoginType;
 use App\Form\UserType;
+use App\Helper;
+use App\Model\FreeVetResponse;
 use App\Model\PaginatedResult;
 use App\Model\PaginationQueryParams;
 use App\Repository\UserRepository;
@@ -75,10 +77,10 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer,#[CurrentUser] User $currentUser): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer, #[CurrentUser] User $currentUser): Response
     {
-        if($currentUser->getTypeOfUser()!==User::TYPE_ADMIN){
-            return $this->json('You are not enabled to do this.',Response::HTTP_FORBIDDEN);
+        if ($currentUser->getTypeOfUser() !== User::TYPE_ADMIN) {
+            return $this->json('You are not enabled to do this.', Response::HTTP_FORBIDDEN);
         }
 
         $user = new User();
@@ -337,7 +339,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Security(name: 'Bearer')]
-    #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC,'limit'=>Requirements::NUMERIC], methods: 'GET')]
+    #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC, 'limit' => Requirements::NUMERIC], methods: 'GET')]
     public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
         $myPets = $user->getPets()->toArray();
@@ -536,31 +538,24 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vets/free', methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request, TokenStorageInterface $tokenStorage, UserRepository $userRepo): Response
+    public function getFreeVetsInTimeRange(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
-        //todo check if this is working as it should be and try to make potential refactor
         $queryParams = (object)$request->query->all();
 
         $from = $queryParams->from;
         $to = $queryParams->to;
+        $response = new FreeVetResponse();
 
-        // todo move to service
         $freeVets = $userRepo->getFreeVets($from, $to);
-        $personalVet = UserService::getCurrentUser($tokenStorage)->getVet();
-        if ($personalVet) {
-            $freeVets[] = $this->addNotificationIfVetIsOccupied($personalVet, $freeVets);
-        } else {
-            $freeVets[] = ['notification' => 'You don\'t have personal vet.'];
-        }
-        return $this->json($freeVets, Response::HTTP_OK, [], ['groups' => 'user_showAll']);
-    }
+        $response->freeVets = $freeVets;
+        $personalVet = $currentUser->getVet();
 
-    private function addNotificationIfVetIsOccupied(User $personalVet, array $freeVets): array
-    {
-        if (!in_array($personalVet, $freeVets)) {
-            return $freeVets[] = ['notification' => 'Your vet is occupied in this period of time, try to choose different time period.'];
+        if ($personalVet) {
+            $response->message = Helper::getNotificationMessageIfVetIsOccupied($personalVet, $freeVets);
+        } else {
+            $response->message = Helper::getVetNoAssignedMessage();
         }
-        return $freeVets[] = ['notification' => 'Your vet is free in chosen time range and you can reserve him.'];
+        return $this->json($response, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
     #[OA\Get(
