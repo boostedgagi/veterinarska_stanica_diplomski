@@ -604,14 +604,28 @@ class UserController extends AbstractController
 
 
     #[OA\Get(
-        path: '/vets/{id}/health_records',
+        path: '/vet/{id}/health_record',
         parameters: [
             new OA\Parameter(
                 name: 'id',
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'number')
-            )
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number'),
+                example: 1
+            ),
+            new OA\Parameter(
+                name: 'limit',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number'),
+                example: 5
+            ),
         ],
         responses: [
             new OA\Response(
@@ -628,7 +642,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Route('/vet/{id}/health_records', methods: 'GET')]
+    #[Route('/vet/{id}/health_record', methods: 'GET')]
     public function getVetHealthRecords(?User $vet): Response
     {
         $vetHealthRecords = $vet->getHealthRecords();

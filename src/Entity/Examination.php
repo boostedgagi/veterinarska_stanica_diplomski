@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\ContextGroup;
 use App\Repository\ExaminationRepository;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,7 +35,7 @@ class Examination
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?DateTimeImmutable $updatedAt = null;
+    private ?DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'examination', targetEntity: HealthRecord::class)]
     private Collection $healthRecords;

@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use OpenApi\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Date;
@@ -50,6 +51,7 @@ class Pet
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['startedAt'=>'DESC'])]
     private Collection $healthRecords;
 
     public function __construct()

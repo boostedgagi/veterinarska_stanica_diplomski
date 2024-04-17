@@ -42,7 +42,7 @@ class UploadImage
 
                 $this->entity->setImage($imagePath);
 
-                $this->em->persist($this->entity);
+//                $this->em->persist($this->entity);
                 $this->em->flush();
 
                 unset($uploadedFile);

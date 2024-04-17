@@ -69,6 +69,44 @@ class PetController extends AbstractController
         return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_PET]);
     }
 
+    #[OA\Post(
+        path: '/pet_upload_image/{id}',
+        description: 'Upload image for pet.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'image',
+                            type: 'file',
+                            format: 'binary'
+                        )
+                    ]
+                )
+            )
+        ),
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                description: 'Pet\'s ID.',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_CREATED,
+                description: 'Returns path of the uploaded image.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Could return string if file has errors.',
+            ),
+        ]
+    )]
     #[Route('/pet_upload_image/{id}', methods: 'POST')]
     public function uploadProfileImage(Request $request,?Pet $pet): Response
     {
@@ -77,6 +115,7 @@ class PetController extends AbstractController
         }
         $uploadImage = new UploadImage($request, $pet, $this->em);
         $uploadImage->upload();
+
         return $this->json($pet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_PET]);
     }
 
@@ -189,7 +228,7 @@ class PetController extends AbstractController
     {
         if(!$pet)
         {
-            return $this->json('Pet not found.');
+            return $this->json('Pet not found.',Response::HTTP_NOT_FOUND);
         }
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
@@ -215,7 +254,7 @@ class PetController extends AbstractController
     #[Route('/pet', methods: 'GET')]
     public function showAllPets(Request $request, PetRepository $repo): Response
     {
-        $pets = $repo->findAll();
+        $pets = $repo->findAll();// Todo paginate this
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }

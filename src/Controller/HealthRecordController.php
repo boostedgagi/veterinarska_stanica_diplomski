@@ -207,18 +207,27 @@ class HealthRecordController extends AbstractController
     }
 
     #[OA\Get(
-        path: '/pet/{id}/health_records',
+        path: '/pet/{id}/health_record',
         parameters: [
             new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            ),
+            new OA\Parameter(
                 name: 'page',
-                in: 'query',
+                in: "query",
                 required: true,
-                schema: new OA\Schema(type: 'number')
-            ), new OA\Parameter(
+                schema: new OA\Schema(type: 'number'),
+                example: 1
+            ),
+            new OA\Parameter(
                 name: 'limit',
-                in: 'query',
+                in: "query",
                 required: true,
-                schema: new OA\Schema(type: 'number')
+                schema: new OA\Schema(type: 'number'),
+                example: 5
             )
         ],
         responses: [
