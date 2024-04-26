@@ -357,7 +357,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_USER,
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
-            ContextGroup::ON_CALL
+            ContextGroup::ON_CALL,
+            ContextGroup::ME
         ]
     )]
     public function getImage(): ?string
@@ -452,7 +453,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         [
             ContextGroup::SHOW_NEARBY_VETS,
             ContextGroup::SHOW_USER,
-            ContextGroup::SHOW_HEALTH_RECORD
+            ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::ME,
         ]
     )]
     public function getPhone(): ?string
@@ -506,7 +508,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->users;
     }
 
-    public function removeUser(self $user): self
+    public function removeClient(self $user): self
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
@@ -528,7 +530,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //        return $this;
 //    }
 
-    public function getPlainPassword(): string|null
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }

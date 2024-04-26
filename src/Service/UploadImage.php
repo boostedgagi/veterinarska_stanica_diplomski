@@ -28,10 +28,12 @@ class UploadImage
         $uploadPath = 'images';
 
         $image = $this->request->files->get('image');
-        if($this->entity->getImage()!==null){
-            $this->fs->remove($this->entity->getImage());
-        }
+
         if ($image) {
+            if($this->entity->getImage()!==null){
+                $this->fs->remove($this->entity->getImage());
+            }
+
             $extension = $image->guessExtension();
 
             $newFileName = md5(time() . '-' . mt_rand(10, 100)) . '.' . $extension;
@@ -42,7 +44,6 @@ class UploadImage
 
                 $this->entity->setImage($imagePath);
 
-//                $this->em->persist($this->entity);
                 $this->em->flush();
 
                 unset($uploadedFile);

@@ -44,7 +44,7 @@ class HealthRecord
     private ?DateTime $startedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTime $finishedAt = null;
+    private ?DateTime $finishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -212,6 +212,18 @@ class HealthRecord
 
     #[Groups(
         [
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getDeniedChange():bool
+    {
+        $now = new DateTime();
+        dd();
+        return $this->getStartedAt()->diff($now)->h >= 1;
+    }
+
+    #[Groups(
+        [
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD
         ]
@@ -234,9 +246,9 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getFinishedAt(): ?DateTime
+    public function getFinishedAt(): ?string
     {
-        return $this->finishedAt;
+        return $this->finishedAt->format('Y-m-d H:i:s');
     }
 
     public function setFinishedAt(DateTime $finishedAt): self
@@ -268,6 +280,7 @@ class HealthRecord
 
     /**
      * @param bool|null $notifiedWeekBefore
+     * @return HealthRecord
      */
     public function setNotifiedWeekBefore(?bool $notifiedWeekBefore): self
     {
@@ -325,5 +338,10 @@ class HealthRecord
         $this->setFinishedAt(new DateTime('+' . $examDurationInSeconds . 'seconds'));
 
         return $this;
+    }
+
+    public function getFinishedAtDateTime(): DateTime
+    {
+        return DateTime::createFromFormat('Y-m-d H:i:s',$this->finishedAt);
     }
 }

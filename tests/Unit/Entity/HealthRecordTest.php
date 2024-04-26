@@ -54,8 +54,8 @@ class HealthRecordTest extends BaseTestCase
         $this->assertEquals('Marko',$healthRecordPersisted->getVet()->getFirstName());
         $this->assertEquals('Milosevic',$healthRecordPersisted->getVet()->getLastName());
         $this->assertEquals(60,$healthRecordPersisted->getExamination()->getDuration());
-        $this->assertEquals('2024-03-25 20:07:56',$healthRecordPersisted->getStartedAt()->format('Y-m-d H:i:s'));
-        $this->assertEquals('2024-03-25 22:07:56',$healthRecordPersisted->getFinishedAt()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2024-03-25 20:07:56',$healthRecordPersisted->getStartedAtDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2024-03-25 22:07:56',$healthRecordPersisted->getFinishedAtDateTime()->format('Y-m-d H:i:s'));
 
     }
 

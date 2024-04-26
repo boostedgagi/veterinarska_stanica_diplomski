@@ -28,6 +28,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -161,14 +162,13 @@ class UserController extends AbstractController
     }
 
     #[OA\PUT(
-        path: '/user/{id}',
+        path: '/user',
         description: 'Edit user data here.',
         requestBody: new OA\RequestBody(
             description: 'User data from user form type.',
             required: true,
             content: new OA\MediaType(
                 mediaType: OA\JsonContent::class,
-                //comment to comment
                 schema: new OA\Schema(
                     type: UserType::class
                 )
@@ -187,16 +187,11 @@ class UserController extends AbstractController
             ),
         ]
     )]
-    #[Route('/user/{id}', methods: 'PUT')]
-    public function edit(?User $user, Request $request, UserPasswordHasherInterface $passwordHasher, TokenStorageInterface $tokenStorage): Response
+    #[Route('/user', methods: 'PUT')]
+    public function edit(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
     {
-        if (!$user) {
-            return $this->json('User not found');
-        }
         $this->handleJSONForm($request, $user, UserType::class);
-        if ($user !== UserService::getCurrentUser($tokenStorage)) {
-            return $this->json("Only user itself can edit his account.");
-        }
+
         if ($user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
@@ -204,7 +199,7 @@ class UserController extends AbstractController
             );
             $user->setPassword($hashedPassword);
         }
-        $this->em->persist($user);
+
         $this->em->flush();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
@@ -597,6 +592,14 @@ class UserController extends AbstractController
         $paginatedResult = $paginationService->getPaginatedResult();
 
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
+    }
+
+    #[Route('/vets/simplified', methods: 'GET')]
+    public function showAllVetsSimplified(UserRepository $userRepo): Response
+    {
+        $allVets = $userRepo->allVets();
+
+        return $this->json($allVets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
 
 

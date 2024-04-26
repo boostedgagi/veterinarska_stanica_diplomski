@@ -21,13 +21,8 @@ class UserType extends AbstractType
             ->add('plainPassword',null,[
                 'required'=>false
             ])
-            ->add('typeOfUser',null,[
-                'required'=>false
-            ])
             ->add('image')
             ->add('phone')
-            ->add('latitude')
-            ->add('longitude')
             ->add('vet', null,[
                 'required'=>false
             ]);
