@@ -218,8 +218,9 @@ class HealthRecord
     public function getDeniedChange():bool
     {
         $now = new DateTime();
-        dd();
-        return $this->getStartedAt()->diff($now)->h >= 1;
+
+        return $this->getStartedAt()->diff($now)->h < 1 &&
+            $this->getStartedAt()->diff($now)->d === 0;
     }
 
     #[Groups(
@@ -231,6 +232,16 @@ class HealthRecord
     public function getStartedAt(): ?DateTime
     {
         return $this->startedAt;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getStartedAtString(): ?string
+    {
+        return $this->startedAt->format('Y-m-d H:i:s');
     }
 
     public function setStartedAt(DateTime $startedAt): self
@@ -246,7 +257,17 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getFinishedAt(): ?string
+    public function getFinishedAt(): ?DateTime
+    {
+        return $this->finishedAt;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getFinishedAtString(): ?string
     {
         return $this->finishedAt->format('Y-m-d H:i:s');
     }

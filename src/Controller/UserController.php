@@ -12,8 +12,6 @@ use App\Form\LoginType;
 use App\Form\UserType;
 use App\Helper;
 use App\Model\FreeVetResponse;
-use App\Model\PaginatedResult;
-use App\Model\PaginationQueryParams;
 use App\Repository\UserRepository;
 use App\Service\LogHandler;
 use App\Service\PaginationService;
@@ -28,7 +26,6 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +35,6 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmailService;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 
@@ -78,11 +74,11 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer, #[CurrentUser] User $currentUser): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
-        if ($currentUser->getTypeOfUser() !== User::TYPE_ADMIN) {
-            return $this->json('You are not enabled to do this.', Response::HTTP_FORBIDDEN);
-        }
+//        if ($currentUser->getTypeOfUser() !== User::TYPE_ADMIN) {
+//            return $this->json('You are not enabled to do this.', Response::HTTP_FORBIDDEN);
+//        }
 
         $user = new User();
 

@@ -17,13 +17,7 @@ class RegisterEventSubscriber implements EventSubscriberInterface
     {
         return [
             UserRegisterEvent::NAME => 'onUserRegistration',
-            KernelEvents::CONTROLLER => 'onKernelController',
         ];
-    }
-
-    public function onKernelController():void
-    {
-        // ...
     }
 
     /**

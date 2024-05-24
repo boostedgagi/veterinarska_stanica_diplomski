@@ -30,3 +30,7 @@ services:
     tenant_user_service:
         class: App\Service\JwtService
         arguments: [ '@security.csrf.token_storage' ]
+
+#    AppBundle\EventListener\RegisterEventSubscriber:
+#        tags:
+#            - { name: event_subscriber }
