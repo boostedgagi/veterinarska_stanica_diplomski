@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Entity\User;
+use DateTime;
+use Exception;
 
 class Helper
 {
@@ -18,6 +20,22 @@ class Helper
 
     public static function getVetNoAssignedMessage(): string
     {
-        return 'You don\'t assigned any veterinarian.';
+        return 'You haven\'t chosen a vet yet.';
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function makeHashedChatId(): string
+    {
+        $someRandomNumber=random_int(1000,9000);
+
+        $now = new DateTime();
+        $plainChatId = $someRandomNumber.
+            strtotime(
+                $now->format('Y/m/d H:i:s')
+            );
+
+        return hash('sha256', $plainChatId);
     }
 }

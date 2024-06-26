@@ -220,7 +220,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
             ContextGroup::ON_CALL,
-            ContextGroup::ME
+            ContextGroup::ME,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getFirstName(): ?string
@@ -247,7 +248,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
             ContextGroup::ON_CALL,
-            ContextGroup::ME
+            ContextGroup::ME,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getLastName(): ?string
@@ -328,9 +330,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    public function isVet(): bool
+    #[Groups(
+        [
+            ContextGroup::SHOW_MESSAGE
+        ]
+    )]
+    public function getUserHierarchy(): string
     {
-        return $this->getTypeOfUser() === 2;
+        return $this->getTypeOfUser() === 2 ? 'veterinarian' : 'person';
     }
 
     #[Groups(
@@ -358,7 +365,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_VET,
             ContextGroup::CONTACT_MESSAGE_SENT,
             ContextGroup::ON_CALL,
-            ContextGroup::ME
+            ContextGroup::ME,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getImage(): ?string

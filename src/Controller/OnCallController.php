@@ -8,14 +8,18 @@ use App\Entity\OnCall;
 use App\Enum\ContactMessageStatus;
 use App\Form\MessageType;
 use App\Form\OnCallType;
+use App\Helper;
 use App\Message\Message;
+use App\Repository\ContactMessageRepository;
 use App\Repository\OnCallRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -43,11 +47,15 @@ class OnCallController extends AbstractController
         $onCall = new OnCall();
 
         $this->handleJSONForm($request, $onCall, OnCallType::class);
+
         $this->em->persist($onCall);
         $this->em->flush();
         return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[OA\Post(
         path: '/message',
         requestBody: new OA\RequestBody(
@@ -70,36 +78,17 @@ class OnCallController extends AbstractController
         $message = new Message();
 
         $this->handleJSONForm($request, $message, MessageType::class);
+
+        if (!$message->getChatId()) {
+            $message->setChatId(Helper::makeHashedChatId());
+        }
         $messageBus->dispatch($message);
 
         return $this->json("", Response::HTTP_OK);
     }
 
-    /**
-     * @throws Exception
-     */
-    #[OA\Get(
-        path: '/message/make_hash',
-        description: 'This endpoint makes hash for chatId',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'One health record data.',
-                content: new Model(
-                    type: 'string'
-                )
-            )
-        ]
-    )]
-    #[Route('/message/make_hash', methods: Request::METHOD_GET)]
-    public function provideInitialHash(): Response
-    {
-        //could be refactored to factory class
-        return $this->json(hash('sha256', random_int(1, 100)));
-    }
-
     #[Route('/message/{id}/seen', methods: Request::METHOD_POST)]
-    public function makeMessageSeen(Request $request, ContactMessage $contactMessage): Response
+    public function makeMessageSeen(ContactMessage $contactMessage): Response
     {
         $contactMessage
             ->setStatus(ContactMessageStatus::SEEN->value)
@@ -110,7 +99,24 @@ class OnCallController extends AbstractController
         return $this->json($contactMessage, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CONTACT_MESSAGE_SENT]);
     }
 
-    #[Route('/active_vets',methods: Request::METHOD_GET)]
+    #[Route('/chat/{chatId}', methods: Request::METHOD_GET)]
+    public function getAllMessagesFromOneChat(int $chatId, ContactMessageRepository $messageRepo): JsonResponse
+    {
+        /**
+         * @var $chat Message[]
+         */
+        $chat = [];
+
+        $messages = $messageRepo->findBy(['chatId' => $chatId], ['createdAt' => 'DESC']);
+//
+        foreach($messages as $message){
+            $chat[] = $message;
+        }
+
+        return $this->json($chat, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_MESSAGE]);
+    }
+
+    #[Route('/active_vets', methods: Request::METHOD_GET)]
     public function getOnCallVet(OnCallRepository $onCallRepo): Response
     {
         $activeVets = $onCallRepo->getActiveVets();

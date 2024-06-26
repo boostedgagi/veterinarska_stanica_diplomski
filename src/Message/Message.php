@@ -13,7 +13,7 @@ class Message
 
     public string $content;
 
-    public string $chatId;
+    public ?string $chatId = null;
 
     public ?DateTimeImmutable $createdAt = null;
 
@@ -86,9 +86,9 @@ class Message
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getChatId(): string
+    public function getChatId(): ?string
     {
         return $this->chatId;
     }

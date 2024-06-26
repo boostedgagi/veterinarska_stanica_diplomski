@@ -33,10 +33,10 @@ class ContactMessage
     private ?string $status = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $chatId = null;
@@ -50,8 +50,8 @@ class ContactMessage
      * @param string|null $chatId
      */
     public function __construct(
-        ?User $sender,
-        ?User $receiver,
+        ?User   $sender,
+        ?User   $receiver,
         ?string $content,
         ?string $status,
         ?string $chatId
@@ -73,7 +73,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getSender(): ?User
@@ -90,7 +91,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getReceiver(): ?User
@@ -107,7 +109,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getContent(): ?string
@@ -125,7 +128,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getStatus(): ?string
@@ -142,7 +146,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getCreatedAt(): ?DateTimeImmutable
@@ -158,7 +163,8 @@ class ContactMessage
 
     #[Groups(
         [
-            ContextGroup::CONTACT_MESSAGE_SENT
+            ContextGroup::CONTACT_MESSAGE_SENT,
+            ContextGroup::SHOW_MESSAGE
         ]
     )]
     public function getUpdatedAt(): ?DateTimeImmutable
@@ -173,6 +179,11 @@ class ContactMessage
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_MESSAGE
+        ]
+    )]
     public function getChatId(): ?string
     {
         return $this->chatId;

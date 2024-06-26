@@ -125,7 +125,7 @@ class HealthRecordController extends AbstractController
         ]
     )]
     #[Route('/health_record/{id}', methods: 'PUT')]
-    public function edit(Request $request, ?HealthRecord $healthRecord, HealthRecordRepository $repo): Response
+    public function edit(Request $request, ?HealthRecord $healthRecord): Response
     {
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);

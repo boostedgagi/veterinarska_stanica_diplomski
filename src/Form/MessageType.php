@@ -2,11 +2,9 @@
 
 namespace App\Form;
 
-use App\Entity\Pet;
-use App\Entity\User;
 use App\Message\Message;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,7 +16,9 @@ class MessageType extends AbstractType
             ->add('sender')
             ->add('receiver')
             ->add('content')
-            ->add('chatId');
+            ->add('chatId',TextType::class, [
+                'required' => false
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

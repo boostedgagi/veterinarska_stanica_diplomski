@@ -25,4 +25,5 @@ class ContextGroup
 
     public const CANCEL_HEALTH_RECORD = 'cancel_health_record';
     public const ME = 'user_me';
+    public const SHOW_MESSAGE = 'show_message';
 }
