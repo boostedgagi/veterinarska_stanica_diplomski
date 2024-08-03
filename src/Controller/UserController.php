@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\LoginType;
+use App\Form\PasswordType;
 use App\Form\UserType;
 use App\Helper;
 use App\Model\FreeVetResponse;
@@ -183,23 +184,27 @@ class UserController extends AbstractController
             ),
         ]
     )]
-    #[Route('/user', methods: 'PUT')]
+    #[Route('/user', methods: 'PATCH')]
     public function edit(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
     {
         $this->handleJSONForm($request, $user, UserType::class);
-
-        if ($user->getPlainPassword()) {
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $user->getPlainPassword()
-            );
-            $user->setPassword($hashedPassword);
-        }
 
         $this->em->flush();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
+
+    #[Route('/user', methods: 'PATCH')]
+    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
+    {
+        $this->handleJSONForm($request, $user, PasswordType::class);
+
+        $this->em->flush();
+
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+    }
+
+
 
     #[Security(name: 'Bearer')]
     #[Route('/me', methods: 'GET')]
