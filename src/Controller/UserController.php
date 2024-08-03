@@ -460,27 +460,31 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
-    #[OA\Post(
-        path: '/login_check',
-        requestBody: new OA\RequestBody(
-            description: 'Login',
-            required: true,
-            content: new OA\JsonContent(
-                ref: new Model(type: LoginType::class)
-            )
-        ),
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Returns logged in user.',
-                content: new OA\JsonContent()
-            ),
-            new OA\Response(
-                response: Response::HTTP_UNAUTHORIZED,
-                description: 'Wrong credentials.'
-            )
-        ]
-    )]
+//    #[OA\Post(
+//        path: '/login_check',
+//        requestBody: new OA\RequestBody(
+//            description: 'Login',
+//            required: true,
+//            content: new OA\JsonContent(
+//                ref: new Model(type: LoginType::class)
+//            )
+//        ),
+//        responses: [
+//            new OA\Response(
+//                response: Response::HTTP_OK,
+//                description: 'Returns logged in user.',
+//                content: new OA\JsonContent()
+//            ),
+//            new OA\Response(
+//                response: Response::HTTP_UNAUTHORIZED,
+//                description: 'Invalid credentials.'
+//            ),
+//            new OA\Response(
+//                response: Response::HTTP_FORBIDDEN,
+//                description: 'Access forbidden.'
+//            ),
+//        ]
+//    )]
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {

@@ -361,8 +361,8 @@ class HealthRecord
         return $this;
     }
 
-    public function getFinishedAtDateTime(): DateTime
-    {
-        return DateTime::createFromFormat('Y-m-d H:i:s',$this->finishedAt);
-    }
+//    public function getFinishedAtDateTime(): DateTime
+//    {
+//        return DateTime::createFromFormat('Y-m-d H:i:s',$this->getFinishedAtString());
+//    }
 }

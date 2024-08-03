@@ -445,6 +445,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::ME
+        ]
+    )]
     public function getVet(): ?self
     {
         return $this->vet;

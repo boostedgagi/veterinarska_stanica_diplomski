@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Notifier\NotifierInterface;
 
@@ -41,6 +42,9 @@ class NotifyExaminationByEmailCommand extends Command
             ->addOption('time-range', null, InputOption::VALUE_REQUIRED, 'Time range');
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $timeRange = $input->getOption('time-range');
@@ -54,7 +58,7 @@ class NotifyExaminationByEmailCommand extends Command
             $email = new TemplatedEmailService($this->mailer);
 
             $this->setNotifiedByRange($healthRecord,$timeRange);
-            $email->notifyUserAboutAppointment($this->notifier, $healthRecord);
+            $email->notifyUserAboutAppointment($healthRecord);
 
             $this->em->flush();
         }
