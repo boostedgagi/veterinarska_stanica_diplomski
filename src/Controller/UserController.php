@@ -85,13 +85,13 @@ class UserController extends AbstractController
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
-        if ($plainPassword = $user->getPlainPassword()) {
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $plainPassword
-            );
-            $user->setPassword($hashedPassword);
-        }
+
+        $plainPassword = $user->getPassword();
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $plainPassword
+        );
+        $user->setPassword($hashedPassword);
 
         $this->em->persist($user);
         $this->em->flush();
@@ -201,7 +201,6 @@ class UserController extends AbstractController
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
     }
-
 
 
     #[Security(name: 'Bearer')]

@@ -16,9 +16,6 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
-#        main:
-#          pattern: ^/login_check
-#          user_checker: App\Security\UserChecker
         login:
             pattern: ^/login_check
             user_checker: App\Security\UserChecker

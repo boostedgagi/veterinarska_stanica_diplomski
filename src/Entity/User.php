@@ -80,8 +80,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'vet', targetEntity: self::class)]
     private Collection $users;
 
-    private ?string $plainPassword = null;
-
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: ContactMessage::class)]
     private Collection $contactMessagesAsSender;
 
@@ -106,6 +104,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contactMessagesAsReceiver = new ArrayCollection();
         $this->onCalls = new ArrayCollection();
         $this->setAllowed(false);
+        $this->setVerified(false);
         $this->setTypeOfUser(3);
     }
 
@@ -208,7 +207,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     #[Groups(
@@ -545,17 +543,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //
 //        return $this;
 //    }
-
-    public function getPlainPassword(): ?string
-    {
-        return $this->plainPassword;
-    }
-
-    public function setPlainPassword(string $plainPassword): self
-    {
-        $this->plainPassword = $plainPassword;
-        return $this;
-    }
 
     /**
      * @return Collection<int, ContactMessage>

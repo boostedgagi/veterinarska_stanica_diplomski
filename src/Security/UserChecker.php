@@ -13,7 +13,7 @@ class UserChecker implements UserCheckerInterface
     public function checkPreAuth(UserInterface $user):void
     {
         if($user instanceof AppUser){
-            if(!$user->isAllowed()){
+            if(!$user->isAllowed() || !$user->isVerified()){
                 throw new CustomUserMessageAccountStatusException('Access forbidden');
             }
         }

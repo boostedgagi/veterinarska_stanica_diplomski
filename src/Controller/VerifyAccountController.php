@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\VerifyAccount;
 use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,15 +24,16 @@ class VerifyAccountController extends AbstractController
     #[Route('/verify_account', methods: 'GET')]
     public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo): Response
     {
-        $queryParams = (object)$request->query->all();
+        $queryParams = new VerifyAccount($request->query->all());
 
-        $savedToken = $verifyRepo->findOneByValue($queryParams->token);
-        if ($savedToken['token'] && ($savedToken['expires'] > strtotime(date('Y-m-d h:i:s'))))
+        $savedToken = $verifyRepo->findOneByValue($queryParams->getToken());
+        if ($savedToken[0]['token'] && ($savedToken[0]['expires'] > strtotime(date('Y-m-d h:i:s'))))
         {
-            $user = $userRepo->find($queryParams->user_id);
-            $user->setAllowed(true);
+            $user = $userRepo->find($queryParams->getUserId());
+//            dd($queryParams,$savedToken);
+            $user->setVerified(true);
 
-            $token = $verifyRepo->find($queryParams->token_id);
+            $token = $verifyRepo->find($queryParams->getTokenId());
             $this->em->remove($token);
             $this->em->flush();
 
