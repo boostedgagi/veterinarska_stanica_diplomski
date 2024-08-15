@@ -86,6 +86,6 @@ class ForgottenPasswordController extends AbstractController
         $email = new TemplatedEmailService($mailer);
         $email->sendPasswordRequest($token,$requestNewPassword->email);
 
-        return $this->json([],Response::HTTP_CREATED);
+        return $this->json('Email successfully sent. Check your email inbox.',Response::HTTP_CREATED);
     }
 }

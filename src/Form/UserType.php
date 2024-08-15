@@ -15,6 +15,7 @@ class UserType extends AbstractType
             ->add('email')
             ->add('firstName')
             ->add('lastName')
+            ->add('password')
             ->add('image', null, [
                 'required' => false
             ])
@@ -27,7 +28,8 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class
+            'data_class' => User::class,
+            'allow_extra_fields' => true
         ]);
     }
 }

@@ -22,6 +22,4 @@ class UserRegisterEvent
         $this->mailer = $mailer;
         $this->em = $em;
     }
-
-
 }

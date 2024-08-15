@@ -31,6 +31,10 @@ services:
         class: App\Service\JwtService
         arguments: [ '@security.csrf.token_storage' ]
 
-#    AppBundle\EventListener\RegisterEventSubscriber:
-#        tags:
-#            - { name: event_subscriber }
+    App\Security\CustomUserChecker:
+        tags:
+            - { name: security.user_checker.main }
+
+    AppBundle\EventListener\RegisterEventSubscriber:
+        tags:
+            - { name: event_subscriber }

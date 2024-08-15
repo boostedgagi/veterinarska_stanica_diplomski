@@ -14,6 +14,7 @@ use App\Form\UserType;
 use App\Helper;
 use App\Model\FreeVetResponse;
 use App\Repository\UserRepository;
+use App\Security\UserChecker;
 use App\Service\LogHandler;
 use App\Service\PaginationService;
 use App\Service\UploadImage;
@@ -84,9 +85,6 @@ class UserController extends AbstractController
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);
-        if (!$user->getPlainPassword()) {
-            return $this->json("Password not valid.");
-        }
         if ($plainPassword = $user->getPlainPassword()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
@@ -465,31 +463,31 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
-//    #[OA\Post(
-//        path: '/login_check',
-//        requestBody: new OA\RequestBody(
-//            description: 'Login',
-//            required: true,
-//            content: new OA\JsonContent(
-//                ref: new Model(type: LoginType::class)
-//            )
-//        ),
-//        responses: [
-//            new OA\Response(
-//                response: Response::HTTP_OK,
-//                description: 'Returns logged in user.',
-//                content: new OA\JsonContent()
-//            ),
-//            new OA\Response(
-//                response: Response::HTTP_UNAUTHORIZED,
-//                description: 'Invalid credentials.'
-//            ),
-//            new OA\Response(
-//                response: Response::HTTP_FORBIDDEN,
-//                description: 'Access forbidden.'
-//            ),
-//        ]
-//    )]
+    #[OA\Post(
+        path: '/login_check',
+        requestBody: new OA\RequestBody(
+            description: 'Login',
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: LoginType::class)
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns logged in user.',
+                content: new OA\JsonContent()
+            ),
+            new OA\Response(
+                response: Response::HTTP_UNAUTHORIZED,
+                description: 'Invalid credentials.'
+            ),
+            new OA\Response(
+                response: Response::HTTP_FORBIDDEN,
+                description: 'Access forbidden.'
+            ),
+        ]
+    )]
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {

@@ -34,7 +34,10 @@ class VerifyAccountController extends AbstractController
             $token = $verifyRepo->find($queryParams->token_id);
             $this->em->remove($token);
             $this->em->flush();
+
+            return $this->json("Account verified.", Response::HTTP_OK);
         }
-        return $this->json("Account verified.", Response::HTTP_OK);
+
+        return $this->json("Account not verified.", Response::HTTP_FORBIDDEN);
     }
 }

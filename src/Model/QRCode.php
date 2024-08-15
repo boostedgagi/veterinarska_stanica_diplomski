@@ -28,7 +28,7 @@ class QRCode
 
     private function makeUrl():string
     {
-        return ApiClient::$apiUrl . "/found_pet?id=" . $this->petId;
+        return ApiClient::$websiteUrl . "/found_pet?id=" . $this->petId;
     }
 
     public function generateQRCode():string

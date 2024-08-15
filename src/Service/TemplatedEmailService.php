@@ -26,7 +26,7 @@ class TemplatedEmailService
      */
     public function sendWelcomeEmail(User $user, Token $token): void
     {
-        $apiUrl = ApiClient::$apiUrl;
+        $apiUrl = ApiClient::$websiteUrl;
 
         $email = (new TemplatedEmail())
             ->to($user->getEmail())
@@ -35,7 +35,7 @@ class TemplatedEmailService
             ->context([
                 'user'=>$user,
                 'token'=>$token,
-                'apiUrl'=>ApiClient::$apiUrl
+                'apiUrl'=>ApiClient::$websiteUrl
             ]);
 
         $this->mailer->send($email);
@@ -70,7 +70,7 @@ class TemplatedEmailService
             ->htmlTemplate('email/qrCode.html.twig')
             ->context([
                 'qrCode' => $qrCodePath,
-                'host' => ApiClient::$apiUrl
+                'host' => ApiClient::$websiteUrl
             ]);
 
         $this->mailer->send($email);

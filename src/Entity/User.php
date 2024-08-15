@@ -94,6 +94,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?float $popularity = null;
 
+    #[ORM\Column]
+    private ?bool $verified = null;
+
     public function __construct()
     {
         $this->pets = new ArrayCollection();
@@ -671,6 +674,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPopularity(?string $popularity): static
     {
         $this->popularity = $popularity;
+
+        return $this;
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): static
+    {
+        $this->verified = $verified;
 
         return $this;
     }
