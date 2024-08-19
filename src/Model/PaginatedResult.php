@@ -31,7 +31,8 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_MY_PETS
+            ContextGroup::SHOW_MY_PETS,
+            ContextGroup::SHOW_USER,
         ]
     )]
     public function getItems(): array
@@ -56,6 +57,7 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
+            ContextGroup::SHOW_USER,
         ]
     )]
     public function getItemsCount(): int
@@ -80,7 +82,8 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_MY_PETS
+            ContextGroup::SHOW_MY_PETS,
+            ContextGroup::SHOW_USER
         ]
     )]
     public function getCurrentPageNumber(): int
@@ -105,7 +108,8 @@ class PaginatedResult
         [
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
-            ContextGroup::SHOW_MY_PETS
+            ContextGroup::SHOW_MY_PETS,
+            ContextGroup::SHOW_USER
         ]
     )]
     public function getTotalItemsCount(): int

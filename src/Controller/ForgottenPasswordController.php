@@ -47,7 +47,7 @@ class ForgottenPasswordController extends AbstractController
             return $this->json('User not found.', Response::HTTP_OK);
         }
 
-        if ($token['token'] && ($token['expires'] > strtotime(date('Y-m-d h:i:s')))) {
+        if ($token["token"] && ($token["expires"] > strtotime(date('Y-m-d h:i:s')))) {
             $tokenObj = $verifyRepo->find($newPasswordEnvelope->token_id);
 
             $hashedPassword = $passwordHasher->hashPassword(

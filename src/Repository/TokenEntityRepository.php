@@ -50,7 +50,7 @@ class TokenEntityRepository extends ServiceEntityRepository
             ->andWhere('va.token = :token')
             ->setParameter('token',$token);
 
-        return $qb->getQuery()->getResult();
+        return $qb->getQuery()->getResult()[0];
     }
 
     public function getExpiredTokens():array

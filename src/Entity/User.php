@@ -276,6 +276,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->allowed;
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->typeOfUser === $this::TYPE_ADMIN;
+    }
+
     public function setAllowed(bool $allowed): self
     {
         $this->allowed = $allowed;

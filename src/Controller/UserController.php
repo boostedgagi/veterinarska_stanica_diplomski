@@ -243,10 +243,23 @@ class UserController extends AbstractController
 
     #[OA\Get(
         path: '/user',
+        parameters: [
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            ), new OA\Parameter(
+                name: 'limit',
+                in: 'query',
+                required: true,
+                schema: new OA\Schema(type: 'number')
+            )
+        ],
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,
-                description: 'Get all examinations.',
+                description: 'Get all users paginated.',
                 content: new Model(
                     type: User::class,
                     groups: [ContextGroup::SHOW_USER]
@@ -258,12 +271,18 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Route('/user', methods: 'GET')]
-    public function showAllUsers(UserRepository $repo): Response
+    #[Route('/user', requirements: ['page' => Requirements::NUMERIC, 'limit' => Requirements::NUMERIC], methods: 'GET')]
+    public function showAllUsers(UserRepository $repo, #[CurrentUser] User $user, Request $request,PaginatorInterface $paginator): Response
     {
-        $allUsers = $repo->findAll();//also paginate in free time
+        if(!$user->isAdmin()){
+            return $this->json('Access forbidden',Response::HTTP_FORBIDDEN);
+        }
+        $allUsers = $repo->findAll();
 
-        return $this->json($allUsers, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
+        $paginationService = new PaginationService($paginator, $request, $allUsers);
+        $paginatedResult = $paginationService->getPaginatedResult();
+
+        return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
     #[OA\Get(
