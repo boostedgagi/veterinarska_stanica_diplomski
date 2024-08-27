@@ -4,16 +4,20 @@ namespace App\Controller;
 
 use App\ContextGroup;
 use App\Entity\Examination;
+use App\Entity\User;
 use App\Form\ExaminationType;
 use App\Repository\ExaminationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ExaminationController extends AbstractController
 {
@@ -104,8 +108,9 @@ class ExaminationController extends AbstractController
             )
         ]
     )]
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/examination', methods: 'POST')]
-    public function create(Request $request): Response
+    public function create(Request $request,#[CurrentUser] User $user): Response
     {
         $examination = new Examination();
         $this->handleJSONForm($request, $examination, ExaminationType::class);
@@ -147,6 +152,7 @@ class ExaminationController extends AbstractController
             )
         ]
     )]
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/examination/{id}', methods: 'PUT')]
     public function update(Request $request, Examination $examination): Response
     {
@@ -179,6 +185,7 @@ class ExaminationController extends AbstractController
             )
         ]
     )]
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/examination/{id}', methods: 'DELETE')]
     public function deleteExamination(Examination $examination): Response
     {

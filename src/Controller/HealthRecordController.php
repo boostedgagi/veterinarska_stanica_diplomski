@@ -14,6 +14,7 @@ use App\Model\PaginationQueryParams;
 use App\Repository\HealthRecordRepository;
 use App\Service\HealthRecordService;
 use App\Service\PaginationService;
+use App\Service\TemplatedEmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -43,6 +45,7 @@ class HealthRecordController extends AbstractController
 
     /**
      * @throws Exception
+     * @throws TransportExceptionInterface
      * Insert new health record here.
      */
     #[OA\Post(
@@ -71,8 +74,11 @@ class HealthRecordController extends AbstractController
             ),
         ]
     )]
+    /*
+     * todo refactor creation to factory
+     */
     #[Route('/health_record', methods: 'POST')]
-    public function create(Request $request): Response
+    public function create(Request $request, MailerInterface $mailer): Response
     {
         $healthRecord = new HealthRecord();
 
@@ -82,9 +88,12 @@ class HealthRecordController extends AbstractController
         {
             $healthRecord->makeHealthRecordNow();
         }
-        //this else could be disposed
         else {
             $healthRecord->setMadeByVet(false);
+            $email = new TemplatedEmailService($mailer);
+
+            $email->notifyUserAboutAppointment($healthRecord);
+
         }
 
         $this->em->persist($healthRecord);

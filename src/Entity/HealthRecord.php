@@ -36,8 +36,8 @@ class HealthRecord
     #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 
-    #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'healthRecords' )]
+    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
     private ?Examination $examination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

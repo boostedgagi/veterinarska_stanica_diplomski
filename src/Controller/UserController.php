@@ -8,10 +8,12 @@ use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
+use App\Form\AssignVetType;
 use App\Form\LoginType;
 use App\Form\PasswordType;
 use App\Form\UserType;
 use App\Helper;
+use App\Model\AssignVet;
 use App\Model\FreeVetResponse;
 use App\Repository\UserRepository;
 use App\Security\UserChecker;
@@ -692,5 +694,21 @@ class UserController extends AbstractController
         $this->em->flush();
 
         return $this->json("", Response::HTTP_OK);
+    }
+
+    #[Security(name:'Bearer')]
+    #[Route('/assign', methods:Request::METHOD_POST)]
+    public function assignVet(Request $request, #[CurrentUser] User $currentUser,UserRepository $userRepo):Response
+    {
+        $assignVet = new AssignVet();
+        $this->handleJSONForm($request, $assignVet, AssignVetType::class);
+
+        $vet = $userRepo->find($assignVet->getVet());
+
+        $currentUser->setVet($vet);
+        $this->em->flush();
+
+
+        return $this->json(Response::HTTP_CREATED);
     }
 }

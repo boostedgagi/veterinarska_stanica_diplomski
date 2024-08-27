@@ -31,6 +31,17 @@ class ForgottenPasswordController extends AbstractController
         $this->em = $em;
     }
 
+
+    /**
+     * @param Request $request
+     * @param TokenEntityRepository $verifyRepo
+     * @param UserRepository $userRepo
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return Response
+     *
+     * Here i should make a logic for registered user if logged in change password
+     * without token and other things
+     */
     #[Route('/password/make_new', methods: 'POST')]
     public function renewForgottenPassword(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher): Response
     {

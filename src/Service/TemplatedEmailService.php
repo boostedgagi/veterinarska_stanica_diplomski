@@ -101,7 +101,8 @@ class TemplatedEmailService
             ->to($pet->getOwner()->getEmail())
             ->subject('Appointment notification')
             ->htmlTemplate('email/scheduledAppointment.html.twig')
-            ->context(['healthRecord' => $healthRecord]);
+            ->context(
+                ['healthRecord' => $healthRecord]);
 
         $this->mailer->send($email);
     }
