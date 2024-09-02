@@ -138,13 +138,13 @@ class Examination
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new DateTime();
     }
 
     #[Groups(
@@ -155,13 +155,6 @@ class Examination
     public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 
     /**

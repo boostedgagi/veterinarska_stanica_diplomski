@@ -7,6 +7,7 @@ use App\Repository\PetRepository;
 
 //use DateTime;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -107,12 +108,12 @@ class Pet
 
         ]
     )]
-    public function getDateOfBirth(): ?\DateTimeImmutable
+    public function getDateOfBirth(): ?DateTimeImmutable
     {
         return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(\DateTimeImmutable $dateOfBirth): self
+    public function setDateOfBirth(DateTimeImmutable $dateOfBirth): self
     {
         $this->dateOfBirth = $dateOfBirth;
 

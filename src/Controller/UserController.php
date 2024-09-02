@@ -158,9 +158,9 @@ class UserController extends AbstractController
         return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 
-    #[OA\PUT(
+    #[OA\PATCH(
         path: '/user',
-        description: 'Edit user data here.',
+        description: 'Edit your personal data here.',
         requestBody: new OA\RequestBody(
             description: 'User data from user form type.',
             required: true,
@@ -175,7 +175,7 @@ class UserController extends AbstractController
             new OA\Response(
                 response: Response::HTTP_CREATED,
                 description: 'Returns updated user with new data.',
-                content: new Model(type: User::class, groups: ['user_showAll'])
+                content: new Model(type: User::class, groups: [ContextGroup::CREATE_USER])
             ),
             new OA\Response(
                 response: Response::HTTP_NOT_FOUND,
@@ -185,24 +185,23 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', methods: 'PATCH')]
-    public function edit(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
+    public function edit(Request $request, #[CurrentUser] User $user): Response
     {
         $this->handleJSONForm($request, $user, UserType::class);
-
         $this->em->flush();
 
-        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
-    #[Route('/user', methods: 'PATCH')]
-    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
-    {
-        $this->handleJSONForm($request, $user, PasswordType::class);
-
-        $this->em->flush();
-
-        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
-    }
+//    #[Route('/user', methods: 'PATCH')]
+//    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
+//    {
+//        $this->handleJSONForm($request, $user, PasswordType::class);
+//
+//        $this->em->flush();
+//
+//        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
+//    }
 
 
     #[Security(name: 'Bearer')]

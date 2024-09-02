@@ -81,6 +81,7 @@ class HealthRecordController extends AbstractController
     public function create(Request $request, MailerInterface $mailer): Response
     {
         $healthRecord = new HealthRecord();
+        $email = new TemplatedEmailService($mailer);
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
@@ -90,14 +91,16 @@ class HealthRecordController extends AbstractController
         }
         else {
             $healthRecord->setMadeByVet(false);
-            $email = new TemplatedEmailService($mailer);
 
             $email->notifyUserAboutAppointment($healthRecord);
-
         }
 
         $this->em->persist($healthRecord);
         $this->em->flush();
+
+        if($healthRecord->isMadeByVet()===false){
+            $email->notifyVetAboutAppointment($healthRecord);
+        }
 
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
@@ -178,6 +181,24 @@ class HealthRecordController extends AbstractController
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
+
+        return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
+    }
+
+    #[Route('/health_record', methods: 'GET')]
+    public function acceptOrDenyHealthRecord(Request $request,HealthRecordRepository $healthRecordRepo): Response
+    {
+        $queryParams = $request->query->all();
+        $healthRecord = $healthRecordRepo->find($queryParams["id"]);
+        if (!$healthRecord) {
+            return $this->json(["error" => "Health record not found."]);
+        }
+
+        if($queryParams["operation"]==="accept"){
+            $healthRecord->setStatus("waiting");
+        }
+
+        $this->em->flush();
 
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }

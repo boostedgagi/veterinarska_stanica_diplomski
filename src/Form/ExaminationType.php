@@ -21,6 +21,7 @@ class ExaminationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Examination::class,
+            'allow_extra_fields'=>true
         ]);
     }
 }

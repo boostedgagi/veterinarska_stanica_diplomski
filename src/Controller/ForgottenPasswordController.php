@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Factory\TokenFactory;
+use App\Form\NewPasswordAuthenticatedType;
 use App\Form\NewPasswordEnvelopeType;
 use App\Form\RequestNewPasswordType;
+use App\Model\NewPasswordAuthenticated;
 use App\Model\NewPasswordEnvelope;
 use App\Model\RequestNewPassword;
 use App\Repository\UserRepository;
@@ -19,6 +22,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ForgottenPasswordController extends AbstractController
 {
@@ -43,17 +47,22 @@ class ForgottenPasswordController extends AbstractController
      * without token and other things
      */
     #[Route('/password/make_new', methods: 'POST')]
-    public function renewForgottenPassword(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher): Response
+    public function renewForgottenPassword(
+        Request                     $request,
+        TokenEntityRepository       $verifyRepo,
+        UserRepository              $userRepo,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response
     {
         $newPasswordEnvelope = new NewPasswordEnvelope();
-        $this->handleJSONForm($request,$newPasswordEnvelope,NewPasswordEnvelopeType::class);
+        $this->handleJSONForm($request, $newPasswordEnvelope, NewPasswordEnvelopeType::class);
 
         $token = $verifyRepo->findOneByValue($newPasswordEnvelope->token);
         if (!$token) {
             return $this->json('Token is not valid.', Response::HTTP_OK);
         }
 
-        $user = $userRepo->findOneBy(['email'=>$newPasswordEnvelope->email]);
+        $user = $userRepo->findOneBy(['email' => $newPasswordEnvelope->email]);
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
         }
@@ -78,12 +87,12 @@ class ForgottenPasswordController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/password/request_new', methods: 'POST')]
-    public function requestNewPassword(Request $request, MailerInterface $mailer,UserRepository $userRepo): Response
+    public function requestNewPassword(Request $request, MailerInterface $mailer, UserRepository $userRepo): Response
     {
         $requestNewPassword = new RequestNewPassword();
-        $this->handleJSONForm($request,$requestNewPassword,RequestNewPasswordType::class);
+        $this->handleJSONForm($request, $requestNewPassword, RequestNewPasswordType::class);
 
-        $user = $userRepo->findBy(['email'=>$requestNewPassword->email]);
+        $user = $userRepo->findBy(['email' => $requestNewPassword->email]);
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
         }
@@ -95,8 +104,28 @@ class ForgottenPasswordController extends AbstractController
         $this->em->flush();
 
         $email = new TemplatedEmailService($mailer);
-        $email->sendPasswordRequest($token,$requestNewPassword->email);
+        $email->sendPasswordRequest($token, $requestNewPassword->email);
 
-        return $this->json('Email successfully sent. Check your email inbox.',Response::HTTP_CREATED);
+        return $this->json('Email successfully sent. Check your email inbox.', Response::HTTP_CREATED);
+    }
+
+    #[Route('/password/make_new_authenticated', methods: 'POST')]
+    public function makeNewPasswordAuthenticated(
+        Request                     $request,
+        #[CurrentUser] User         $user,
+        UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $newPasswordAuthenticated = new NewPasswordAuthenticated();
+        $this->handleJSONForm($request, $newPasswordAuthenticated, NewPasswordAuthenticatedType::class);
+
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $newPasswordAuthenticated->getNewPassword()
+        );
+
+        $user->setPassword($hashedPassword);
+        $this->em->flush();
+
+        return $this->json('Password changed.', Response::HTTP_CREATED);
     }
 }

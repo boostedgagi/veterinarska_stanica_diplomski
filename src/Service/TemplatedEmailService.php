@@ -110,6 +110,23 @@ class TemplatedEmailService
     /**
      * @throws TransportExceptionInterface
      */
+    public function notifyVetAboutAppointment(HealthRecord $healthRecord): void
+    {
+        $pet = $healthRecord->getPet();
+
+        $email = (new TemplatedEmail())
+            ->to($pet->getOwner()->getVet()->getEmail())
+            ->subject('Appointment notification')
+            ->htmlTemplate('email/scheduledAppointmentForVet.html.twig')
+            ->context(
+                ['healthRecord' => $healthRecord]);
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function sendPasswordRequest(Token $token, string $emailAddress): void
     {
         $email = (new TemplatedEmail())
