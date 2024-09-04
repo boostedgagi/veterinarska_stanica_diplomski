@@ -237,7 +237,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[OA\Get(
-        path: '/pet/{id}/health_record',
+        path: '/{id}/health_record',
         parameters: [
             new OA\Parameter(
                 name: 'id',

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\ContextGroup;
 use App\Entity\Pet;
+use App\Entity\User;
 use App\Form\PetType;
 use App\Form\QRCodeType;
 use App\Model\QRCode;
@@ -17,6 +18,7 @@ use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -257,6 +259,14 @@ class PetController extends AbstractController
         $pets = $repo->findAll();// Todo paginate this
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
+    }
+
+    #[Route('/user/{id}/pets')]
+    public function showOneUserPets(User $user):JsonResponse
+    {
+        $pets = $user->getPets();
+
+        return $this->json($pets,Response::HTTP_OK,[],['groups'=>ContextGroup::SHOW_MY_PETS]);
     }
 
     /**

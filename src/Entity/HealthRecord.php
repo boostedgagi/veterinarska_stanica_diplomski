@@ -28,16 +28,16 @@ class HealthRecord
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private User $vet;
 
 
     #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 
-    #[ORM\ManyToOne(inversedBy: 'healthRecords' )]
-    #[ORM\JoinColumn(nullable: true,onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(inversedBy: 'healthRecords')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Examination $examination = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -53,10 +53,10 @@ class HealthRecord
     private ?string $status = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
+    private ?DateTimeInterface $updatedAt = null;
 
     #[ORM\Column()]
     private ?bool $notifiedWeekBefore;
@@ -73,6 +73,7 @@ class HealthRecord
     {
         $this->notifiedWeekBefore = false;
         $this->notifiedDayBefore = false;
+        $this->status = "pending";
     }
 
     #[Groups(
@@ -84,42 +85,6 @@ class HealthRecord
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    #[Groups(
-        [
-            ContextGroup::CREATE_HEALTH_RECORD,
-            ContextGroup::SHOW_HEALTH_RECORD
-        ]
-    )]
-    public function getPet(): ?Pet
-    {
-        return $this->pet;
-    }
-
-    public function setPet(?Pet $pet): self
-    {
-        $this->pet = $pet;
-
-        return $this;
-    }
-
-    #[Groups(
-        [
-            ContextGroup::CREATE_HEALTH_RECORD,
-            ContextGroup::SHOW_HEALTH_RECORD
-        ]
-    )]
-    public function getExamination(): ?Examination
-    {
-        return $this->examination;
-    }
-
-    public function setExamination(?Examination $examination): self
-    {
-        $this->examination = $examination;
-
-        return $this;
     }
 
     #[Groups(
@@ -164,7 +129,7 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -172,7 +137,7 @@ class HealthRecord
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     #[Groups(
@@ -180,12 +145,12 @@ class HealthRecord
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -194,28 +159,10 @@ class HealthRecord
 
     #[Groups(
         [
-            ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD
         ]
     )]
-    public function getVet(): ?User
-    {
-        return $this->vet;
-    }
-
-    public function setVet(?User $vet): self
-    {
-        $this->vet = $vet;
-
-        return $this;
-    }
-
-    #[Groups(
-        [
-            ContextGroup::SHOW_HEALTH_RECORD
-        ]
-    )]
-    public function getDeniedChange():bool
+    public function getDeniedChange(): bool
     {
         $now = new DateTime();
 
@@ -234,6 +181,13 @@ class HealthRecord
         return $this->startedAt;
     }
 
+    public function setStartedAt(DateTime $startedAt): self
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
+
     #[Groups(
         [
             ContextGroup::SHOW_HEALTH_RECORD
@@ -242,13 +196,6 @@ class HealthRecord
     public function getStartedAtString(): ?string
     {
         return $this->startedAt->format('Y-m-d H:i:s');
-    }
-
-    public function setStartedAt(DateTime $startedAt): self
-    {
-        $this->startedAt = $startedAt;
-
-        return $this;
     }
 
     #[Groups(
@@ -262,6 +209,13 @@ class HealthRecord
         return $this->finishedAt;
     }
 
+    public function setFinishedAt(DateTime $finishedAt): self
+    {
+        $this->finishedAt = $finishedAt;
+
+        return $this;
+    }
+
     #[Groups(
         [
             ContextGroup::SHOW_HEALTH_RECORD
@@ -270,13 +224,6 @@ class HealthRecord
     public function getFinishedAtString(): ?string
     {
         return $this->finishedAt->format('Y-m-d H:i:s');
-    }
-
-    public function setFinishedAt(DateTime $finishedAt): self
-    {
-        $this->finishedAt = $finishedAt;
-
-        return $this;
     }
 
     public function isMadeByVet(): ?bool
@@ -322,6 +269,14 @@ class HealthRecord
     }
 
     /**
+     * @return string|null
+     */
+    public function getAtPresent(): ?string
+    {
+        return $this->atPresent;
+    }
+
+    /**
      * @param string|null $atPresent
      * @return HealthRecord
      */
@@ -331,21 +286,68 @@ class HealthRecord
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getAtPresent(): ?string
+    public function checkHolyTrinity(): bool
     {
-        return $this->atPresent;
-    }
-
-    public function checkHolyTrinity():bool{
         return $this->getVet() && $this->getPet() && $this->getExamination();
     }
 
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getVet(): ?User
+    {
+        return $this->vet;
+    }
+
+    public function setVet(?User $vet): self
+    {
+        $this->vet = $vet;
+
+        return $this;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getPet(): ?Pet
+    {
+        return $this->pet;
+    }
+
+    public function setPet(?Pet $pet): self
+    {
+        $this->pet = $pet;
+
+        return $this;
+    }
+
+    #[Groups(
+        [
+            ContextGroup::CREATE_HEALTH_RECORD,
+            ContextGroup::SHOW_HEALTH_RECORD
+        ]
+    )]
+    public function getExamination(): ?Examination
+    {
+        return $this->examination;
+    }
+
+    public function setExamination(?Examination $examination): self
+    {
+        $this->examination = $examination;
+
+        return $this;
+    }
+
     /**
-     * @throws Exception
      * @return HealthRecord
+     * @throws Exception
      */
     public function makeHealthRecordNow(): self
     {

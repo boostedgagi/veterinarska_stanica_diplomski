@@ -38,19 +38,25 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hi {{ healthRecord.pet.owner.firstName }}</h1>
-        <p>We are notifying you that your pet named {{ healthRecord.pet.name }},
-            will have {{ healthRecord.examination.name }} on {{ healthRecord.startedAt|date("Y-m-d H:i:s") }}.
-            Examination is {{ healthRecord.examination.duration }} minutes long.</p>
-            {% if healthRecord.madeByVet == true%}
-                This appointment is created by our veterinarian {{ healthRecord.vet.firstName }}
-            {% endif %}
+<div class="container">
+    <h1>Hi {{ healthRecord.pet.owner.firstName }}</h1>
+    <p>We are notifying you that your pet named {{ healthRecord.pet.name }},
+        will have {{ healthRecord.examination.name }} on {{ healthRecord.startedAt|date("Y-m-d H:i:s") }}.
+        Examination is {{ healthRecord.examination.duration }} minutes long.</p>
+    {% if healthRecord.status == "pending" %}
+        This appointment is currently waiting for response of your vet.
+    {% endif %}
+    {% if healthRecord.madeByVet == true %}
+        This appointment is created by our veterinarian {{ healthRecord.vet.firstName }}
+    {% endif %}
+    {% if healthRecord.status == "waiting" or healthRecord.madeByVet %}
         <p>See you then!</p><br>
-        <p>Your VetShop!</p>
-    </div>
-    <div class="footer">
-        This is an automated message. Please do not reply.
-    </div>
+    {% endif %}
+
+    <p>Your VetShop!</p>
+</div>
+<div class="footer">
+    This is an automated message. Please do not reply.
+</div>
 </body>
 </html>

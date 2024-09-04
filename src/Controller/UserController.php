@@ -482,6 +482,17 @@ class UserController extends AbstractController
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
 
+    #[Route('/user_autocomplete', methods: 'GET')]
+    public function getUsersAutocomplete(Request $request,UserRepository $userRepo): Response
+    {
+        $firstName = $request->query->get('firstName');
+        $lastName = $request->query->get('lastName');
+
+        $users = $userRepo->findByFirstAndLastName($firstName,$lastName);
+
+        return $this->json($users, Response::HTTP_OK, [], ['groups' => ContextGroup::USER_AUTOCOMPLETE]);
+    }
+
     #[OA\Post(
         path: '/login_check',
         requestBody: new OA\RequestBody(

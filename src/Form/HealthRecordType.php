@@ -31,7 +31,7 @@ class HealthRecordType extends AbstractType
                 'widget' => 'single_text'
             ])
             ->add('comment')
-            ->add('status')
+//            ->add('status')
             ->add('madeByVet');
     }
 

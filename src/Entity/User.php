@@ -115,7 +115,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_VET,
             ContextGroup::ON_CALL,
-            ContextGroup::ME
+            ContextGroup::ME,
+            ContextGroup::USER_AUTOCOMPLETE,
         ]
     )]
     public function getId(): ?int
@@ -222,7 +223,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CONTACT_MESSAGE_SENT,
             ContextGroup::ON_CALL,
             ContextGroup::ME,
-            ContextGroup::SHOW_MESSAGE
+            ContextGroup::SHOW_MESSAGE,
+            ContextGroup::USER_AUTOCOMPLETE,
         ]
     )]
     public function getFirstName(): ?string
@@ -250,7 +252,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::CONTACT_MESSAGE_SENT,
             ContextGroup::ON_CALL,
             ContextGroup::ME,
-            ContextGroup::SHOW_MESSAGE
+            ContextGroup::SHOW_MESSAGE,
+            ContextGroup::USER_AUTOCOMPLETE,
         ]
     )]
     public function getLastName(): ?string
@@ -670,6 +673,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(
+        [
+            ContextGroup::SHOW_USER,
+            ContextGroup::ME
+        ]
+    )]
     public function isVerified(): ?bool
     {
         return $this->verified;
