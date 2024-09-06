@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 class UploadImage
 {
     private Filesystem $fs;
-    public function __construct(
-        private readonly Request $request,
-        private readonly User|Pet $entity,
-        private readonly EntityManagerInterface $em,
 
+    public function __construct(
+        private readonly Request                $request,
+        private readonly User|Pet               $entity,
+        private readonly EntityManagerInterface $em,
     )
     {
         $this->fs = new Filesystem();
@@ -30,7 +30,7 @@ class UploadImage
         $image = $this->request->files->get('image');
 
         if ($image) {
-            if($this->entity->getImage()!==null){
+            if ($this->entity->getImage() !== null) {
                 $this->fs->remove($this->entity->getImage());
             }
 
@@ -51,6 +51,17 @@ class UploadImage
                 error_log($e->getMessage());
             }
 
+        }
+    }
+
+    public function remove(): void
+    {
+        if ($this->entity instanceof User) {
+            $user = $this->entity;
+            $this->fs->remove($user->getImage());
+            $this->entity->setImage(null);
+
+            $this->em->flush();
         }
     }
 }

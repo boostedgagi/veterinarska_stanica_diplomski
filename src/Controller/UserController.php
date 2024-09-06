@@ -411,6 +411,16 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
+    #[Route('/user/{id}/remove_image', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
+    public function removeProfileImage(Request $request, User $user): Response
+    {
+        $uploadImage = new UploadImage($request, $user, $this->em);
+
+        $uploadImage->remove();
+
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
+    }
+
     #[OA\Get(
         path: '/vet/{id}',
         parameters: [
