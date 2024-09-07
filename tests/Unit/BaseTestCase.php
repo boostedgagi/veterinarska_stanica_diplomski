@@ -54,7 +54,6 @@ class BaseTestCase extends KernelTestCase
             ->setTypeOfUser(2)
             ->setEmail('vet@vetShop.com')
             ->setPassword('password')
-            ->setPlainPassword('password')
             ->setVet(null)
             ->setAllowed(true)
             ->setPhone('0631669825')
