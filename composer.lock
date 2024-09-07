@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "308dff5cf7a83e91e449691954a292df",
+    "content-hash": "3cfd3e2316d6084eac46fffd4c5c0f73",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -10291,27 +10291,27 @@
         },
         {
             "name": "nebkam/fluent-test",
-            "version": "4.1",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nebkam/fluent-test.git",
-                "reference": "602d3883cc5b2a583e7069bc1b34dace4ffac2f3"
+                "reference": "69e3299e38a2135cb4198403e734298d2880e392"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nebkam/fluent-test/zipball/602d3883cc5b2a583e7069bc1b34dace4ffac2f3",
-                "reference": "602d3883cc5b2a583e7069bc1b34dace4ffac2f3",
+                "url": "https://api.github.com/repos/nebkam/fluent-test/zipball/69e3299e38a2135cb4198403e734298d2880e392",
+                "reference": "69e3299e38a2135cb4198403e734298d2880e392",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "php": "^7.2 || ^8.0",
-                "symfony/browser-kit": "^4.4.7 || ^5.0.7 || 6.*",
-                "symfony/framework-bundle": "^4.4.7 || ^5.0.7 || 6.*",
-                "symfony/http-foundation": "^4.4.7 || ^5.0.7 || 6.*"
+                "symfony/browser-kit": "^4.4.7 || ^5.0.7 || 6.* || 7.*",
+                "symfony/framework-bundle": "^4.4.7 || ^5.0.7 || 6.* || 7.*",
+                "symfony/http-foundation": "^4.4.7 || ^5.0.7 || 6.* || 7.*"
             },
             "require-dev": {
-                "symfony/phpunit-bridge": "^5.0 || 6.*"
+                "symfony/phpunit-bridge": "^5.0 || 6.* || 7.*"
             },
             "type": "library",
             "autoload": {
@@ -10326,9 +10326,9 @@
             "description": "A few helpers to ease functional API testing in Symfony",
             "support": {
                 "issues": "https://github.com/nebkam/fluent-test/issues",
-                "source": "https://github.com/nebkam/fluent-test/tree/4.1"
+                "source": "https://github.com/nebkam/fluent-test/tree/4.2.0"
             },
-            "time": "2022-03-11T12:05:48+00:00"
+            "time": "2024-04-10T11:52:23+00:00"
         },
         {
             "name": "nikic/php-parser",
