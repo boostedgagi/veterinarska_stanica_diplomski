@@ -273,10 +273,10 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', requirements: ['page' => Requirements::NUMERIC, 'limit' => Requirements::NUMERIC], methods: 'GET')]
-    public function showAllUsers(UserRepository $repo, #[CurrentUser] User $user, Request $request,PaginatorInterface $paginator): Response
+    public function showAllUsers(UserRepository $repo, #[CurrentUser] User $user, Request $request, PaginatorInterface $paginator): Response
     {
-        if(!$user->isAdmin()){
-            return $this->json('Access forbidden',Response::HTTP_FORBIDDEN);
+        if (!$user->isAdmin()) {
+            return $this->json('Access forbidden', Response::HTTP_FORBIDDEN);
         }
         $allUsers = $repo->findAll();
 
@@ -493,13 +493,16 @@ class UserController extends AbstractController
     }
 
     #[Route('/user_autocomplete', methods: 'GET')]
-    public function getUsersAutocomplete(Request $request,UserRepository $userRepo): Response
+    public function getUsersAutocomplete(Request $request, UserRepository $userRepo): Response
     {
+        $users = [];
+
         $firstName = $request->query->get('firstName');
         $lastName = $request->query->get('lastName');
 
-        $users = $userRepo->findByFirstAndLastName($firstName,$lastName);
-
+        if ($firstName || $lastName) {
+            $users = $userRepo->findByFirstAndLastName($firstName, $lastName);
+        }
         return $this->json($users, Response::HTTP_OK, [], ['groups' => ContextGroup::USER_AUTOCOMPLETE]);
     }
 
@@ -716,9 +719,9 @@ class UserController extends AbstractController
         return $this->json("", Response::HTTP_OK);
     }
 
-    #[Security(name:'Bearer')]
-    #[Route('/assign', methods:Request::METHOD_POST)]
-    public function assignVet(Request $request, #[CurrentUser] User $currentUser,UserRepository $userRepo):Response
+    #[Security(name: 'Bearer')]
+    #[Route('/assign', methods: Request::METHOD_POST)]
+    public function assignVet(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
         $assignVet = new AssignVet();
         $this->handleJSONForm($request, $assignVet, AssignVetType::class);
