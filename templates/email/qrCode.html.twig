@@ -1,7 +1,7 @@
-<h4 style='font-weight: 500;'>This qr code is supposed to be located in your pet's necklace<br>
-    and also to be scanned if your pet is lost and been found after.</h4>
+<h4 style='font-weight: 500;'>This qr code is supposed to be located in your {{ pet.name}}'s necklace.<br>
+    Main usage is to be scanned if your pet get lost and been found after.</h4>
 <img
-        src="{{ host }} / {{ qrCodePath }}"
+        src="{{ QRCode.dataUri }}"
         height='140px'
         width='140px'
         alt='qr-code'>

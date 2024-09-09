@@ -7,6 +7,7 @@ use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\Token;
+use Endroid\QrCode\Writer\Result\ResultInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -62,14 +63,14 @@ class TemplatedEmailService
     /**
      * @throws TransportExceptionInterface
      */
-    public function sendQrCodeWithMail(Pet $pet, string $qrCodePath): void
+    public function sendQrCodeWithMail(Pet $pet, ResultInterface $qrCodePath): void
     {
         $email = (new TemplatedEmail())
             ->to($pet->getOwner()->getEmail())
             ->subject('Your pet\'s QR code.')
             ->htmlTemplate('email/qrCode.html.twig')
             ->context([
-                'qrCode' => $qrCodePath,
+                'QRCode' => $qrCodePath,
                 'host' => ApiClient::$websiteUrl
             ]);
 

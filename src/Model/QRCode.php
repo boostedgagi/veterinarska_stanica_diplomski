@@ -4,7 +4,8 @@ namespace App\Model;
 
 use App\ApiClient;
 use Endroid\QrCode\Builder\BuilderInterface;
-use PHPUnit\Util\Filesystem;
+use Endroid\QrCode\Writer\Result\ResultInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class QRCode
 {
@@ -31,19 +32,10 @@ class QRCode
         return ApiClient::$websiteUrl . "/found_pet?id=" . $this->petId;
     }
 
-    public function generateQRCode():string
+    public function generate():ResultInterface
     {
         $url = $this->makeUrl();
-        $possibleQRCode = $this->builder->data($url)->build();
-        $qrCodePath = $this->makeFilePath();
-        $possibleQRCode->saveToFile($qrCodePath);
-
-        return $qrCodePath;
-    }
-
-    private function makeFilePath():string
-    {
-        return 'public/qr-codes/'. uniqid('', true) . '.png';
+        return $this->builder->data($url)->build();
     }
 
 }
