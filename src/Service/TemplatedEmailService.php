@@ -70,6 +70,7 @@ class TemplatedEmailService
             ->subject('Your pet\'s QR code.')
             ->htmlTemplate('email/qrCode.html.twig')
             ->context([
+                'pet'=>$pet,
                 'QRCode' => $qrCodePath,
                 'host' => ApiClient::$websiteUrl
             ]);

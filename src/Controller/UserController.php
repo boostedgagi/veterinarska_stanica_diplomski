@@ -8,6 +8,7 @@ use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
+use App\Form\AdminUserType;
 use App\Form\AssignVetType;
 use App\Form\LoginType;
 use App\Form\PasswordType;
@@ -40,6 +41,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmailService;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
 class UserController extends AbstractController
@@ -132,7 +134,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name: 'Bearer')]
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -193,15 +195,14 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
     }
 
-//    #[Route('/user', methods: 'PATCH')]
-//    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, #[CurrentUser] User $user): Response
-//    {
-//        $this->handleJSONForm($request, $user, PasswordType::class);
-//
-//        $this->em->flush();
-//
-//        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => 'user_created']);
-//    }
+    #[Route('/user/{id}', methods: 'PATCH')]
+    public function editUserAdmin(Request $request, User $user): Response
+    {
+        $this->handleJSONForm($request, $user, AdminUserType::class);
+        $this->em->flush();
+
+        return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
+    }
 
 
     #[Security(name: 'Bearer')]

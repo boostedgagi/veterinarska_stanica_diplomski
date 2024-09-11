@@ -19,6 +19,6 @@ class AppFixtures extends Fixture
         PetFactory::createMany(20);
         ExaminationFactory::createMany(6);
 
-        HealthRecordFactory::createMany(50);
+        HealthRecordFactory::createMany(30);
     }
 }

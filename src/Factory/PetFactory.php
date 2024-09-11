@@ -49,7 +49,6 @@ final class PetFactory extends ModelFactory
         return [
             'animal' => 'dog',
             'breed' => self::faker()->lastName(),
-//            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'dateOfBirth' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'name' => self::faker()->firstNameMale(255),
             'owner' => UserFactory::random(), // TODO add App\Entity\User ORM type manually,
