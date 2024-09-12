@@ -1,0 +1,44 @@
+[11-Sep-2024 23:26:51 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/OnCallController.php:29
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/OnCallController.php on line 29
+[12-Sep-2024 02:03:46 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:03:59 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:12 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:14 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:19 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:21 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:28 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:36 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:50 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22
+[12-Sep-2024 02:04:58 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Controller\AbstractController" not found in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php:22
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Controller/ExaminationController.php on line 22

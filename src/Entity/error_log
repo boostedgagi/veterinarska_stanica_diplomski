@@ -1,0 +1,16 @@
+[12-Sep-2024 02:02:55 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php on line 20
+[12-Sep-2024 02:03:44 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php on line 20
+[12-Sep-2024 02:04:18 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php on line 20
+[12-Sep-2024 02:04:26 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Entity/User.php on line 20

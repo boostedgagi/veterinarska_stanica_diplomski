@@ -1,0 +1,40 @@
+[12-Sep-2024 01:04:27 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:04:46 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:05:52 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:05:58 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:06:24 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:06:33 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:06:39 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:06:56 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:07:26 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8
+[12-Sep-2024 01:07:48 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\HttpKernel\Kernel" not found in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Kernel.php on line 8

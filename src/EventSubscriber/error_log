@@ -1,0 +1,40 @@
+[12-Sep-2024 02:02:56 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:03:38 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:00 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:02 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:23 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:29 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:35 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:04:55 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:05:15 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14
+[12-Sep-2024 02:05:22 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\EventDispatcher\EventSubscriberInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/EventSubscriber/RegisterEventSubscriber.php on line 14

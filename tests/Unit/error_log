@@ -1,0 +1,20 @@
+[12-Sep-2024 02:02:57 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Test\KernelTestCase" not found in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php on line 16
+[12-Sep-2024 02:03:50 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Test\KernelTestCase" not found in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php on line 16
+[12-Sep-2024 02:04:38 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Test\KernelTestCase" not found in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php on line 16
+[12-Sep-2024 02:05:00 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Test\KernelTestCase" not found in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php on line 16
+[12-Sep-2024 02:05:09 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Bundle\FrameworkBundle\Test\KernelTestCase" not found in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/tests/Unit/BaseTestCase.php on line 16

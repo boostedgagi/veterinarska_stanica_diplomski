@@ -1,0 +1,40 @@
+[12-Sep-2024 02:03:04 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserCheckerInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php on line 10
+[12-Sep-2024 02:03:19 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php on line 19
+[12-Sep-2024 02:03:47 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php on line 19
+[12-Sep-2024 02:04:03 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserCheckerInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php on line 10
+[12-Sep-2024 02:04:22 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php on line 19
+[12-Sep-2024 02:04:28 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserCheckerInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php on line 10
+[12-Sep-2024 02:04:38 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserCheckerInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php on line 10
+[12-Sep-2024 02:04:45 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php on line 19
+[12-Sep-2024 02:04:53 UTC] PHP Fatal error:  Uncaught Error: Interface "Symfony\Component\Security\Core\User\UserCheckerInterface" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/UserChecker.php on line 10
+[12-Sep-2024 02:05:13 UTC] PHP Fatal error:  Uncaught Error: Class "Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator" not found in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Security/AppAuthenticator.php on line 19

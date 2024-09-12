@@ -1,0 +1,440 @@
+[12-Sep-2024 01:03:56 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:03:57 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:03:58 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:04:01 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:04:02 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:04:03 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:04:04 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:04:09 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:04:17 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:04:26 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:04:29 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:04:30 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:04:31 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:04:41 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:04:45 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:04:45 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:04:46 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:04:47 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:04:48 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:04:48 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:04:50 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:04:50 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:04:56 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:05:00 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:05:04 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:05:07 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:05:17 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:05:19 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:05:20 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:05:21 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:05:23 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:25 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:31 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:05:31 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:05:32 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:33 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:05:34 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:05:34 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:05:35 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:35 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:05:36 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:05:36 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:05:37 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:05:42 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:42 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:05:43 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:05:43 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:43 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:05:43 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:05:44 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:05:44 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:05:45 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:05:46 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:05:48 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:05:48 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:05:50 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:05:51 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:05:52 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:05:52 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:05:52 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:05:53 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:05:53 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230405214207.php on line 13
+[12-Sep-2024 01:05:56 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:05:57 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:06:00 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:06:00 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:06:01 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:06:02 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:06:02 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:06:04 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:06:06 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:06:07 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:06:08 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:06:09 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:06:09 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:06:10 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:06:11 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:06:13 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:06:17 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230603141255.php on line 13
+[12-Sep-2024 01:06:18 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124121919.php on line 13
+[12-Sep-2024 01:06:22 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231127164714.php on line 13
+[12-Sep-2024 01:06:22 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240907085512.php on line 13
+[12-Sep-2024 01:06:23 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:06:24 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:06:25 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:06:26 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:06:27 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:06:28 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:06:29 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:06:29 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:06:32 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:06:34 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:06:39 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:06:40 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:06:49 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:06:54 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:06:58 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:07:00 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240215143949.php on line 13
+[12-Sep-2024 01:07:01 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20231124110451.php on line 13
+[12-Sep-2024 01:07:02 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230823172801.php on line 13
+[12-Sep-2024 01:07:06 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20240815093524.php on line 13
+[12-Sep-2024 01:07:17 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:07:28 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230915124256.php on line 13
+[12-Sep-2024 01:07:28 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:07:47 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13
+[12-Sep-2024 01:07:56 UTC] PHP Fatal error:  Uncaught Error: Class "Doctrine\Migrations\AbstractMigration" not found in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/migrations/Version20230826202723.php on line 13

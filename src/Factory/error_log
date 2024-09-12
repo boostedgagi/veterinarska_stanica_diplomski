@@ -1,0 +1,100 @@
+[12-Sep-2024 02:02:46 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php on line 30
+[12-Sep-2024 02:02:51 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php on line 30
+[12-Sep-2024 02:02:54 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php on line 30
+[12-Sep-2024 02:02:56 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php on line 30
+[12-Sep-2024 02:02:58 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php on line 30
+[12-Sep-2024 02:03:18 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php on line 30
+[12-Sep-2024 02:03:23 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php on line 30
+[12-Sep-2024 02:03:42 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php on line 30
+[12-Sep-2024 02:03:54 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php on line 30
+[12-Sep-2024 02:03:58 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php on line 30
+[12-Sep-2024 02:04:00 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php on line 30
+[12-Sep-2024 02:04:05 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php on line 30
+[12-Sep-2024 02:04:12 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php on line 30
+[12-Sep-2024 02:04:13 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php on line 30
+[12-Sep-2024 02:04:23 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php on line 30
+[12-Sep-2024 02:04:27 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php on line 30
+[12-Sep-2024 02:04:30 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/LogFactory.php on line 30
+[12-Sep-2024 02:04:32 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php on line 30
+[12-Sep-2024 02:04:44 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/UserFactory.php on line 30
+[12-Sep-2024 02:04:51 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php on line 30
+[12-Sep-2024 02:04:52 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/PetFactory.php on line 30
+[12-Sep-2024 02:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php on line 30
+[12-Sep-2024 02:04:59 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/ExaminationFactory.php on line 30
+[12-Sep-2024 02:05:06 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php on line 30
+[12-Sep-2024 02:05:15 UTC] PHP Fatal error:  Uncaught Error: Class "Zenstruck\Foundry\ModelFactory" not found in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php:30
+Stack trace:
+#0 {main}
+  thrown in /home/boostedgagi/api.boostedgagi.com/src/Factory/HealthRecordFactory.php on line 30
