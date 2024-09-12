@@ -188,11 +188,6 @@ class HealthRecord
         return $this;
     }
 
-    #[Groups(
-        [
-            ContextGroup::SHOW_HEALTH_RECORD
-        ]
-    )]
     public function getStartedAtString(): ?string
     {
         return $this->startedAt->format('Y-m-d H:i:s');
@@ -216,11 +211,6 @@ class HealthRecord
         return $this;
     }
 
-    #[Groups(
-        [
-            ContextGroup::SHOW_HEALTH_RECORD
-        ]
-    )]
     public function getFinishedAtString(): ?string
     {
         return $this->finishedAt->format('Y-m-d H:i:s');

@@ -4,7 +4,7 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+public/bundles/
 /var/
 /vendor/
 /.env
@@ -12,7 +12,6 @@
 #/public/exports
 /.idea
 /mysqldata
-#/public/qr-codes
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
