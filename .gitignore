@@ -10,6 +10,7 @@ public/bundles/
 /.env
 /.env.test
 #/public/exports
+public/images
 /.idea
 /mysqldata
 ###< symfony/framework-bundle ###
