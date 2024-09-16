@@ -35,8 +35,7 @@ class TemplatedEmailService
             ->htmlTemplate('email/welcome.html.twig')
             ->context([
                 'user'=>$user,
-                'token'=>$token,
-                'apiUrl'=>ApiClient::$websiteUrl
+                'token'=>$token
             ]);
 
         $this->mailer->send($email);
