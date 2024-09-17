@@ -15,7 +15,7 @@ use App\Form\PasswordType;
 use App\Form\UserType;
 use App\Helper;
 use App\Model\AssignVet;
-use App\Model\FreeVetResponse;
+use App\Model\VetAvailability;
 use App\Repository\UserRepository;
 use App\Security\UserChecker;
 use App\Service\LogHandler;
@@ -586,17 +586,9 @@ class UserController extends AbstractController
 
         $from = $queryParams->from;
         $to = $queryParams->to;
-        $response = new FreeVetResponse();
 
-        $freeVets = $userRepo->getFreeVets($from, $to);
-        $response->freeVets = $freeVets;
-        $personalVet = $currentUser->getVet();
+        $response = $userRepo->getFreeVets($from, $to);
 
-        if ($personalVet) {
-            $response->message = Helper::getNotificationMessageIfVetIsOccupied($personalVet, $freeVets);
-        } else {
-            $response->message = Helper::getVetNoAssignedMessage();
-        }
         return $this->json($response, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 

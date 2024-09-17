@@ -3,13 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Model\VetAvailability;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -115,7 +112,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getFreeVets($from, $to): array
     {
         $occupiedVets = $this->getOccupiedVetsInTimeRange($from, $to);
-        return $this->excludeOccupiedVets($occupiedVets);
+        $freeVets = $this->excludeOccupiedVets($occupiedVets);
+
+        /**
+         * @var $response VetAvailability[]
+         */
+        $response = [];
+        foreach($this->findAll() as $vet){
+            if(in_array($vet, $occupiedVets, true)){
+                $response[] = (new VetAvailability())
+                    ->setVet($vet)
+                    ->setAvailable(false);
+            }
+            else if(in_array($vet, $freeVets, true)){
+                $response[] = (new VetAvailability())
+                    ->setVet($vet)
+                    ->setAvailable(true);
+            }
+        }
+
+        return $response;
     }
 
     public function getOccupiedVetsInTimeRange($from, $to): array
