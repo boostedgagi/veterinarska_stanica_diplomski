@@ -7,12 +7,9 @@ use App\Repository\HealthRecordRepository;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use OpenApi\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]
@@ -27,16 +24,16 @@ class HealthRecord
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class,inversedBy: 'healthRecords')]
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: 'EAGER', inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(name: 'vet_id',referencedColumnName: 'id',nullable: true, onDelete: 'SET NULL')]
     private User $vet;
 
 
-    #[ORM\ManyToOne(inversedBy: 'healthRecords')]
+    #[ORM\ManyToOne(targetEntity: Pet::class,fetch: 'EAGER', inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 
-    #[ORM\ManyToOne(inversedBy: 'healthRecords')]
+    #[ORM\ManyToOne(targetEntity: Examination::class,fetch: 'EAGER',inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Examination $examination = null;
 
