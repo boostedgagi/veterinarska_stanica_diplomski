@@ -27,8 +27,8 @@ class HealthRecord
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'healthRecords')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: User::class,inversedBy: 'healthRecords')]
+    #[ORM\JoinColumn(name: 'vet_id',referencedColumnName: 'id',nullable: true, onDelete: 'SET NULL')]
     private User $vet;
 
 
