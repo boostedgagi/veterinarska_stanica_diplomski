@@ -588,7 +588,6 @@ class UserController extends AbstractController
         $to = $queryParams->to;
 
         $response = $userRepo->getFreeVets($from, $to);
-
         return $this->json($response, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 

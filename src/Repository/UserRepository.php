@@ -112,22 +112,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getFreeVets($from, $to): array
     {
         $occupiedVets = $this->getOccupiedVetsInTimeRange($from, $to);
-        $freeVets = $this->excludeOccupiedVets($occupiedVets);
 
         /**
          * @var $response VetAvailability[]
          */
         $response = [];
-        foreach($this->findAll() as $vet){
-            if(in_array($vet, $occupiedVets, true)){
+        foreach ($this->findBy(
+            ['typeOfUser'=>2],
+            ['popularity'=>'DESC'])
+                 as $vet)
+        {
+            if ($vet->getTypeOfUser() === 2) {
                 $response[] = (new VetAvailability())
                     ->setVet($vet)
-                    ->setAvailable(false);
-            }
-            else if(in_array($vet, $freeVets, true)){
-                $response[] = (new VetAvailability())
-                    ->setVet($vet)
-                    ->setAvailable(true);
+                    ->setAvailable(!in_array($vet, $occupiedVets, true));
             }
         }
 
@@ -148,38 +146,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    public function excludeOccupiedVets(array $occupiedVets): array
-    {
-        $qb = $this->createQueryBuilder('u');
-        $qb->select('u')
-            ->andWhere('u.id not in (:occupiedVetsIDs)')
-            ->setParameter('occupiedVetsIDs', $this->occupiedVetsIDs($occupiedVets))
-            ->andWhere('u.typeOfUser=2')
-            ->orderBy('u.id');
-
-        return $qb->getQuery()->getResult();
-    }
-
-    private function occupiedVetsIds(array $occupiedVets): array
-    {
-        $occupiedVetsIDs = [];
-
-        foreach ($occupiedVets as $occupiedVet) {
-            $occupiedVetsIDs[] = $occupiedVet->getId();
-        }
-        return $occupiedVetsIDs;
-    }
-
-    public function getId(string $email)
-    {
-        $qb = $this->createQueryBuilder('u');
-        $qb
-            ->select('u.id')
-            ->andWhere('u.email=:email')
-            ->setParameter('email', $email);
-
-        return $qb->getQuery()->getResult();
-    }
 
     public function allVets(): array
     {
@@ -195,16 +161,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @param $firstName
      * @param $lastName
-     * @return User[]
+     * @return array []
      */
-    public function findByFirstAndLastName($firstName, $lastName):array
+    public function findByFirstAndLastName($firstName, $lastName): array
+    {
+        if ($firstName || $lastName) {
+            $qb = $this->createQueryBuilder('u');
+
+            $qb->orWhere('u.firstName like :firstName')
+                ->setParameter('firstName', '%' . $firstName . '%')
+                ->orWhere('u.lastName like :lastName')
+                ->setParameter('lastName', '%' . $lastName . '%');
+
+            return $qb->getQuery()->getResult();
+        }
+        return [];
+    }
+
+
+    public function getId(string $email)
     {
         $qb = $this->createQueryBuilder('u');
-
-        $qb->orWhere('u.firstName like :firstName')
-            ->setParameter('firstName','%'.$firstName.'%')
-            ->orWhere('u.lastName like :lastName')
-            ->setParameter('lastName','%'.$lastName.'%');
+        $qb
+            ->select('u.id')
+            ->andWhere('u.email=:email')
+            ->setParameter('email', $email);
 
         return $qb->getQuery()->getResult();
     }
