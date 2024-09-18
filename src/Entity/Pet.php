@@ -62,6 +62,7 @@ class Pet
 
     #[Groups(
         [
+            ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_MY_PETS,
