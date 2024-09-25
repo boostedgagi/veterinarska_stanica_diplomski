@@ -135,7 +135,7 @@ class UserController extends AbstractController
         ]
     )]
     #[IsGranted("ROLE_ADMIN")]
-    #[Security(name:"Bearer")]
+    #[Security(name: "Bearer")]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -682,8 +682,12 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vet/{id}/health_record', methods: 'GET')]
-    public function getVetHealthRecords(?User $vet,PaginatorInterface $paginator,Request $request): Response
+    public function getVetHealthRecords(?User $vet, PaginatorInterface $paginator, Request $request, #[CurrentUser] User $currentUser): Response
     {
+        if ($currentUser->getTypeOfUser() === USER::TYPE_USER) {
+            return $this->json("Access forbidden", Response::HTTP_FORBIDDEN);
+        }
+
         $vetHealthRecords = $vet->getHealthRecords();
 
         $paginationService = new PaginationService($paginator, $request, $vetHealthRecords);
