@@ -32,7 +32,7 @@ class PaginatedResult
             ContextGroup::SHOW_VET,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::SHOW_MY_PETS,
-            ContextGroup::SHOW_USER,
+            ContextGroup::SHOW_USER
         ]
     )]
     public function getItems(): array

@@ -135,6 +135,7 @@ class UserController extends AbstractController
         ]
     )]
     #[IsGranted("ROLE_ADMIN")]
+    #[Security(name:"Bearer")]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -668,7 +669,7 @@ class UserController extends AbstractController
         responses: [
             new OA\Response(
                 response: Response::HTTP_OK,
-                description: 'Health records by one vet.',
+                description: 'Paginated health records by one vet.',
                 content: new Model(
                     type: HealthRecord::class,
                     groups: [ContextGroup::SHOW_HEALTH_RECORD]
@@ -681,11 +682,14 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vet/{id}/health_record', methods: 'GET')]
-    public function getVetHealthRecords(?User $vet): Response
+    public function getVetHealthRecords(?User $vet,PaginatorInterface $paginator,Request $request): Response
     {
         $vetHealthRecords = $vet->getHealthRecords();
 
-        return $this->json($vetHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
+        $paginationService = new PaginationService($paginator, $request, $vetHealthRecords);
+        $paginatedResult = $paginationService->getPaginatedResult();
+
+        return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
     #[OA\Post(

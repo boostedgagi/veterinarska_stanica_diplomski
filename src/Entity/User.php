@@ -425,11 +425,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection
+     * @return HealthRecord[]
      */
-    public function getHealthRecords(): Collection
+    public function getHealthRecords(): array
     {
-        return $this->healthRecords;
+        return $this->healthRecords->toArray();
     }
 
     public function addHealthRecord(HealthRecord $healthRecord): self
@@ -647,6 +647,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->setRoles(["ROLE_VET"]);
         $this->setAllowed(true);
+        $this->setVerified(true);
         $this->setTypeOfUser(2);
 
         return $this;

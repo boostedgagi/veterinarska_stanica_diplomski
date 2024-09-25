@@ -39,6 +39,7 @@ security:
          - { path: ^/vets/simplified, roles: PUBLIC_ACCESS }
          - { path: ^/vets/, roles: [ROLE_USER,ROLE_ADMIN] }
          - { path: ^/vets/free, roles: [ROLE_USER,ROLE_ADMIN] }
+         - { path: ^/vet/{id}/health_record, roles: [ROLE_VET,ROLE_ADMIN] }
          - { path: ^/pets/, roles: [ROLE_USER,ROLE_ADMIN] }
          - { path: ^/make_vet, roles: ROLE_ADMIN }
          - { path: ^/login_check, roles: PUBLIC_ACCESS }

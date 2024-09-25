@@ -47,7 +47,7 @@ class TemplatedEmailService
     public function sendMailToNewVet(User $vet, string $password): void
     {
         $email = (new TemplatedEmail())
-            ->from('welcome@vetshop.com')
+//            ->from('boostedgagi@boostedgagi.com')
             ->to($vet->getEmail())
             ->subject('Welcome to the vetShop')
             ->htmlTemplate('email/welcomeNewVet.html.twig')
@@ -83,7 +83,7 @@ class TemplatedEmailService
     public function sendCancelMailByVet(Pet $pet, string $cancelText): void
     {
         $email = (new TemplatedEmail())
-            ->from('cancel@vetshop.com')
+//            ->from('cancel@vetshop.com')
             ->to($pet->getOwner()->getEmail())
             ->subject('Examination of your pet is canceled.')
             ->htmlTemplate('email/cancelAppointment.html.twig');
