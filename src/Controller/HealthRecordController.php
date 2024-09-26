@@ -21,6 +21,7 @@ use Exception;
 use Knp\Component\Pager\PaginatorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +39,7 @@ class HealthRecordController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly TokenStorageInterface $tokenStorage
+        private readonly TokenStorageInterface  $tokenStorage
     )
     {
     }
@@ -85,11 +86,9 @@ class HealthRecordController extends AbstractController
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
-        if ($healthRecord->isMadeByVet()===true && $healthRecord->getAtPresent()===true)
-        {
+        if ($healthRecord->isMadeByVet() === true && $healthRecord->getAtPresent() === true) {
             $healthRecord->makeHealthRecordNow();
-        }
-        else {
+        } else {
             $healthRecord->setMadeByVet(false);
 
             $email->notifyUserAboutAppointment($healthRecord);
@@ -98,7 +97,7 @@ class HealthRecordController extends AbstractController
         $this->em->persist($healthRecord);
         $this->em->flush();
 
-        if($healthRecord->isMadeByVet()===false){
+        if ($healthRecord->isMadeByVet() === false) {
             $email->notifyVetAboutAppointment($healthRecord);
         }
 
@@ -186,7 +185,7 @@ class HealthRecordController extends AbstractController
     }
 
     #[Route('/health_record', methods: 'GET')]
-    public function acceptOrDenyHealthRecord(Request $request,HealthRecordRepository $healthRecordRepo): Response
+    public function acceptOrDenyHealthRecord(Request $request, HealthRecordRepository $healthRecordRepo): Response
     {
         $queryParams = $request->query->all();
         $healthRecord = $healthRecordRepo->find($queryParams["id"]);
@@ -194,7 +193,7 @@ class HealthRecordController extends AbstractController
             return $this->json(["error" => "Health record not found."]);
         }
 
-        if($queryParams["operation"]==="accept"){
+        if ($queryParams["operation"] === "accept") {
             $healthRecord->setStatus("waiting");
         }
 
@@ -276,7 +275,7 @@ class HealthRecordController extends AbstractController
         ]
     )]
     #[Route('/pet/{id}/health_record', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
-    public function petHealthRecords(Request $request,?Pet $pet,PaginatorInterface $paginator): Response
+    public function petHealthRecords(Request $request, ?Pet $pet, PaginatorInterface $paginator): Response
     {
         if (!$pet) {
             throw new NotFoundHttpException('Pet not found');
@@ -331,20 +330,19 @@ class HealthRecordController extends AbstractController
             ),
         ]
     )]
+    #[Security(name:'Bearer')]
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
-    public function cancel(Request $request, ?HealthRecord $healthRecord,HealthRecordService $healthRecordService,#[CurrentUser] $canceler): Response
+    public function cancel(Request $request, ?HealthRecord $healthRecord, HealthRecordService $healthRecordService, #[CurrentUser] $canceler): Response
     {
-        if (!$healthRecord)
-        {
+        if (!$healthRecord) {
             return $this->json("Health record not found.");
         }
         $cancel = new CancelHealthRecord();
         $this->handleJSONForm($request, $cancel, CancelHealthRecordType::class);
 
-        $message = $healthRecordService->cancel($healthRecord,$cancel,$canceler);
-
+        $serviceMessage = $healthRecordService->cancel($healthRecord, $cancel, $canceler);
         $this->em->flush();
 
-        return $this->json(['message' => $message], Response::HTTP_OK);
+        return $this->json(['message' => $serviceMessage], Response::HTTP_OK);
     }
 }

@@ -80,13 +80,14 @@ class TemplatedEmailService
     /**
      * @throws TransportExceptionInterface
      */
-    public function sendCancelMailByVet(Pet $pet, string $cancelText): void
+    public function sendCancelMailByVet(Pet $pet, string $cancelMessage): void
     {
         $email = (new TemplatedEmail())
 //            ->from('cancel@vetshop.com')
             ->to($pet->getOwner()->getEmail())
             ->subject('Examination of your pet is canceled.')
-            ->htmlTemplate('email/cancelAppointment.html.twig');
+            ->htmlTemplate('email/cancelAppointment.html.twig')
+            ->context(['message'=>$cancelMessage]);
 
         $this->mailer->send($email);
     }

@@ -31,7 +31,6 @@ class HealthRecordService
         {
             $email = new TemplatedEmailService($this->mailer);
 
-            //this should be enqueued
             $email->sendCancelMailByVet(
                 $healthRecord->getPet(),
                 $cancel->getCancelMessage()
