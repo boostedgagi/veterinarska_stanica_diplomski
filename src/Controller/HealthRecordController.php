@@ -184,7 +184,7 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
-    #[Route('/health_record', methods: 'GET')]
+    #[Route('/health_record_status', methods: 'GET')]
     public function acceptOrDenyHealthRecord(Request $request, HealthRecordRepository $healthRecordRepo): Response
     {
         $queryParams = $request->query->all();

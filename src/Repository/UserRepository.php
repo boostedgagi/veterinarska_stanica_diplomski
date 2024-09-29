@@ -183,7 +183,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $qb->orWhere('u.firstName like :firstName')
                 ->setParameter('firstName', '%' . $firstName . '%')
                 ->orWhere('u.lastName like :lastName')
-                ->setParameter('lastName', '%' . $lastName . '%');
+                ->setParameter('lastName', '%' . $lastName . '%')
+                ->andWhere('u.typeOfUser=:userType')
+                ->setParameter('userType',User::TYPE_USER);
 
             return $qb->getQuery()->getResult();
         }

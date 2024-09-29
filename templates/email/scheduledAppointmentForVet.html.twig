@@ -52,12 +52,12 @@
         will have {{ healthRecord.examination.name }} on {{ healthRecord.startedAt|date("Y-m-d H:i:s") }}.
         Examination is {{ healthRecord.examination.duration }} minutes long.</p><br>
         <button class="deny-button">
-            <a href="https://api.boostedgagi.com/health_record?id={{ healthRecord.id }}&operation=deny">
+            <a href="https://vetshop.boostedgagi.com/appointment_status?id={{ healthRecord.id }}&operation=deny">
                 Deny
             </a>
         </button>
         <button class="accept-button">
-            <a href="https://api.boostedgagi.com/health_record?id={{ healthRecord.id }}&operation=accept">
+            <a href="https://vetshop.boostedgagi.com/appointment_status?id={{ healthRecord.id }}&operation=accept">
                 Accept
             </a>
         </button>
