@@ -8,5 +8,4 @@ enum HealthRecordStatus: string
     case WAITING = 'waiting';
     case CANCELED = 'canceled';
     case FINISHED = 'finished';
-
 }
