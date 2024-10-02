@@ -97,10 +97,8 @@ class TemplatedEmailService
      */
     public function notifyUserAboutAppointment(HealthRecord $healthRecord): void
     {
-        $pet = $healthRecord->getPet();
-
         $email = (new TemplatedEmail())
-            ->to($pet->getOwner()->getEmail())
+            ->to($healthRecord->getPet()->getOwner()->getEmail())
             ->subject('Appointment notification')
             ->htmlTemplate('email/scheduledAppointment.html.twig')
             ->context(

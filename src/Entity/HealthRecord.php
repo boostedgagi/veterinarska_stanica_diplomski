@@ -29,7 +29,7 @@ class HealthRecord
     private User $vet;
 
 
-    #[ORM\ManyToOne(targetEntity: Pet::class,fetch: 'EAGER', inversedBy: 'healthRecords')]
+    #[ORM\ManyToOne(targetEntity: Pet::class, fetch: 'EAGER', inversedBy: 'healthRecords')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Pet $pet = null;
 

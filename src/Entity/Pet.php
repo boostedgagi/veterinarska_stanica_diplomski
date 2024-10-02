@@ -38,7 +38,7 @@ class Pet
     #[ORM\Column(length: 255)]
     private ?string $breed = null;
 
-    #[ORM\ManyToOne(inversedBy: 'pets')]
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: 'EAGER', inversedBy: 'pets')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $owner = null;
 
