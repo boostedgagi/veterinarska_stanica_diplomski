@@ -6,8 +6,8 @@ use App\Entity\ContactMessage;
 use App\Entity\User;
 use App\Enum\ContactMessageStatus;
 use App\Message\Message;
-use App\Message\MessageStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use Ratchet\ConnectionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use App\Repository\UserRepository;
 
@@ -36,6 +36,8 @@ class MessageHandler
 
         $this->em->persist($contactMessage);
         $this->em->flush();
+
+//        $this->connection->send($contactMessage->getContent());
     }
 
     private function getUser(string $userId):User

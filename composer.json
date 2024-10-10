@@ -26,6 +26,7 @@
         "nyholm/psr7": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.14",
+        "react/zmq": "^0.4.0",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "6.2.*",
         "symfony/console": "6.2.*",
@@ -52,7 +53,8 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/inky-extra": "^3.4",
         "twig/twig": "^2.12|^3.0",
-        "willdurand/geocoder-bundle": "^5.0"
+        "willdurand/geocoder-bundle": "^5.0",
+      "ext-zmq": "*"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^7.3",

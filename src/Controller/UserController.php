@@ -483,12 +483,14 @@ class UserController extends AbstractController
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(User $vet): Response
     {
-        $vetUsers = $vet->getClients();
+        $clients = $vet->getClients();
 
         $pets = [];
-        foreach ($vetUsers as $vetUser) {
-            if ($vetUser->getPets() !== null) {
-                $pets[] = $vetUser->getPets();
+        foreach ($clients as $client) {
+            if ($client->getPets()) {
+                foreach ($client->getPets() as $pet) {
+                    $pets[] = $pet;
+                }
             }
         }
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);

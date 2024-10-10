@@ -12,8 +12,6 @@ use App\Helper;
 use App\Message\Message;
 use App\Repository\ContactMessageRepository;
 use App\Repository\OnCallRepository;
-use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -25,6 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
+use ZMQ;
+use ZMQContext;
+use ZMQSocket;
 
 class OnCallController extends AbstractController
 {
@@ -83,6 +84,11 @@ class OnCallController extends AbstractController
             $message->setChatId(Helper::makeHashedChatId());
         }
         $messageBus->dispatch($message);
+        $zmqContext = new ZMQContext();
+        $socket = $zmqContext->getSocket(ZMQ::SOCKET_PUSH,'pusher');
+        $socket->connect("tcp://localhost:5000");
+
+        $socket->send(json_encode($message));
 
         return $this->json("", Response::HTTP_OK);
     }
