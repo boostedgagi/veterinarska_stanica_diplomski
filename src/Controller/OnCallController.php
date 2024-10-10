@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Chat\Chat;
 use App\ContextGroup;
 use App\Entity\ContactMessage;
 use App\Entity\OnCall;
+use App\Entity\Chat as MessageChat;
 use App\Enum\ContactMessageStatus;
 use App\Form\MessageType;
 use App\Form\OnCallType;
@@ -43,7 +45,7 @@ class OnCallController extends AbstractController
      * @return Response
      */
     #[Route('/on_call', methods: Request::METHOD_POST)]
-    public function createOnCall(Request $request): Response
+    public function createOnCallSession(Request $request): Response
     {
         $onCall = new OnCall();
 
@@ -51,6 +53,23 @@ class OnCallController extends AbstractController
 
         $this->em->persist($onCall);
         $this->em->flush();
+        return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL]);
+    }
+
+    /**
+     * @param Request $request
+     * @param OnCall $onCall
+     * @return Response
+     *
+     * This endpoint accepts OnCall type of object with altered finish date time that will represent information
+     * that vet goes off duty
+     */
+    #[Route('/on_call/{id}', methods: Request::METHOD_PUT)]
+    public function finishOnCallSession(Request $request,OnCall $onCall): Response
+    {
+        $this->handleJSONForm($request, $onCall, OnCallType::class);
+        $this->em->flush();
+
         return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL]);
     }
 
@@ -80,17 +99,38 @@ class OnCallController extends AbstractController
 
         $this->handleJSONForm($request, $message, MessageType::class);
 
-        if (!$message->getChatId()) {
-            $message->setChatId(Helper::makeHashedChatId());
-        }
         $messageBus->dispatch($message);
         $zmqContext = new ZMQContext();
         $socket = $zmqContext->getSocket(ZMQ::SOCKET_PUSH,'pusher');
         $socket->connect("tcp://localhost:5000");
 
-        $socket->send(json_encode($message));
+        $socket->send(json_encode($message, JSON_THROW_ON_ERROR));
 
         return $this->json("", Response::HTTP_OK);
+    }
+
+    #[OA\Post(
+        path: '/initialize_chat_id',
+        description:'This route initializing chat id for sending messages inside one chat.',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Returns chat id value.'
+            )
+        ]
+    )]
+    /**
+     * @throws Exception
+     */
+    #[Route('/initialize_chat_id',methods: Request::METHOD_POST)]
+    public function initializeChatId():Response
+    {
+        $chat = (new MessageChat())
+            ->setChatId(
+                Helper::makeHashedChatId()
+            );
+
+        return $this->json(['chatId'=>$chat->getChatId()]);
     }
 
     #[Route('/message/{id}/seen', methods: Request::METHOD_POST)]

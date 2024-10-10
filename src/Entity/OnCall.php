@@ -72,7 +72,6 @@ class OnCall
         return $this->finishedAt;
     }
 
-    //TODO set this on finish in separate route
     public function setFinishedAt(?DateTimeImmutable $finishedAt): self
     {
         $this->finishedAt = $finishedAt;

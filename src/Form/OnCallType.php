@@ -13,7 +13,13 @@ class OnCallType extends AbstractType
     {
         $builder
             ->add('vet')
-        ;
+            ->add('finishedAt', null,
+                [
+                    "required" => false,
+//                    "format" => "yyyy-MM-dd HH:mm",
+                    "widget" => "single_text"
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
