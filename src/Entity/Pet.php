@@ -52,7 +52,7 @@ class Pet
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'pet', targetEntity: HealthRecord::class, cascade: ['persist', 'remove'])]
-    #[ORM\OrderBy(['startedAt'=>'DESC'])]
+    #[ORM\OrderBy(['createdAt'=>'DESC'])]
     private Collection $healthRecords;
 
     public function __construct()

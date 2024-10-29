@@ -7,6 +7,7 @@
         "php": ">=8.2.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-zmq": "*",
         "beberlei/doctrineextensions": "dev-master",
         "cboden/ratchet": "^0.4.4",
         "doctrine/annotations": "^1.0",
@@ -53,8 +54,7 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/inky-extra": "^3.4",
         "twig/twig": "^2.12|^3.0",
-        "willdurand/geocoder-bundle": "^5.0",
-      "ext-zmq": "*"
+        "willdurand/geocoder-bundle": "^5.0"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^7.3",

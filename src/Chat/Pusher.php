@@ -2,44 +2,60 @@
 
 namespace App\Chat;
 
+use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
 class Pusher implements WampServerInterface
 {
 
-    function onOpen(ConnectionInterface $conn)
+    protected array $chatIds = [];
+
+    public function onOpen(ConnectionInterface $conn)
     {
         // TODO: Implement onOpen() method.
     }
 
-    function onClose(ConnectionInterface $conn)
+
+    public function onClose(ConnectionInterface $conn)
     {
         // TODO: Implement onClose() method.
     }
 
-    function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, Exception $e)
     {
         // TODO: Implement onError() method.
     }
 
-    function onCall(ConnectionInterface $conn, $id, $topic, array $params)
+    public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
     {
         // TODO: Implement onCall() method.
     }
 
-    function onSubscribe(ConnectionInterface $conn, $topic)
+    public function onSubscribe(ConnectionInterface $conn, $topic): void
     {
-        // TODO: Implement onSubscribe() method.
+        $this->chatIds[$topic->getId()] = $topic;
     }
 
-    function onUnSubscribe(ConnectionInterface $conn, $topic)
+    public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
         // TODO: Implement onUnSubscribe() method.
     }
 
-    function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
+    public function onBlogEntry($entry)
     {
-        // TODO: Implement onPublish() method.
+        $entryData = json_decode($entry, true, 512, JSON_THROW_ON_ERROR);
+        if (!array_key_exists($entryData['chatId'], $this->chatIds)) {
+            return;
+        }
+
+        $chat=$this->chatIds[$entryData['chatId']];
+
+        $chat->broadcast($entryData);
+    }
+
+    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
+    {
+        $conn->close();
     }
 }

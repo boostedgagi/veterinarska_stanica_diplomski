@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Chat\Chat;
 use App\ContextGroup;
 use App\Entity\ContactMessage;
 use App\Entity\OnCall;
@@ -27,7 +26,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 use ZMQ;
 use ZMQContext;
-use ZMQSocket;
 
 class OnCallController extends AbstractController
 {
@@ -100,13 +98,14 @@ class OnCallController extends AbstractController
         $this->handleJSONForm($request, $message, MessageType::class);
 
         $messageBus->dispatch($message);
-        $zmqContext = new ZMQContext();
-        $socket = $zmqContext->getSocket(ZMQ::SOCKET_PUSH,'pusher');
-        $socket->connect("tcp://localhost:5000");
+//
+//        $zmqContext = new ZMQContext();
+//        $socket = $zmqContext->getSocket(ZMQ::SOCKET_PUSH,'pusher');
+//        $socket->connect("tcp://localhost:5555");
+//
+//        $socket->send(json_encode($message, JSON_THROW_ON_ERROR));
 
-        $socket->send(json_encode($message, JSON_THROW_ON_ERROR));
-
-        return $this->json("", Response::HTTP_OK);
+        return $this->json("message sent", Response::HTTP_OK);
     }
 
     #[OA\Post(
