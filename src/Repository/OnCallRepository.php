@@ -74,7 +74,7 @@ class OnCallRepository extends ServiceEntityRepository
         $now = new DateTime();
 
         $qb
-            ->select('vet.id','vet.email','vet.firstName','vet.lastName')
+            ->select('vet.id as activeVetId')
             ->innerJoin('o.vet','vet')
             ->andWhere('o.startedAt between :last24hours and :now')
             ->setParameter('last24hours',$last24hours)

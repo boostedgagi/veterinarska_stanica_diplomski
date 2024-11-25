@@ -32,16 +32,17 @@ class OnCall
     {
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     #[Groups(
         [
             ContextGroup::ON_CALL
         ]
     )]
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
     public function getVet(): ?User
     {
         return $this->vet;

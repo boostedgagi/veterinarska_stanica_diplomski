@@ -29,7 +29,8 @@ class Pusher implements WampServerInterface
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
     {
-        // TODO: Implement onCall() method.
+        $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
+
     }
 
     public function onSubscribe(ConnectionInterface $conn, $topic): void

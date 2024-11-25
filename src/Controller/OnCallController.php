@@ -25,7 +25,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 use ZMQ;
-use ZMQContext;
 
 class OnCallController extends AbstractController
 {
@@ -99,10 +98,10 @@ class OnCallController extends AbstractController
 
         $messageBus->dispatch($message);
 //
-//        $zmqContext = new ZMQContext();
+//        $zmqContext = new \ZMQContext();
 //        $socket = $zmqContext->getSocket(ZMQ::SOCKET_PUSH,'pusher');
 //        $socket->connect("tcp://localhost:5555");
-//
+
 //        $socket->send(json_encode($message, JSON_THROW_ON_ERROR));
 
         return $this->json("message sent", Response::HTTP_OK);

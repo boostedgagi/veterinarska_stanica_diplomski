@@ -613,9 +613,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, OnCall>
-     */
+    #[Groups(
+        [
+            ContextGroup::ON_CALL
+        ]
+    )]
     public function getOnCalls(): Collection
     {
         return $this->onCalls;
