@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class HealthRecordControllerTest extends WebTestCase
 {
+    private ?int $insertedHealthRecordId;
+
     /**
      * @throws Exception
      */
@@ -53,6 +55,35 @@ class HealthRecordControllerTest extends WebTestCase
         self::assertEquals(3,$healthRecord->getExamination()->getId());
     }
 
+    public function testEditHealthRecord():void
+    {
+        $client = static::createClient();
+        $response = RequestBuilder::create($client)
+            ->setMethod('PUT')
+            ->setUri('/health_record/%s',50)
+            ->setContent('
+                {
+                      "vet": 12,
+                      "pet": 1,
+                      "examination": 3,
+                      "startedAt": "2024-09-07T10:30:00.000Z",
+                      "finishedAt": "2024-09-07T12:55:00.000Z",
+                      "comment": "Changed minor things just to check if everything is working."
+                }
+            ')
+            ->getResponse();
+
+        $em = $client->getContainer()->get(EntityManagerInterface::class);
+        /**
+         * @var $healthRecord HealthRecord
+         */
+        $healthRecord = $em->getRepository(HealthRecord::class)->find($response->getJsonContent()["id"]);
+        self::assertStringContainsString("Changed minor things just to check if everything is working.",$healthRecord->getComment());
+        self::assertEquals(new DateTime('2024-09-07T10:30:00.000Z'),$healthRecord->getStartedAt());
+        self::assertEquals(new DateTime('2024-09-07T12:55:00.000Z'),$healthRecord->getFinishedAt());
+        self::assertResponseIsSuccessful(200);
+    }
+
     public function testGetUserHealthRecords(): void
     {
         $client = static::createClient();
@@ -61,11 +92,21 @@ class HealthRecordControllerTest extends WebTestCase
             ->setUri('/user/%s/health_records','18')
         ->getResponse();
 
-        self::assertResponseIsSuccessful();
         self::assertResponseStatusCodeSame(200);
+        self::assertResponseIsSuccessful();
+        self::assertIsArray($response->getJsonContent());
     }
 
+    public function testDeleteHealthRecord():void
+    {
+        $client = static::createClient();
+        $response = RequestBuilder::create($client)
+            ->setMethod('DELETE')
+            ->setUri('/health_record/%s',51)
+            ->getResponse();
 
+        self::assertResponseIsSuccessful();
+    }
 
     public function tearDown(): void
     {
