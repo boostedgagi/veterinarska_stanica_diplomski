@@ -154,7 +154,6 @@ class UserController extends AbstractController
 
         $this->em->persist($vet);
         $this->em->flush();
-
         $email = new TemplatedEmailService($mailer);
         $email->sendMailToNewVet($vet, $plainPassword);
 

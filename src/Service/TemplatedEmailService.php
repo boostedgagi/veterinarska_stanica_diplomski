@@ -103,7 +103,6 @@ class TemplatedEmailService
             ->htmlTemplate('email/scheduledAppointment.html.twig')
             ->context(
                 ['healthRecord' => $healthRecord]);
-
         $this->mailer->send($email);
     }
 

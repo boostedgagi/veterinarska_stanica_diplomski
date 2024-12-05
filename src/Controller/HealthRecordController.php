@@ -81,6 +81,8 @@ class HealthRecordController extends AbstractController
     #[Route('/health_record', methods: 'POST')]
     public function create(Request $request, MailerInterface $mailer): Response
     {
+        $env = $this->getParameter('kernel.environment');
+
         $healthRecord = new HealthRecord();
         $email = new TemplatedEmailService($mailer);
 
@@ -90,15 +92,18 @@ class HealthRecordController extends AbstractController
             $healthRecord->makeHealthRecordNow();
         } else {
             $healthRecord->setMadeByVet(false);
-
-            $email->notifyUserAboutAppointment($healthRecord);
+            if ($env !== 'test') {
+                $email->notifyUserAboutAppointment($healthRecord);
+            }
         }
 
         $this->em->persist($healthRecord);
         $this->em->flush();
 
         if ($healthRecord->isMadeByVet() === false) {
-            $email->notifyVetAboutAppointment($healthRecord);
+            if ($env !== 'test') {
+                $email->notifyVetAboutAppointment($healthRecord);
+            }
         }
 
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
@@ -330,7 +335,7 @@ class HealthRecordController extends AbstractController
             ),
         ]
     )]
-    #[Security(name:'Bearer')]
+    #[Security(name: 'Bearer')]
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
     public function cancel(Request $request, ?HealthRecord $healthRecord, HealthRecordService $healthRecordService, #[CurrentUser] $canceler): Response
     {
