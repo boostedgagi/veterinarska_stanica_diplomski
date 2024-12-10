@@ -7,7 +7,6 @@ parameters:
     timezone: '%env(APP_TIMEZONE)%'
     kernel.environment: "%env(APP_ENV)%"
 
-
 services:
     # default configuration for services in *this* file
     _defaults:

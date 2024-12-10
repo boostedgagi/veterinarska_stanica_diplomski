@@ -148,7 +148,7 @@ class TemplatedEmailService
         $email = (new TemplatedEmail())
             ->to('boostedgagi@boostedgagi.com')
             ->subject('Monthly report of all examinations.')
-            ->htmlTemplate('email/monthlyCsvExport.html.twig')
+            ->htmlTemplate('base.html.twig')
             ->addPart(
                 new DataPart(new File($CSVPath))
             );
