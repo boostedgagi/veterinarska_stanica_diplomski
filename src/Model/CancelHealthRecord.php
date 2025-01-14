@@ -8,17 +8,43 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CancelHealthRecord
 {
-    private string $cancelMessage;
+    public string $cancelMessage;
 
+    public string $status;
+
+    /**
+     * @return string
+     */
     public function getCancelMessage(): string
     {
         return $this->cancelMessage;
     }
 
-    public function setCancelMessage(string $cancelMessage): self
+    /**
+     * @param string $cancelMessage
+     * @return CancelHealthRecord
+     */
+    public function setCancelMessage(string $cancelMessage): CancelHealthRecord
     {
         $this->cancelMessage = $cancelMessage;
+        return $this;
+    }
 
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return CancelHealthRecord
+     */
+    public function setStatus(string $status): CancelHealthRecord
+    {
+        $this->status = $status;
         return $this;
     }
 

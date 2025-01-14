@@ -109,6 +109,9 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[OA\Put(
         path: '/health_record/{id}',
         description: 'Change examination data.',
@@ -140,15 +143,21 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
-    #[Route('/health_record/{id}', methods: 'PUT')]
-    public function edit(Request $request, ?HealthRecord $healthRecord): Response
+    #[Route('/health_record/{id}', methods: 'PATCH')]
+    public function edit(Request $request, ?HealthRecord $healthRecord, MailerInterface $mailer): Response
     {
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+//
+//        if($healthRecord->getCancelMessage()){
+//            $email = new TemplatedEmailService($mailer);
+//            $email->sendCancelMailByVet($healthRecord->getPet(),$healthRecord->getCancelMessage());
+//
+//            $healthRecord->setCancelMessage(null);
+//        }
 
-        $this->em->persist($healthRecord);
         $this->em->flush();
 
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
@@ -200,6 +209,8 @@ class HealthRecordController extends AbstractController
 //
 //        if ($queryParams["operation"] === "accept") {
 //            $healthRecord->setStatus("waiting");
+//        } else if ($queryParams["operation"]==="deny"){
+//            $healthRecord->setStatus("denied");
 //        }
 //
 //        $this->em->flush();

@@ -66,6 +66,8 @@ class HealthRecord
 
     private ?bool $atPresent = null;
 
+    private ?string $cancelMessage=null;
+
     public function __construct()
     {
         $this->notifiedWeekBefore = false;
@@ -364,4 +366,19 @@ class HealthRecord
 //    {
 //        return DateTime::createFromFormat('Y-m-d H:i:s',$this->getFinishedAtString());
 //    }
+    /**
+     * @return string|null
+     */
+    public function getCancelMessage(): ?string
+    {
+        return $this->cancelMessage;
+    }
+
+    /**
+     * @param string|null $cancelMessage
+     */
+    public function setCancelMessage(?string $cancelMessage): void
+    {
+        $this->cancelMessage = $cancelMessage;
+    }
 }
