@@ -198,25 +198,25 @@ class HealthRecordController extends AbstractController
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
-//    #[Route('/health_record_status', methods: 'GET')]
-//    public function acceptOrDenyHealthRecord(Request $request, HealthRecordRepository $healthRecordRepo): Response
-//    {
-//        $queryParams = $request->query->all();
-//        $healthRecord = $healthRecordRepo->find($queryParams["id"]);
-//        if (!$healthRecord) {
-//            return $this->json(["error" => "Health record not found."]);
-//        }
-//
-//        if ($queryParams["operation"] === "accept") {
-//            $healthRecord->setStatus("waiting");
-//        } else if ($queryParams["operation"]==="deny"){
-//            $healthRecord->setStatus("denied");
-//        }
-//
-//        $this->em->flush();
-//
-//        return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
-//    }
+    #[Route('/health_record_status', methods: 'GET')]
+    public function acceptOrDenyHealthRecord(Request $request, HealthRecordRepository $healthRecordRepo): Response
+    {
+        $queryParams = $request->query->all();
+        $healthRecord = $healthRecordRepo->find($queryParams["id"]);
+        if (!$healthRecord) {
+            return $this->json(["error" => "Health record not found."]);
+        }
+
+        if ($queryParams["operation"] === "accept") {
+            $healthRecord->setStatus("waiting");
+        } else if ($queryParams["operation"]==="deny"){
+            $healthRecord->setStatus("canceled");
+        }
+
+        $this->em->flush();
+
+        return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
+    }
 
     #[OA\Delete(
         path: '/health_record/{id}',
