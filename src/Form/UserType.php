@@ -16,6 +16,12 @@ class UserType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('phone')
+            ->add('password', null, [
+                'required' => false
+            ])
+            ->add('image', null, [
+                'required' => false
+            ])
             ->add('vet', null, [
                 'required' => false
             ]);
