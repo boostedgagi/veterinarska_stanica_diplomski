@@ -35,7 +35,9 @@ class HealthRecordType extends AbstractType
             ])
             ->add('comment')
             ->add('status')
-            ->add('madeByVet');
+            ->add('madeByVet',null,[
+                'required'=>false
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

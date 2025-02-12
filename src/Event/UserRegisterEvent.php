@@ -16,7 +16,11 @@ class UserRegisterEvent
 
     public EntityManagerInterface $em;
 
-    public function __construct(User $user, MailerInterface $mailer, EntityManagerInterface $em)
+    public function __construct(
+        User $user,
+        MailerInterface $mailer,
+        EntityManagerInterface $em
+    )
     {
         $this->user = $user;
         $this->mailer = $mailer;

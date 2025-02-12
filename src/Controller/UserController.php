@@ -82,10 +82,6 @@ class UserController extends AbstractController
     #[Route('/user', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
-//        if ($currentUser->getTypeOfUser() !== User::TYPE_ADMIN) {
-//            return $this->json('You are not enabled to do this.', Response::HTTP_FORBIDDEN);
-//        }
-
         $user = new User();
 
         $this->handleJSONForm($request, $user, UserType::class);

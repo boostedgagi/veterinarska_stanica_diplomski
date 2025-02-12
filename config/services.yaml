@@ -28,14 +28,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 
-    tenant_user_service:
-        class: App\Service\JwtService
-        arguments: [ '@security.csrf.token_storage' ]
-
-    App\Security\CustomUserChecker:
+    App\Security\UserChecker:
         tags:
             - { name: security.user_checker.main }
 
-    AppBundle\EventListener\RegisterEventSubscriber:
+    App\EventSubscriber\RegisterEventSubscriber:
         tags:
             - { name: event_subscriber }

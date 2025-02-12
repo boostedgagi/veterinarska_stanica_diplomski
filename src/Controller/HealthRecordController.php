@@ -143,20 +143,20 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
-    #[Route('/health_record/{id}', methods: 'PATCH')]
+    #[Route('/health_record/{id}', methods: 'PUT')]
     public function edit(Request $request, ?HealthRecord $healthRecord, MailerInterface $mailer): Response
     {
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
-//
-//        if($healthRecord->getCancelMessage()){
-//            $email = new TemplatedEmailService($mailer);
-//            $email->sendCancelMailByVet($healthRecord->getPet(),$healthRecord->getCancelMessage());
-//
-//            $healthRecord->setCancelMessage(null);
-//        }
+
+        if($healthRecord->getCancelMessage()){
+            $email = new TemplatedEmailService($mailer);
+            $email->sendCancelMailByVet($healthRecord->getPet(),$healthRecord->getCancelMessage());
+
+            $healthRecord->setCancelMessage(null);
+        }
 
         $this->em->flush();
 
@@ -322,7 +322,10 @@ class HealthRecordController extends AbstractController
 
     /**
      * @throws TransportExceptionInterface
-     */
+     *
+     *
+
+
     #[OA\Post(
         requestBody: new OA\RequestBody(
             description: 'Cancel health record here..',
@@ -346,6 +349,7 @@ class HealthRecordController extends AbstractController
             ),
         ]
     )]
+
     #[Security(name: 'Bearer')]
     #[Route('/health_record/{id}/cancel', methods: 'POST')]
     public function cancel(Request $request, ?HealthRecord $healthRecord, HealthRecordService $healthRecordService, #[CurrentUser] $canceler): Response
@@ -361,4 +365,5 @@ class HealthRecordController extends AbstractController
 
         return $this->json(['message' => $serviceMessage], Response::HTTP_OK);
     }
+    */
 }
