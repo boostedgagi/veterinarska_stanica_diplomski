@@ -394,7 +394,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(
         [
             ContextGroup::SHOW_MY_PETS,
-            ContextGroup::SHOW_VET
         ]
     )]
     public function getPets(): Collection
