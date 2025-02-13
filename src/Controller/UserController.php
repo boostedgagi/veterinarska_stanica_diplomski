@@ -731,4 +731,9 @@ class UserController extends AbstractController
 
         return $this->json(Response::HTTP_CREATED);
     }
+
+    #[Route('/contact_message',methods: Request::METHOD_POST)]
+    public function sendContactMessage(Request $request){
+
+    }
 }
