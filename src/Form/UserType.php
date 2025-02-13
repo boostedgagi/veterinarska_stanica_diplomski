@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,8 +23,9 @@ class UserType extends AbstractType
             ->add('image', null, [
                 'required' => false
             ])
-            ->add('vet', null, [
-                'required' => false
+            ->add('vet', EntityType::class, [
+                'required' => false,
+                'class'=>User::class
             ]);
     }
 

@@ -8,19 +8,19 @@ class ContactMessage
 
     private string $email;
 
-    private string $contact;
+    private string $content;
 
     /**
      * @param string $name
      * @param string $email
      * @param string $contact
      */
-    public function __construct(string $name, string $email, string $contact)
-    {
-        $this->name = $name;
-        $this->email = $email;
-        $this->contact = $contact;
-    }
+//    public function __construct(string $name, string $email, string $contact)
+//    {
+//        $this->name = $name;
+//        $this->email = $email;
+//        $this->contact = $contact;
+//    }
 
     /**
      * @return string
@@ -61,18 +61,18 @@ class ContactMessage
     /**
      * @return string
      */
-    public function getContact(): string
+    public function getContent(): string
     {
-        return $this->contact;
+        return $this->content;
     }
 
     /**
-     * @param string $contact
+     * @param string $content
      * @return ContactMessage
      */
-    public function setContact(string $contact): ContactMessage
+    public function setContent(string $content): ContactMessage
     {
-        $this->contact = $contact;
+        $this->content = $content;
         return $this;
     }
 }

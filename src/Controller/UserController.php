@@ -10,11 +10,13 @@ use App\Event\UserRegisterEvent;
 use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\AdminUserType;
 use App\Form\AssignVetType;
+use App\Form\ContactMessageType;
 use App\Form\LoginType;
 use App\Form\PasswordType;
 use App\Form\UserType;
 use App\Helper;
 use App\Model\AssignVet;
+use App\Model\ContactMessage;
 use App\Model\VetAvailability;
 use App\Repository\UserRepository;
 use App\Security\UserChecker;
@@ -732,8 +734,18 @@ class UserController extends AbstractController
         return $this->json(Response::HTTP_CREATED);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/contact_message',methods: Request::METHOD_POST)]
-    public function sendContactMessage(Request $request){
+    public function sendContactMessage(Request $request,MailerInterface $mailer): Response
+    {
+        $contactMessage = new ContactMessage();
+        $this->handleJSONForm($request,$contactMessage,ContactMessageType::class);
 
+        $email = new TemplatedEmailService($mailer);
+        $email->sendContactMail($contactMessage);
+
+        return $this->json(Response::HTTP_OK);
     }
 }

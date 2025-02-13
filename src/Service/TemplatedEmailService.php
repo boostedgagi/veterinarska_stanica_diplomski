@@ -7,6 +7,7 @@ use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Entity\Token;
+use App\Model\ContactMessage;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -152,6 +153,23 @@ class TemplatedEmailService
             ->addPart(
                 new DataPart(new File($CSVPath))
             );
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function sendContactMail(ContactMessage $contactMessage): void
+    {
+        $email = (new TemplatedEmail())
+            ->to('boostedgagi@boostedgagi.com')
+            ->from($contactMessage->getEmail())
+            ->subject('Message from '.$contactMessage->getName())
+            ->htmlTemplate('email/contactMail.html.twig')
+            ->context([
+                'content'=>$contactMessage->getContent()
+            ]);
 
         $this->mailer->send($email);
     }

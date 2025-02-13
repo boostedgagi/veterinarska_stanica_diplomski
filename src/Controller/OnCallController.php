@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
-use ZMQ;
 
 class OnCallController extends AbstractController
 {
