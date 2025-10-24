@@ -47,7 +47,7 @@ class ExaminationController extends AbstractController
         ]
     )]
     #[Route('/examination', methods: 'GET')]
-    public function showAllExaminations(ExaminationRepository $examinationRepo): Response
+    public function showAllExaminations(ExaminationRepository $examinationRepo, Request $request): Response
     {
         $allExaminations = $examinationRepo->findAll();
 
@@ -110,7 +110,7 @@ class ExaminationController extends AbstractController
     )]
     #[IsGranted("ROLE_ADMIN")]
     #[Route('/examination', methods: 'POST')]
-    public function create(Request $request,#[CurrentUser] User $user): Response
+    public function create(Request $request, #[CurrentUser] User $user): Response
     {
         $examination = new Examination();
         $this->handleJSONForm($request, $examination, ExaminationType::class);

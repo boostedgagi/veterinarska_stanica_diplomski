@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class HealthRecordControllerTest extends WebTestCase
 {
-    private ?int $insertedHealthRecordId;
 
     /**
      * @throws Exception
@@ -35,7 +34,8 @@ class HealthRecordControllerTest extends WebTestCase
                       "examination": 3,
                       "startedAt": "2024-09-07T10:12:00.393Z",
                       "finishedAt": "2024-09-07T12:35:00.393Z",
-                      "comment": "gotta checc if everything is ok"
+                      "comment": "gotta checc if everything is ok",
+                      "status":"waiting"
                 }
             ')
             ->getResponse();
@@ -71,7 +71,8 @@ class HealthRecordControllerTest extends WebTestCase
                       "examination": 3,
                       "startedAt": "2024-09-07T10:30:00.000Z",
                       "finishedAt": "2024-09-07T12:55:00.000Z",
-                      "comment": "Changed minor things just to check if everything is working."
+                      "comment": "Changed minor things just to check if everything is working.",
+                      "status":"waiting"
                 }
             ')
             ->getResponse();
@@ -107,7 +108,7 @@ class HealthRecordControllerTest extends WebTestCase
             ->setMethod('GET')
             ->setUri('/pet/%s/health_record?page=%s&limit=%s','6','1','5')
             ->getResponse();
-//        dd($response->getJsonContent());
+
         self::assertResponseStatusCodeSame(200);
         self::assertResponseIsSuccessful();
         self::assertIsArray($response->getJsonContent()["items"]);
