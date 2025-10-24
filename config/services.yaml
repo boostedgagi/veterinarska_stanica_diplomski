@@ -34,4 +34,8 @@ services:
 
     App\EventSubscriber\RegisterEventSubscriber:
         tags:
-            - { name: event_subscriber }
+            - { name: kernel.event_subscriber }
+
+    App\EventSubscriber\PostHealthRecordCreationSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }

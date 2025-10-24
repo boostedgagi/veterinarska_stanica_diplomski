@@ -28,9 +28,6 @@ class RegisterEventSubscriber implements EventSubscriberInterface
         $tokenFactory = new TokenFactory($event->em);
         $token = $tokenFactory->save();
 
-        $event->em->persist($token);
-        $event->em->flush();
-
         $email = new TemplatedEmailService($event->mailer);
         $email->sendWelcomeEmail($event->user, $token);
     }

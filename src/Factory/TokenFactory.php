@@ -15,10 +15,8 @@ class TokenFactory
     public function save():Token
     {
         $token = $this->createToken();
-
         $this->em->persist($token);
         $this->em->flush();
-
         return $token;
     }
 

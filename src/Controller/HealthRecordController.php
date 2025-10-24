@@ -102,7 +102,6 @@ class HealthRecordController extends AbstractController
         }
 
         $this->em->persist($healthRecord);
-        $this->em->flush();
 
         if ($healthRecord->isMadeByVet() === false) {
             if ($env !== 'test') {
@@ -111,9 +110,9 @@ class HealthRecordController extends AbstractController
         }
 
         $event = new PostHealthRecordCreationEvent($healthRecord, $this->em);
-        $this->eventDispatcher->addSubscriber(new PostHealthRecordCreationSubscriber());
         $this->eventDispatcher->dispatch($event, PostHealthRecordCreationEvent::NAME);
 
+        $this->em->flush();
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 

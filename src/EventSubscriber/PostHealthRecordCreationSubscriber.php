@@ -43,6 +43,10 @@ class PostHealthRecordCreationSubscriber implements EventSubscriberInterface
         $vet = $healthRecord->getVet();
         $popularity = UserService::calculateVetPopularity($vet, $allHealthRecordCount);
         $vet->setPopularity($popularity);
-        $entityManager->flush();
+
+        /**
+         * flush always need to be in controller in order to prevent "Double Flush"
+         */
+//        $entityManager->flush();
     }
 }
