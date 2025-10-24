@@ -28,8 +28,6 @@ class TemplatedEmailService
      */
     public function sendWelcomeEmail(User $user, Token $token): void
     {
-        $apiUrl = ApiClient::$websiteUrl;
-
         $email = (new TemplatedEmail())
             ->to($user->getEmail())
             ->subject('Welcome to the vetShop.')

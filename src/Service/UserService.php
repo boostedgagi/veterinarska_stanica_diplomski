@@ -11,6 +11,9 @@ class UserService
     public static function calculateVetPopularity(User $vet, int $allExaminationsCount): string
     {
         $vetExaminationsCount = count($vet->getHealthRecords());
+        if($allExaminationsCount==0){
+            return "0";
+        }
         $percentage = 100 * $vetExaminationsCount / $allExaminationsCount;
 
         return number_format((float)$percentage, 2, '.', '');

@@ -6,6 +6,8 @@ use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
+use App\Event\PostHealthRecordCreationEvent;
+use App\EventSubscriber\PostHealthRecordCreationSubscriber;
 use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
@@ -24,6 +26,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -39,7 +42,8 @@ class HealthRecordController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly TokenStorageInterface  $tokenStorage
+        private readonly TokenStorageInterface  $tokenStorage,
+        private readonly EventDispatcherInterface $eventDispatcher
     )
     {
     }
@@ -105,6 +109,10 @@ class HealthRecordController extends AbstractController
                 $email->notifyVetAboutAppointment($healthRecord);
             }
         }
+
+        $event = new PostHealthRecordCreationEvent($healthRecord, $this->em);
+        $this->eventDispatcher->addSubscriber(new PostHealthRecordCreationSubscriber());
+        $this->eventDispatcher->dispatch($event, PostHealthRecordCreationEvent::NAME);
 
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
