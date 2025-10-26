@@ -579,14 +579,17 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/vets/free', methods: 'GET')]
-    public function getFreeVetsInTimeRange(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
+    public function getFreeVetsInTimeRange(Request $request, UserRepository $userRepo): Response
     {
         $queryParams = (object)$request->query->all();
 
         $from = $queryParams->from;
         $to = $queryParams->to;
 
-        $response = $userRepo->getFreeVets($from, $to);
+        /**
+         * @see need to pay attention to refactor this on frontend side
+         */
+        $response = $userRepo->getAvailableVets($from, $to);
         return $this->json($response, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
 

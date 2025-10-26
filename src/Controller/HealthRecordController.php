@@ -8,6 +8,7 @@ use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\PostHealthRecordCreationEvent;
 use App\EventSubscriber\PostHealthRecordCreationSubscriber;
+use App\Factory\HealthRecordFactory;
 use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
 use App\Model\CancelHealthRecord;
@@ -86,33 +87,20 @@ class HealthRecordController extends AbstractController
     public function create(Request $request, MailerInterface $mailer): Response
     {
         $env = $this->getParameter('kernel.environment');
-
         $healthRecord = new HealthRecord();
         $email = new TemplatedEmailService($mailer);
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
 
-        if ($healthRecord->isMadeByVet() === true && $healthRecord->getAtPresent() === true) {
-            $healthRecord->makeHealthRecordNow();
-        } else {
-            $healthRecord->setMadeByVet(false);
-            if ($env !== 'test') {
-                $email->notifyUserAboutAppointment($healthRecord);
-            }
-        }
+        $healthRecordFactory = new HealthRecordFactory($this->em);
+        $healthRecordFactory->setMadeByVet($healthRecord,$email,$env);
 
-        $this->em->persist($healthRecord);
-
-        if ($healthRecord->isMadeByVet() === false) {
-            if ($env !== 'test') {
-                $email->notifyVetAboutAppointment($healthRecord);
-            }
-        }
-
+        //these two lines are behaving like a MySQL Trigger but in a Symfony way...
         $event = new PostHealthRecordCreationEvent($healthRecord, $this->em);
         $this->eventDispatcher->dispatch($event, PostHealthRecordCreationEvent::NAME);
 
         $this->em->flush();
+
         return $this->json($healthRecord, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_HEALTH_RECORD]);
     }
 

@@ -109,41 +109,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $nearbyVets->fetchAll();
     }
 
-    public function getFreeVets($from, $to): array
+    /**
+     * @param $from
+     * @param $to
+     * @return array
+     *
+     * @see This method returns only occupied vets
+     */
+    public function getAvailableVets($from, $to): array
     {
-        $occupiedVets = $this->getOccupiedVetsInTimeRange($from, $to);
-
-        /**
-         * @var $response VetAvailability[]
-         */
-        $response = [];
-        foreach ($this->findBy(
-            ['typeOfUser'=>2],
-            ['popularity'=>'DESC'])
-                 as $vet)
-        {
-            if ($vet->getTypeOfUser() === 2) {
-                $response[] = (new VetAvailability())
-                    ->setVet($vet)
-                    ->setAvailable(!in_array($vet, $occupiedVets, true));
-            }
-        }
-
-        return $response;
-    }
-
-    public function getOccupiedVetsInTimeRange($from, $to): array
-    {
-        $qb = $this->createQueryBuilder('u');
-
-        $qb->innerJoin('u.healthRecords', 'hr')
-            ->orWhere('hr.startedAt >= :from and hr.startedAt <= :to')
-            ->orWhere('hr.finishedAt >= :from and hr.finishedAt <= :to')
-            ->orWhere('u.id not in (hr.vet)')
+        $qb = $this->createQueryBuilder('u')
+            ->leftJoin('u.healthRecords', 'hr', 'WITH',
+                'hr.vet = u AND hr.startedAt BETWEEN :from AND :to OR hr.finishedAt BETWEEN :from AND :to'
+            )
+            ->where('u.typeOfUser = :type')
+            ->andWhere('hr.id IS NULL')
+            ->setParameter('type', User::TYPE_VET)
             ->setParameter('from', $from)
             ->setParameter('to', $to);
 
-        return $qb->getQuery()->getResult();
+        return  $qb->getQuery()->getResult();
     }
 
 
@@ -158,13 +143,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    public function findByRole($role):User|int
+    public function findByRole($role): User|int
     {
         $qb = $this->createQueryBuilder('u');
 
         $qb
             ->andWhere($qb->expr()->like('u.roles', ':role'))
-            ->setParameter('role', '%'.$role.'%')
+            ->setParameter('role', '%' . $role . '%')
             ->orderBy('u.firstName', 'ASC');
 
         return $qb->getQuery()->getResult()[0];
@@ -185,7 +170,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->orWhere('u.lastName like :lastName')
                 ->setParameter('lastName', '%' . $lastName . '%')
                 ->andWhere('u.typeOfUser=:userType')
-                ->setParameter('userType',User::TYPE_USER);
+                ->setParameter('userType', User::TYPE_USER);
 
             return $qb->getQuery()->getResult();
         }
