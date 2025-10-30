@@ -3,14 +3,17 @@
 /.env.local
 /.env.test
 /.env
+/symfony.lock
 /config/secrets/prod/prod.decrypt.private.php
-public/bundles/
+/public/bundles/
 /var/
 /vendor/
 /public/exports
-public/images
+/public/images
 /.idea
 /mysqldata
+/docker-compose.yml
+/docker-compose.override.yml
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
