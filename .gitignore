@@ -1,15 +1,13 @@
 
 ###> symfony/framework-bundle ###
 /.env.local
-/.env.local.php
-/.env.*.local
+/.env.test
+/.env
 /config/secrets/prod/prod.decrypt.private.php
 public/bundles/
 /var/
 /vendor/
-/.env
-.env.test
-#/public/exports
+/public/exports
 public/images
 /.idea
 /mysqldata
@@ -17,16 +15,15 @@ public/images
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
+/config/secrets
 ###< lexik/jwt-authentication-bundle ###
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
-/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
-.phpunit.result.cache
 ###< phpunit/phpunit ###
 
 ###> phpstan/phpstan ###
