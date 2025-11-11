@@ -23,7 +23,7 @@ class PaginationService
      * @param Request $request
      * @param ArrayCollection|Collection|array $recordCollection
      */
-    public function __construct(PaginatorInterface $paginator,Request $request,ArrayCollection|Collection|array $recordCollection)
+    public function __construct(PaginatorInterface $paginator, Request $request,ArrayCollection|Collection|array $recordCollection)
     {
         $this->paginator = $paginator;
         $this->request = $request;
