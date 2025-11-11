@@ -14,14 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 
 /**
- * @extends ServiceEntityRepository<HealthRecord>
+ * @extends BaseRepository<HealthRecord>
  *
  * @method HealthRecord|null find($id, $lockMode = null, $lockVersion = null)
  * @method HealthRecord|null findOneBy(array $criteria, array $orderBy = null)
  * @method HealthRecord[]    findAll()
  * @method HealthRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class HealthRecordRepository extends ServiceEntityRepository
+class HealthRecordRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
