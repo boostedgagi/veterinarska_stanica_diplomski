@@ -14,12 +14,12 @@ class SearchService
         private readonly EntityManagerInterface $em
     ){}
 
-    public function search(array $criteria, string $entityName): array
+    public function search(string $entityName, array $fields): array
     {
         $result = [];
         $entity = $this->getEntityByName($entityName);
 
-        $result = $this->em->getRepository($entity)->search();
+        $qb = $this->em->getRepository($entity)->createQueryBuilderForSearch($entityName);
 
         return $result;
     }
