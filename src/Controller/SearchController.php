@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ExaminationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +14,9 @@ class SearchController extends AbstractController
     /**
      * @see I decided to work with separate route/endpoint for every single entity that I want to search through.
      */
-    public function searchExaminations(Request $request): Response
+    public function searchExaminations(Request $request,ExaminationRepository $examinationRepo): Response
     {
-        $examinationName = $request->get('name',null);
-        $examinationDuration = $request->get('duration',null);
-        $examinationPrice = $request->get('price',null);
-
-
-
-        return $this->json();
+        $result = [];
+        return $this->json($result);
     }
 }

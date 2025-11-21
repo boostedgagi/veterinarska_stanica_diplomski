@@ -7,14 +7,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends BaseRepository<Examination>
- *
  * @method Examination|null find($id, $lockMode = null, $lockVersion = null)
  * @method Examination|null findOneBy(array $criteria, array $orderBy = null)
  * @method Examination[]    findAll()
  * @method Examination[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ExaminationRepository extends BaseRepository
+class ExaminationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -37,6 +35,13 @@ class ExaminationRepository extends BaseRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function search(string $alias,array $criteria):array
+    {
+        $qb = $this->createQueryBuilderForSearch($alias);
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

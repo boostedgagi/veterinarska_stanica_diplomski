@@ -2,26 +2,17 @@
 
 namespace App\Service;
 
-use ContainerBU1KZdA\get_ServiceLocator_FUl3IfhService;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
-use Knp\Component\Pager\Pagination\PaginationInterface;
 
 class SearchService
 {
 
-    public function __construct(
-        private readonly EntityManagerInterface $em
-    ){}
-
-    public function search(string $entityName, array $fields): array
+    /**
+     * @param array $criteria
+     * @return void
+     */
+    public function search(array $criteria): void
     {
-        $result = [];
-        $entity = $this->getEntityByName($entityName);
-
-        $qb = $this->em->getRepository($entity)->createQueryBuilderForSearch($entityName);
-
-        return $result;
     }
 
 
