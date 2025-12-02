@@ -37,9 +37,30 @@ class ExaminationRepository extends ServiceEntityRepository
         }
     }
 
-    public function search(string $alias,array $criteria):array
+    public function search(array $criteria):array
     {
-        $qb = $this->createQueryBuilderForSearch($alias);
+        $qb = $this->createQueryBuilder('e');
+
+        $name = $criteria["name"] ?? null;
+        if($name){
+            $qb->orWhere('e.name LIKE :name')
+                ->setParameter('name',"%$name%");
+        }
+        $duration = $criteria["duration"] ?? null;
+        if($duration){
+            $qb->orWhere('e.duration = :duration')
+                ->setParameter('duration',"$duration");
+        }
+        $price = $criteria["price"] ?? null;
+        if($price){
+            $qb->orWhere('e.price = :price')
+                ->setParameter('price',"$price");
+        }
+
+        $orderBy = $criteria["orderBy"] ?? null; //ASC or DESC
+        if($orderBy){
+            $qb->orderBy('e.name',$orderBy);
+        }
 
         return $qb->getQuery()->getResult();
     }

@@ -55,6 +55,7 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
+
     /**
      * @return HealthRecord[]
      */
@@ -63,8 +64,7 @@ class HealthRecordRepository extends ServiceEntityRepository
         $now = new DateTime();
         $deadline = $this->convertTextInputToRange($range);
 
-        if(!$deadline)
-        {
+        if (!$deadline) {
             return [];
         }
         $qb = $this->createQueryBuilder('hr');
@@ -74,10 +74,9 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->andWhere('hr.finishedAt<:deadline')
             ->setParameter('deadline', $deadline);
 
-        if($range===NotifyingTimeRange::NEXT_WEEK->value){
+        if ($range === NotifyingTimeRange::NEXT_WEEK->value) {
             $qb->andWhere('hr.notifiedWeekBefore = false');
-        }
-        else if($range===NotifyingTimeRange::NEXT_DAY->value){
+        } else if ($range === NotifyingTimeRange::NEXT_DAY->value) {
             $qb->andWhere('hr.notifiedDayBefore = false');
         }
 
@@ -86,12 +85,10 @@ class HealthRecordRepository extends ServiceEntityRepository
 
     private function convertTextInputToRange(string $range): ?DateTime
     {
-        if ($range === "today")
-        {
+        if ($range === "today") {
             return new DateTime('+1 day');
         }
-        if ($range === "next_week")
-        {
+        if ($range === "next_week") {
             return new DateTime('+7 days');
         }
         return null;
@@ -135,6 +132,53 @@ class HealthRecordRepository extends ServiceEntityRepository
             ->innerJoin('p.owner', 'u')
             ->andWhere('u.id=:id')
             ->setParameter('id', $user->getId());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function search(array $criteria)
+    {
+        $qb = $this->createQueryBuilder('hr');
+
+        $vetId = $criteria["vetId"] ?? null;
+        if ($vetId) {
+            $qb->orWhere('hr.vet = :vetId')
+                ->setParameter('vetId', $vetId);
+        }
+
+        $petId = $criteria["petId"] ?? null;
+        if ($petId) {
+            $qb->orWhere('hr.pet = :petId')
+                ->setParameter('petId', $petId);
+        }
+
+        $examinationId = $criteria["examinationId"] ?? null;
+        if ($examinationId) {
+            $qb->orWhere('hr.examination = :examinationId')
+                ->setParameter('examinationId', $examinationId);
+        }
+
+        $start = $criteria["start"] ?? null;
+        $finish = $criteria["finish"] ?? null;
+
+        if($start && $finish){
+            $qb->orWhere('hr.startedAt BETWEEN :start AND :finish')
+                ->orWhere('hr.finishedAt BETWEEN :start AND :finish')
+                ->setParameter('start',"$start")
+                ->setParameter('finish',$finish);
+        }
+
+        $status = $criteria["status"] ?? null;
+        if ($status) {
+            $qb->orWhere('hr.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        $madeByVet = $criteria["madeByVet"] ?? null;
+        if ($madeByVet) {
+            $qb->orWhere('hr.madeByVet = :madeByVet')
+                ->setParameter('madeByVet', $madeByVet);
+        }
 
         return $qb->getQuery()->getResult();
     }
