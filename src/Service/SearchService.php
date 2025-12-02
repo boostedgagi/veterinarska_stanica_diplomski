@@ -2,10 +2,19 @@
 
 namespace App\Service;
 
+use App\Model\PaginatedResult;
+use App\Repository\ExaminationRepository;
+use App\Repository\HealthRecordRepository;
 use Doctrine\ORM\Mapping\Entity;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class SearchService
 {
+
+    public function __construct(public readonly PaginatorInterface $paginator){
+
+    }
 
     /**
      * @param array $criteria
@@ -15,7 +24,7 @@ class SearchService
     {
     }
 
-    public function mapExaminationQuery(array $filtersToMap): array
+    public function mapExaminationQueryAndSearch(array $filtersToMap,Request $request,ExaminationRepository $examinationRepo): PaginatedResult
     {
         $filterMap = [
             'title' => 'name',
@@ -24,7 +33,11 @@ class SearchService
             'orderBy' => 'orderBy'
         ];
 
-        return $this->mapFilters($filtersToMap,$filterMap);
+        $mappedFilters = $this->mapFilters($filtersToMap,$filterMap);
+        $searchedData = $examinationRepo->search($mappedFilters);
+
+        $paginationService = new PaginationService($this->paginator, $request, $searchedData);
+        return $paginationService->getPaginatedResult();
     }
 
     private function mapFilters(array $filtersToMap,$filterMap): array
@@ -39,7 +52,7 @@ class SearchService
         return $mappedFilters;
     }
 
-    public function mapHealthRecordQuery(array $filtersToMap): array
+    public function mapHealthRecordQueryAndSearch(array $filtersToMap,Request $request, HealthRecordRepository $healthRecordRepo): PaginatedResult
     {
         $filterMap = [
             'vet' => 'vetId',
@@ -52,6 +65,10 @@ class SearchService
             'madeByVet'=>'madeByVet'
         ];
 
-        return $this->mapFilters($filtersToMap,$filterMap);
+        $mappedFilters = $this->mapFilters($filtersToMap,$filterMap);
+        $searchedData = $healthRecordRepo->search($mappedFilters);
+
+        $paginationService = new PaginationService($this->paginator, $request, $searchedData);
+        return $paginationService->getPaginatedResult();
     }
 }
