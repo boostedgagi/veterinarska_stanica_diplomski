@@ -43,17 +43,17 @@ class ExaminationRepository extends ServiceEntityRepository
 
         $name = $criteria["name"] ?? null;
         if($name){
-            $qb->orWhere('e.name LIKE :name')
+            $qb->andWhere('e.name LIKE :name')
                 ->setParameter('name',"%$name%");
         }
         $duration = $criteria["duration"] ?? null;
         if($duration){
-            $qb->orWhere('e.duration = :duration')
+            $qb->andWhere('e.duration = :duration')
                 ->setParameter('duration',"$duration");
         }
         $price = $criteria["price"] ?? null;
         if($price){
-            $qb->orWhere('e.price = :price')
+            $qb->andWhere('e.price = :price')
                 ->setParameter('price',"$price");
         }
 

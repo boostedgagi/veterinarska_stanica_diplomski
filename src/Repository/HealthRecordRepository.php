@@ -142,19 +142,19 @@ class HealthRecordRepository extends ServiceEntityRepository
 
         $vetId = $criteria["vetId"] ?? null;
         if ($vetId) {
-            $qb->orWhere('hr.vet = :vetId')
+            $qb->andWhere('hr.vet = :vetId')
                 ->setParameter('vetId', $vetId);
         }
 
         $petId = $criteria["petId"] ?? null;
         if ($petId) {
-            $qb->orWhere('hr.pet = :petId')
+            $qb->andWhere('hr.pet = :petId')
                 ->setParameter('petId', $petId);
         }
 
         $examinationId = $criteria["examinationId"] ?? null;
         if ($examinationId) {
-            $qb->orWhere('hr.examination = :examinationId')
+            $qb->andWhere('hr.examination = :examinationId')
                 ->setParameter('examinationId', $examinationId);
         }
 
@@ -162,21 +162,27 @@ class HealthRecordRepository extends ServiceEntityRepository
         $finish = $criteria["finish"] ?? null;
 
         if($start && $finish){
-            $qb->orWhere('hr.startedAt BETWEEN :start AND :finish')
-                ->orWhere('hr.finishedAt BETWEEN :start AND :finish')
+            $qb->andWhere('hr.startedAt BETWEEN :start AND :finish')
+                ->andWhere('hr.finishedAt BETWEEN :start AND :finish')
                 ->setParameter('start',"$start")
                 ->setParameter('finish',$finish);
         }
 
         $status = $criteria["status"] ?? null;
         if ($status) {
-            $qb->orWhere('hr.status = :status')
+            $qb->andWhere('hr.status = :status')
                 ->setParameter('status', $status);
+        }
+
+        $comment = $criteria["comment"] ?? null;
+        if ($comment) {
+            $qb->andWhere('hr.comment = :comment')
+                ->setParameter('comment', $comment);
         }
 
         $madeByVet = $criteria["madeByVet"] ?? null;
         if ($madeByVet) {
-            $qb->orWhere('hr.madeByVet = :madeByVet')
+            $qb->andWhere('hr.madeByVet = :madeByVet')
                 ->setParameter('madeByVet', $madeByVet);
         }
 

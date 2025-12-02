@@ -47,9 +47,8 @@ class SearchService
             'examination' => 'examinationId',
             'start'=>'startedAt',
             'finish'=>'finishedAt',
+            'comment'=>'comment',
             'status'=>'status',
-            'created'=>'createdAt',
-            'notifiedDayBefore'=>'notifiedDayBefore',
             'madeByVet'=>'madeByVet'
         ];
 
