@@ -24,20 +24,19 @@ class SearchController extends AbstractController
     #[Route('/search/examination', methods: Request::METHOD_GET)]
     public function searchExamination(Request $request, ExaminationRepository $examinationRepo): Response
     {
-        $mappedQueryFilters = $this->searchService->mapExaminationQuery($request->query->all());
-
-        $searchedData = $examinationRepo->search($mappedQueryFilters);
+        $searchedData = $this->searchService->mapExaminationQueryAndSearch($request->query->all(),$request,$examinationRepo);
 
         return $this->json($searchedData, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_EXAMINATION]);
     }
 
     #[Route('/search/health_record', methods: Request::METHOD_GET)]
-    public function searchHealthRecord(Request $request, HealthRecordRepository $healthRecordRepository,PaginatorInterface $paginator): Response
+    public function searchHealthRecord(Request $request, HealthRecordRepository $healthRecordRepository): Response
     {
-        //mapping query params to ORM namings
-        $mappedQueryFilters = $this->searchService->mapHealthRecordQuery($request->query->all());
-        //searching database after mapping query params
-        $searchedData = $healthRecordRepository->search($mappedQueryFilters);
+        $searchedData = $this->searchService->mapHealthRecordQueryAndSearch(
+            $request->query->all(),
+            $request,
+            $healthRecordRepository
+        );
 
         return $this->json($searchedData, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
