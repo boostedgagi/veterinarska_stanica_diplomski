@@ -2,9 +2,9 @@
 
 namespace App\Model;
 
+use Symfony\Component\Serializer\Attribute\Groups;
 use App\ContextGroup;
 use App\Entity\User;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 class VetAvailability
 {

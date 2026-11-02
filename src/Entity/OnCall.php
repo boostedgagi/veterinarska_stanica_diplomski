@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Serializer\Attribute\Groups;
 use App\ContextGroup;
 use App\Repository\OnCallRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: OnCallRepository::class)]
