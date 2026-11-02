@@ -34,7 +34,7 @@ class QRCode
     public function generate():ResultInterface
     {
         $url = $this->makeUrl();
-        return $this->builder->data($url)->build();
+        return $this->builder->build(data: $url);
     }
 
 }
