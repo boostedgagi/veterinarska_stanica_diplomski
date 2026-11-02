@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
@@ -35,7 +36,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmailService;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;

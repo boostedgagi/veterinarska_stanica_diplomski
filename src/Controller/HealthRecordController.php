@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
@@ -25,7 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HealthRecordController extends AbstractController
