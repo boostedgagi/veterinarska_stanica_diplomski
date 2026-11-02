@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0 done.
+Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0, S1, S2 done.
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -330,23 +330,33 @@ Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once 
 5. New and not in the plan: with `core.autocrlf=true` a checkout turns `Makefile` / `bin/console` into CRLF, which breaks make and the shebang.
 6. PHPStan 2 is stricter: 238 baselined errors instead of 120. `src/Security/AppAuthenticator.php` is excluded via `excludePaths`, because its 4 `return.missing` errors are non-ignorable and the file stays untouched (D9).
 
-### S1: Test tooling on 6.4 (gets to a green baseline)
-- [ ] test: PHPUnit `^12.5`, `phpunit.xml.dist` migrated (`--migrate-configuration`; drop the PHPUnit 9 `<listeners>` / `convertDeprecationsToExceptions`), symfony/phpunit-bridge config
-- [ ] rector: apply phpunit composer-based rules
-- [ ] test: DAMA `^8.7` (extension `DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension` for PHPUnit 10+)
-- [ ] test: Foundry `^2.15`: migrate the 4 `ModelFactory` classes. `HealthRecordFactory` (a domain helper, not a Foundry factory) is **not** renamed. Fix `AppFixtures` so it creates health records without calling a non-existent method (D6).
-- [ ] test: schema created once per run (migrations or SchemaTool in bootstrap) instead of `DatabasePrimer` per test; controller tests seed their own entities through Foundry. Assertions unchanged.
-- [ ] **Gate: full suite green on 6.4**
-- [ ] ci: GitHub Actions workflow (lint, PHPStan with baseline, PHPUnit on PHP 8.4 + `mysql:8.4`), without the Rector gate yet (D8)
+### S1: Test tooling on 6.4 ✅ (2026-11-02)
+- [x] test: PHPUnit `12.5`, `phpunit.xml.dist` rewritten for PHPUnit 12 (bridge `SymfonyExtension` + DAMA extension instead of the PHPUnit 9 listener), symfony/phpunit-bridge `7.4` (`2b3e74f`)
+- [x] rector: phpunit composer-based rules: **no-op** (no rule matched the tests)
+- [x] test: DAMA `8.7` + `doctrine.dbal.use_savepoints: true` (`2b3e74f`)
+- [x] test: Foundry `2.15`: the 4 factories → `PersistentObjectFactory`; `AppFixtures` builds health records with an anonymous Foundry factory; `HealthRecordFactory` unchanged (`2b3e74f`)
+- [x] test: `DatabasePrimer` → Foundry `ResetDatabase` (schema once per run); controller tests seed their own data; assertions unchanged except where they compared to a hard-coded ID (`2b3e74f`)
+- [x] **Gate: full suite green on 6.4**: 11 tests / 49 assertions, 3 consecutive runs
+- [x] ci: GitHub Actions workflow (`8c332a1`), simulated in a clean clone (all steps green after `f034375`)
 
-### S2: Clean up 6.4 deprecations
-- [ ] rector: apply symfony composer-based rules (6.4): `Routing\Annotation\Route` → `Routing\Attribute\Route`
-- [ ] rector: attributes sets (expected no-op)
-- [ ] fix: remove `security.enable_authenticator_manager`
-- [ ] fix: `User::eraseCredentials(): void`
-- [ ] fix: `doctrine.orm.controller_resolver.auto_mapping: false` + `#[MapEntity]` where needed; route baseline diff = empty
-- [ ] fix: implicit nullable params in tests (PHP 8.4)
-- [ ] **Gate: `debug:container --deprecations` has no entries from `App\` or our config**
+**S1 deviations**
+1. **Regression found and fixed:** Rector 2.8 (S0) bundles `phpstan/phpdoc-parser` 2, and its `bootstrap.php` (in Composer's autoload `files`) could load that copy into the app process. `phpdocumentor/type-resolver` 1.8 then called the v1 API, so `POST/PUT /health_record` returned 500 in dev/test. Production (no dev packages) was never affected. Fix: the app's `phpstan/phpdoc-parser` → `^2.1` (type-resolver 1.12, reflection-docblock 5.6, jms/serializer 3.32, webmozart/assert 2, not used by our code).
+2. DAMA 8 pulled `doctrine/doctrine-bundle` 2.13 → 2.19 early (still the 2.x line, ORM 2.19).
+3. Foundry's own `UP_TO_FOUNDRY_2` Rector set doesn't load on Rector 2 (removed interface, plus it needs phpstan-doctrine), so the 4 factories were migrated by hand.
+4. `UserFactory` and the test mock users now set `verified` (NOT NULL column; the old test DB predated it).
+5. CI writes throwaway `.env` / `.env.test` and a throwaway JWT keypair, because both env files are git-ignored here. The `schema:validate` sync check is skipped until S3 (DBAL 3 `DC2Type` comment drift).
+6. The PHPStan baseline was line-ending dependent (PHPDoc parse-error offsets differ between CRLF/LF). Offsets are now matched with `\d+` and `make phpstan-baseline` regenerates + normalizes. Baseline: 238 → 131 entries.
+
+### S2: Clean up 6.4 deprecations ✅ (2026-11-02)
+- [x] rector: unused imports split into their own commit (97 lines, 34 files). Serializer metadata for all entities/models identical (`d88a98e`)
+- [x] rector: symfony composer-based rules (6.4): `Routing\Annotation\Route` → `Routing\Attribute\Route`, 7 controllers; route table identical (`c60b54b`)
+- [x] rector: doctrine composer-based rules: DBAL `execute()`/`fetchAll()` → `executeQuery()`/`fetchAllAssociative()` (the planned S3 hand fix, done by Rector; output of `getNearbyVets()` identical on fixture data) (`5add8ea`); `@extends ServiceEntityRepository<…>` on 3 repositories (`79f1a67`)
+- [x] rector: attributes sets: no-op. **`vendor/bin/rector process --dry-run` = 0 changes on 6.4**
+- [x] fix: remove `security.enable_authenticator_manager`; effective security config identical (`2df796d`)
+- [x] fix: `User::eraseCredentials(): void` (`e6434dc`)
+- [x] fix: `controller_resolver.auto_mapping: false`. All 20 entity arguments come from `{id}` or `#[CurrentUser]`, so no `#[MapEntity]` was needed (`7f03da0`)
+- [x] fix: implicit nullable params in tests (part of `2b3e74f`)
+- [x] **Gate passed:** `debug:container --deprecations` has 0 entries from `App\` or our config. The 37 left are vendor (endroid/qr-code 21, Lexik 13, Knp 2, mobile-detect 1), all fixed by the S4 bumps
 
 ### S3: Doctrine ORM 3 / DBAL 4 (still on Symfony 6.4)
 - [ ] local: switch `var/upgrade/compose.ports.yml` to `mysql:8.4` images (prod parity, D5), recreate the WSL DBs, verify with `SELECT @@hostname, @@version`
@@ -427,6 +437,9 @@ Still open (each has a default that I'll use unless you say otherwise):
 - The `popularity` column history
 - `GET /found_pet?id=<unknown>` answers 500 (an uncaught RuntimeException); the commented-out line above it shows a 404 was intended.
 - `src/Entity/Token.php` imports a non-existent `App\Model\Token as ModelToken` (unused, so it's harmless).
+- **Security:** the `access_control` rule `^/health_records` (plural) doesn't match the `/health_record/...` routes (singular), and no `#[IsGranted]` is on them, so creating, editing and deleting health records works without authentication (the tests do it without logging in). Fixing it changes the public API → separate decision.
+- `UserTest::testCreatedUser` and `testCreatedUserWithVet` are `protected`, so PHPUnit never runs them.
+- `UserRepository::findByRole()` is declared `User|int` but returns `null` when nothing matches (TypeError).
 - `tests/Unit/BaseTestCase.php` imports the generated `Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig` without using it. (`VARCHAR` "NN.00%" → `DOUBLE`).
 
 ---
