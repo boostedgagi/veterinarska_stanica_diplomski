@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
+use Detection\MobileDetect;
 
 class MobileDetectRepository
 {
     public function __construct(
-        public readonly MobileDetectorInterface $mobileDetector
+        public readonly MobileDetect $mobileDetector
     )
     {
     }

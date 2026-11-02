@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Detection\MobileDetect;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,7 +26,6 @@ use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -703,7 +703,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/log', methods: 'POST')]
-    public function takeLocation(MobileDetectorInterface $detector): JsonResponse
+    public function takeLocation(MobileDetect $detector): JsonResponse
     {
         $logHandler = new LogHandler();
 
