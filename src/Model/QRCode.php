@@ -5,7 +5,6 @@ namespace App\Model;
 use App\ApiClient;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class QRCode
 {

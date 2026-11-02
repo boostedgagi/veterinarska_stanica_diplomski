@@ -3,13 +3,10 @@
 namespace App\Tests\Unit;
 
 use App\Entity\Examination;
-use App\Entity\HealthRecord;
 use App\Entity\User;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 

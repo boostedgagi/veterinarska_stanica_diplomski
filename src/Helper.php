@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Entity\User;
 use DateTime;
 use Exception;
 

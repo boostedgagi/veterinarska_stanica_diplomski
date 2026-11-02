@@ -1,9 +1,7 @@
 <?php
 namespace App\Message;
 
-use App\Entity\User;
 use DateTimeImmutable;
-use Doctrine\ORM\Mapping\PrePersist;
 
 class Message
 {

@@ -2,21 +2,13 @@
 
 namespace App\Tests\Unit\Controller;
 
-use App\ApiClient;
 use App\Entity\Examination;
 use App\Factory\ExaminationFactory;
 use App\Factory\UserFactory;
-use App\Entity\HealthRecord;
 use App\Entity\User;
-use App\Repository\ExaminationRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use JsonException;
 use Nebkam\FluentTest\RequestBuilder;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 

@@ -2,11 +2,8 @@
 
 namespace App\Entity;
 
-use App\Helper;
 use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Model\Token as ModelToken;
-use Exception;
 
 #[ORM\Entity(repositoryClass: TokenEntityRepository::class)]
 class Token

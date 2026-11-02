@@ -3,9 +3,7 @@
 namespace App\Event;
 
 use App\Entity\HealthRecord;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Mailer\MailerInterface;
 
 class PostHealthRecordCreationEvent
 {

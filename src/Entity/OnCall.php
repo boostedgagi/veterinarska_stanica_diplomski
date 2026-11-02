@@ -6,7 +6,6 @@ use App\ContextGroup;
 use App\Repository\OnCallRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use OpenApi\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\HasLifecycleCallbacks]

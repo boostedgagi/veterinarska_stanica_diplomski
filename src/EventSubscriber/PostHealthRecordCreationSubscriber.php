@@ -3,13 +3,10 @@
 namespace App\EventSubscriber;
 
 use App\Entity\HealthRecord;
-use App\Entity\User;
 use App\Event\PostHealthRecordCreationEvent;
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PostHealthRecordCreationSubscriber implements EventSubscriberInterface

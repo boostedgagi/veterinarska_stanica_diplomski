@@ -3,7 +3,6 @@
 namespace App\Factory;
 
 use App\Entity\HealthRecord;
-use App\Repository\HealthRecordRepository;
 use App\Service\TemplatedEmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

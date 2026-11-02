@@ -3,8 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Token;
-use App\Model\SavedToken;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
