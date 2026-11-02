@@ -2,15 +2,50 @@
 
 namespace App\Tests\Unit\Controller;
 
+use App\Entity\Examination;
 use App\Entity\HealthRecord;
+use App\Entity\Pet;
+use App\Entity\User;
+use App\Factory\ExaminationFactory;
+use App\Factory\PetFactory;
+use App\Factory\UserFactory;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\FluentTest\RequestBuilder;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 class HealthRecordControllerTest extends WebTestCase
 {
+    use ResetDatabase;
+    use Factories;
+
+    private function seedVet(): User
+    {
+        return UserFactory::createOne(['typeOfUser' => User::TYPE_VET, 'allowed' => true, 'verified' => true]);
+    }
+
+    private function seedPet(): Pet
+    {
+        UserFactory::createOne(['typeOfUser' => User::TYPE_USER]); // PetFactory picks a random owner
+        return PetFactory::createOne();
+    }
+
+    private function seedHealthRecord(User $vet, Pet $pet, Examination $examination): HealthRecord
+    {
+        return persistent_factory(HealthRecord::class)->create([
+            'vet' => $vet,
+            'pet' => $pet,
+            'examination' => $examination,
+            'startedAt' => new DateTime('2024-09-07T09:00:00.000Z'),
+            'finishedAt' => new DateTime('2024-09-07T10:00:00.000Z'),
+            'status' => 'waiting',
+            'madeByVet' => false,
+        ]);
+    }
 
     /**
      * @throws Exception
@@ -24,20 +59,24 @@ class HealthRecordControllerTest extends WebTestCase
     public function testCreateHealthRecord(): void
     {
         $client = static::createClient();
+        $vet = $this->seedVet();
+        $pet = $this->seedPet();
+        $examination = ExaminationFactory::createOne();
+
         $response = RequestBuilder::create($client)
             ->setMethod('POST')
             ->setUri('/health_record')
-            ->setContent('
+            ->setContent(sprintf('
                 {
-                      "vet": 12,
-                      "pet": 1,
-                      "examination": 3,
+                      "vet": %d,
+                      "pet": %d,
+                      "examination": %d,
                       "startedAt": "2024-09-07T10:12:00.393Z",
                       "finishedAt": "2024-09-07T12:35:00.393Z",
                       "comment": "gotta checc if everything is ok",
                       "status":"waiting"
                 }
-            ')
+            ', $vet->getId(), $pet->getId(), $examination->getId()))
             ->getResponse();
 
         self::assertResponseIsSuccessful();
@@ -53,28 +92,33 @@ class HealthRecordControllerTest extends WebTestCase
         self::assertStringContainsString('gotta checc',$healthRecord->getComment());
         self::assertEquals(new DateTime('2024-09-07T10:12:00.393Z'),$healthRecord->getStartedAt());
         self::assertEquals(new DateTime('2024-09-07T12:35:00.393Z'),$healthRecord->getFinishedAt());
-        self::assertEquals(1,$healthRecord->getPet()->getId());
-        self::assertEquals(12,$healthRecord->getVet()->getId());
-        self::assertEquals(3,$healthRecord->getExamination()->getId());
+        self::assertEquals($pet->getId(),$healthRecord->getPet()->getId());
+        self::assertEquals($vet->getId(),$healthRecord->getVet()->getId());
+        self::assertEquals($examination->getId(),$healthRecord->getExamination()->getId());
     }
 
     public function testEditHealthRecord():void
     {
         $client = static::createClient();
+        $vet = $this->seedVet();
+        $pet = $this->seedPet();
+        $examination = ExaminationFactory::createOne();
+        $existing = $this->seedHealthRecord($vet, $pet, $examination);
+
         $response = RequestBuilder::create($client)
             ->setMethod('PUT')
-            ->setUri('/health_record/%s',50)
-            ->setContent('
+            ->setUri('/health_record/%s',$existing->getId())
+            ->setContent(sprintf('
                 {
-                      "vet": 12,
-                      "pet": 1,
-                      "examination": 3,
+                      "vet": %d,
+                      "pet": %d,
+                      "examination": %d,
                       "startedAt": "2024-09-07T10:30:00.000Z",
                       "finishedAt": "2024-09-07T12:55:00.000Z",
                       "comment": "Changed minor things just to check if everything is working.",
                       "status":"waiting"
                 }
-            ')
+            ', $vet->getId(), $pet->getId(), $examination->getId()))
             ->getResponse();
 
         $em = $client->getContainer()->get(EntityManagerInterface::class);
@@ -91,9 +135,11 @@ class HealthRecordControllerTest extends WebTestCase
     public function testGetUserHealthRecords(): void
     {
         $client = static::createClient();
+        $user = UserFactory::createOne(['typeOfUser' => User::TYPE_USER]);
+
         $response = RequestBuilder::create($client)
             ->setMethod('GET')
-            ->setUri('/user/%s/health_records','18')
+            ->setUri('/user/%s/health_records',$user->getId())
         ->getResponse();
 
         self::assertResponseStatusCodeSame(200);
@@ -104,9 +150,11 @@ class HealthRecordControllerTest extends WebTestCase
     public function testPetHealthRecords(): void
     {
         $client = static::createClient();
+        $pet = $this->seedPet();
+
         $response = RequestBuilder::create($client)
             ->setMethod('GET')
-            ->setUri('/pet/%s/health_record?page=%s&limit=%s','6','1','5')
+            ->setUri('/pet/%s/health_record?page=%s&limit=%s',$pet->getId(),'1','5')
             ->getResponse();
 
         self::assertResponseStatusCodeSame(200);
@@ -120,9 +168,11 @@ class HealthRecordControllerTest extends WebTestCase
     public function testDeleteHealthRecord():void
     {
         $client = static::createClient();
+        $existing = $this->seedHealthRecord($this->seedVet(), $this->seedPet(), ExaminationFactory::createOne());
+
         $response = RequestBuilder::create($client)
             ->setMethod('DELETE')
-            ->setUri('/health_record/%s',51)
+            ->setUri('/health_record/%s',$existing->getId())
             ->getResponse();
 
         self::assertResponseIsSuccessful();

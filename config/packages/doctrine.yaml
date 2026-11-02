@@ -8,6 +8,8 @@ doctrine:
         #was '5.6'
 
         profiling_collect_backtrace: '%kernel.debug%'
+        # Required by dama/doctrine-test-bundle 8; always on with DBAL 4
+        use_savepoints: true
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

@@ -20,7 +20,7 @@
         "nelmio/api-doc-bundle": "*",
         "nelmio/cors-bundle": "^2.3",
         "phpdocumentor/reflection-docblock": "^5.3",
-        "phpstan/phpdoc-parser": "^1.14",
+        "phpstan/phpdoc-parser": "^2.1",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "6.4.*",
         "symfony/console": "6.4.*",
@@ -48,18 +48,18 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
-        "dama/doctrine-test-bundle": "^7.3",
+        "dama/doctrine-test-bundle": "^8.7",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "nebkam/fluent-test": "^4.2",
+        "nebkam/fluent-test": "^4.2.1",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^12.5",
         "rector/rector": "^2.8",
         "symfony/browser-kit": "6.4.*",
         "symfony/css-selector": "6.4.*",
         "symfony/maker-bundle": "^1.49",
-        "symfony/phpunit-bridge": "^6.4",
+        "symfony/phpunit-bridge": "^7.4",
         "symfony/stopwatch": "6.4.*",
-        "zenstruck/foundry": "^1.35"
+        "zenstruck/foundry": "^2.15"
     },
     "config": {
         "platform-check": false,

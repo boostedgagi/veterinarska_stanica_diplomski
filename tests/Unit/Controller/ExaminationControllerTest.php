@@ -4,6 +4,8 @@ namespace App\Tests\Unit\Controller;
 
 use App\ApiClient;
 use App\Entity\Examination;
+use App\Factory\ExaminationFactory;
+use App\Factory\UserFactory;
 use App\Entity\HealthRecord;
 use App\Entity\User;
 use App\Repository\ExaminationRepository;
@@ -15,9 +17,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 class ExaminationControllerTest extends WebTestCase
 {
+    use ResetDatabase;
+    use Factories;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -26,10 +33,11 @@ class ExaminationControllerTest extends WebTestCase
     public function testGetOneExamination():void
     {
         $client = static::createClient();
+        $seededExamination = ExaminationFactory::createOne();
 
         $response = RequestBuilder::create($client)
             ->setMethod('GET')
-            ->setUri('/examination/%s','5')
+            ->setUri('/examination/%s',$seededExamination->getId())
             ->getResponse();
 
         $em = $client->getContainer()->get(EntityManagerInterface::class);
@@ -50,6 +58,7 @@ class ExaminationControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $em = $client->getContainer()->get(EntityManagerInterface::class);
+        UserFactory::createOne(['roles' => ['ROLE_ADMIN'], 'typeOfUser' => User::TYPE_ADMIN, 'allowed' => true, 'verified' => true]);
 
         /**
          * @var $admin User
@@ -84,6 +93,7 @@ class ExaminationControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $em = $client->getContainer()->get(EntityManagerInterface::class);
+        UserFactory::createOne(['roles' => ['ROLE_ADMIN'], 'typeOfUser' => User::TYPE_ADMIN, 'allowed' => true, 'verified' => true]);
 
         /**
          * @var $admin User
@@ -93,7 +103,7 @@ class ExaminationControllerTest extends WebTestCase
         $client->loginUser($admin);
         $response = RequestBuilder::create($client)
             ->setMethod('PUT')
-            ->setUri('/examination/%s',5)
+            ->setUri('/examination/%s',ExaminationFactory::createOne()->getId())
             ->setContent('
                 {
                       "name": "Test examination changed",

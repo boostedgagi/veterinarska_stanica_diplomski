@@ -3,48 +3,22 @@
 namespace App\Factory;
 
 use App\Entity\Pet;
-use App\Repository\PetRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends ModelFactory<Pet>
- *
- * @method        Pet|Proxy create(array|callable $attributes = [])
- * @method static Pet|Proxy createOne(array $attributes = [])
- * @method static Pet|Proxy find(object|array|mixed $criteria)
- * @method static Pet|Proxy findOrCreate(array $attributes)
- * @method static Pet|Proxy first(string $sortedField = 'id')
- * @method static Pet|Proxy last(string $sortedField = 'id')
- * @method static Pet|Proxy random(array $attributes = [])
- * @method static Pet|Proxy randomOrCreate(array $attributes = [])
- * @method static PetRepository|RepositoryProxy repository()
- * @method static Pet[]|Proxy[] all()
- * @method static Pet[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Pet[]|Proxy[] createSequence(array|callable $sequence)
- * @method static Pet[]|Proxy[] findBy(array $attributes)
- * @method static Pet[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static Pet[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @extends PersistentObjectFactory<Pet>
  */
-final class PetFactory extends ModelFactory
+final class PetFactory extends PersistentObjectFactory
 {
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
-     */
-    public function __construct()
+    public static function class(): string
     {
-        parent::__construct();
+        return Pet::class;
     }
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
-     * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array
     {
         return [
             'animal' => 'dog',
@@ -59,15 +33,10 @@ final class PetFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Pet $pet): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Pet::class;
     }
 }

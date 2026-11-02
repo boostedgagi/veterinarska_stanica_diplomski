@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\Examination;
 use App\Entity\HealthRecord;
 use App\Entity\User;
-use App\Tests\DatabasePrimer;
 use App\Tests\Unit\BaseTestCase;
 use DateTime;
 

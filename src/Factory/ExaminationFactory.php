@@ -3,48 +3,22 @@
 namespace App\Factory;
 
 use App\Entity\Examination;
-use App\Repository\ExaminationRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends ModelFactory<Examination>
- *
- * @method        Examination|Proxy create(array|callable $attributes = [])
- * @method static Examination|Proxy createOne(array $attributes = [])
- * @method static Examination|Proxy find(object|array|mixed $criteria)
- * @method static Examination|Proxy findOrCreate(array $attributes)
- * @method static Examination|Proxy first(string $sortedField = 'id')
- * @method static Examination|Proxy last(string $sortedField = 'id')
- * @method static Examination|Proxy random(array $attributes = [])
- * @method static Examination|Proxy randomOrCreate(array $attributes = [])
- * @method static ExaminationRepository|RepositoryProxy repository()
- * @method static Examination[]|Proxy[] all()
- * @method static Examination[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Examination[]|Proxy[] createSequence(array|callable $sequence)
- * @method static Examination[]|Proxy[] findBy(array $attributes)
- * @method static Examination[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static Examination[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @extends PersistentObjectFactory<Examination>
  */
-final class ExaminationFactory extends ModelFactory
+final class ExaminationFactory extends PersistentObjectFactory
 {
-    /**
-     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
-     *
-     * @todo inject services if required
-     */
-    public function __construct()
+    public static function class(): string
     {
-        parent::__construct();
+        return Examination::class;
     }
 
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
-     *
-     * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array
     {
         return [
 //            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
@@ -57,15 +31,10 @@ final class ExaminationFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Examination $examination): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Examination::class;
     }
 }
