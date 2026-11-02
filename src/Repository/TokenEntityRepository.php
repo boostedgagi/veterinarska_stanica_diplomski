@@ -7,7 +7,6 @@ use App\Model\SavedToken;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Http\Discovery\Exception\NotFoundException;
 
 /**
  * @extends ServiceEntityRepository<Token>

@@ -13,7 +13,6 @@ use App\Service\TemplatedEmailService;
 use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
-use Http\Discovery\Exception\NotFoundException;
 use Nebkam\SymfonyTraits\FormTrait;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Context;
@@ -343,7 +342,7 @@ class PetController extends AbstractController
         if(!$pet)
             {
 //            return $this->json("Pet is not existing in our database.",Response::HTTP_NOT_FOUND);
-            throw new NotFoundException('Pet is not existing in our database.');
+            throw new \RuntimeException('Pet is not existing in our database.');
             }
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::FOUND_PET]);
