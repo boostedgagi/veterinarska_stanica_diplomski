@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 3 – awaiting approval** (open questions answered 2026-11-02, see D5–D10). No application code has been changed yet.
+Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0 done.
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -303,23 +303,32 @@ After each run: `vendor/bin/rector process --dry-run` → review → `process` �
 
 Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once green) + `lint:container` + PHPStan don't get worse.
 
-### S0: Housekeeping on 6.4
-- [ ] Create branch `upgrade/symfony-7.4` from `main`
-- [ ] chore: commit the already-staged untracking of `public/images`, `public/exports` + the `.gitignore` `/.env.*.local` rule
-- [ ] chore: untrack `**/error_log` + ignore rule
-- [ ] build: `config.platform.php` `8.2.0` → `8.4.0`, `require.php` → `>=8.4` (D5)
-- [ ] fix: remove `symfony/notifier`, `config/packages/notifier.yaml` and the unused `NotifierInterface` argument (D7) → `lint:container` ✅
-- [ ] chore: remove `cboden/ratchet` + `bin/chat-server.php`, `bin/push-server.php`, `src/Chat/`, unused `use Ratchet\…`
-- [ ] chore: remove `symfony/proxy-manager-bridge`
-- [ ] chore: remove `doctrine/annotations` (+ check `framework.annotations` is off)
-- [ ] chore: remove `gesdinet/jwt-refresh-token-bundle` + its route/config files (D7)
-- [ ] chore: remove `willdurand/geocoder-bundle` (+ bundle registration, config)
-- [ ] chore: remove `gedmo/doctrine-extensions`, `nyholm/psr7`
-- [ ] chore: pin `beberlei/doctrineextensions` to `^1.5`
-- [ ] chore: require `symfony/security-bundle: 6.4.*` explicitly (it's used directly)
-- [ ] chore: delete `config/packages/config_test.yaml` (sqlite `memory` + `url` deprecation)
-- [ ] build: Rector `^2.8`, PHPStan `^2.1`, new `rector.php` (§3.3), composer scripts, Makefile
-- [ ] build: PHPStan baseline file (`phpstan-baseline.neon`) so new errors are caught without fixing the 120 old ones
+### S0: Housekeeping on 6.4 ✅ (2026-11-02)
+- [x] Create branch `upgrade/symfony-7.4` from `main`
+- [x] chore: commit the already-staged untracking of `public/images`, `public/exports` + the `.gitignore` `/.env.*.local` rule (`da2f93f`)
+- [x] chore: untrack `**/error_log` + ignore rule (`59fdec9`)
+- [x] fix: remove `symfony/notifier`, `config/packages/notifier.yaml` and the unused `NotifierInterface` argument (D7) → `lint:container` ✅ (`ee68941`)
+- [x] chore: remove `cboden/ratchet` + `bin/chat-server.php`, `bin/push-server.php`, `src/Chat/`, unused `use Ratchet\…` (`0695a24`)
+- [x] chore: remove `symfony/proxy-manager-bridge` (`eb32a57`)
+- [x] chore: remove `doctrine/annotations`; all `framework.annotations` / Doctrine `Reader` deprecations gone (`7174eab`)
+- [x] chore: remove `gesdinet/jwt-refresh-token-bundle` + its route/config files (D7). Route diff vs baseline: only `gesdinet_jwt_refresh_token` removed (`9ea2dd5`)
+- [x] chore: remove `willdurand/geocoder-bundle` **+ php-http/\* + `nyholm/psr7`** (`5c8bccc`), see deviation 1
+- [x] chore: remove `gedmo/doctrine-extensions` (`a7dfbaf`)
+- [x] chore: pin `beberlei/doctrineextensions` to `^1.5`; DQL `RAND()` verified (`042dd65`)
+- [x] chore: require `symfony/security-bundle: 6.4.*` explicitly (`753077b`)
+- [x] build: `config.platform.php` `8.2.0` → `8.4.0`, `require.php` → `>=8.4`, `symfony/*` → 6.4.49, `lcobucci/jwt` 4.3 (`ec79b25`), see deviation 2
+- [x] chore: delete `config/packages/config_test.yaml` (`5768cf8`), see deviation 3
+- [x] build: Rector `2.8.3`, PHPStan `2.3.4`, new `rector.php`, composer scripts, Makefile (`b7a1133`), see deviation 4
+- [x] build: `.gitattributes` keeps LF for `Makefile`, `bin/*`, `*.sh` (`0a7a256`), see deviation 5
+- [x] build: PHPStan baseline (`b1afca9`), see deviation 6
+
+**S0 deviations from the plan**
+1. `nyholm/psr7` wasn't completely unused: it was the PSR-17 implementation that `php-http/discovery` found for `config/packages/http_discovery.yaml`. Removing the geocoder removed php-http/discovery, and nothing in `src/` or the bundles autowires PSR-7/17, so nyholm was removed in the same commit. The removed class `Http\Discovery\Exception\NotFoundException` was still thrown in `PetController::foundPet()`. It's replaced by `\RuntimeException` with the same message, so `GET /found_pet?id=<unknown>` keeps its current response (500). I first committed without noticing this and amended the commit before moving on. A new local check (`var/upgrade/check-imports.php`) now resolves every import/`new`/`throw` in `src/` and `tests/` after each dependency change.
+2. The PHP 8.4 platform bump couldn't be done before the removals (`laminas-code`, via proxy-manager, and `lcobucci/clock` 2 don't allow PHP 8.4), so it moved after them and includes a 6.4 patch update.
+3. The deleted file also set `charset: UTF8`, which applied to dev/test MySQL URLs without a `charset` parameter. Prod sets `utf8mb4` explicitly, so it's unaffected.
+4. Rector dry run (6.4): 13 rule hits + `removeUnusedImports` in 28 files. **Skipped** `EventSubscriberToAttributeRector`: it would replace our two `EventSubscriberInterface` classes with `#[AsEventListener]`, which changes the pattern and conflicts with the explicit `kernel.event_subscriber` tags in `services.yaml`. Rector's DBAL rename (`execute()` → `executeQuery()`, `fetchAll()` → `fetchAllAssociative()`) covers the planned hand fix in `UserRepository::getNearbyVets()`. The dry-run output is in `var/upgrade/rector-s0-dryrun.json`.
+5. New and not in the plan: with `core.autocrlf=true` a checkout turns `Makefile` / `bin/console` into CRLF, which breaks make and the shebang.
+6. PHPStan 2 is stricter: 238 baselined errors instead of 120. `src/Security/AppAuthenticator.php` is excluded via `excludePaths`, because its 4 `return.missing` errors are non-ignorable and the file stays untouched (D9).
 
 ### S1: Test tooling on 6.4 (gets to a green baseline)
 - [ ] test: PHPUnit `^12.5`, `phpunit.xml.dist` migrated (`--migrate-configuration`; drop the PHPUnit 9 `<listeners>` / `convertDeprecationsToExceptions`), symfony/phpunit-bridge config
@@ -415,7 +424,10 @@ Still open (each has a default that I'll use unless you say otherwise):
 - The duplicate `app.swagger_ui` route is defined twice.
 - `UserController` and the access_control in `security.yaml` have overlapping/ordered rules (`^/vets/` before `^/vets/free`).
 - PHPStan: 120 level-6 errors.
-- The `popularity` column history (`VARCHAR` "NN.00%" → `DOUBLE`).
+- The `popularity` column history
+- `GET /found_pet?id=<unknown>` answers 500 (an uncaught RuntimeException); the commented-out line above it shows a 404 was intended.
+- `src/Entity/Token.php` imports a non-existent `App\Model\Token as ModelToken` (unused, so it's harmless).
+- `tests/Unit/BaseTestCase.php` imports the generated `Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig` without using it. (`VARCHAR` "NN.00%" → `DOUBLE`).
 
 ---
 
