@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\Pet;
@@ -15,7 +16,6 @@ use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

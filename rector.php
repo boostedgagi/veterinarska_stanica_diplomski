@@ -45,12 +45,12 @@ return RectorConfig::configure()
     ])
     // Namespace renames that no Rector set in this version covers:
     // - Symfony 7.4 deprecates the Serializer\Annotation class aliases
-    // - Nelmio 5 removes Nelmio\ApiDocBundle\Annotation (enabled in the commit that bumps it)
+    // - Nelmio 5 removes the Nelmio\ApiDocBundle\Annotation namespace
     ->withConfiguredRule(\Rector\Renaming\Rector\Name\RenameClassRector::class, [
         'Symfony\Component\Serializer\Annotation\Groups' => 'Symfony\Component\Serializer\Attribute\Groups',
         'Symfony\Component\Serializer\Annotation\SerializedName' => 'Symfony\Component\Serializer\Attribute\SerializedName',
-        // 'Nelmio\ApiDocBundle\Annotation\Model' => 'Nelmio\ApiDocBundle\Attribute\Model',
-        // 'Nelmio\ApiDocBundle\Annotation\Security' => 'Nelmio\ApiDocBundle\Attribute\Security',
+        'Nelmio\ApiDocBundle\Annotation\Model' => 'Nelmio\ApiDocBundle\Attribute\Model',
+        'Nelmio\ApiDocBundle\Annotation\Security' => 'Nelmio\ApiDocBundle\Attribute\Security',
     ])
     // Enabled last, each in its own commit:
     // ->withPreparedSets(symfonyCodeQuality: true, symfonyConfigs: true)

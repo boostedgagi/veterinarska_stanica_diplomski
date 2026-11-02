@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\HealthRecord;
@@ -25,8 +27,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
