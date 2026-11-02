@@ -17,7 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Notifier\NotifierInterface;
 
 #[AsCommand(
     name: 'NotifyExaminationByEmail',
@@ -28,7 +27,6 @@ class NotifyExaminationByEmailCommand extends Command
 {
     public function __construct(
         private readonly MailerInterface        $mailer,
-        private readonly NotifierInterface      $notifier,
         private readonly HealthRecordRepository $healthRecRepo,
         private readonly EntityManagerInterface $em
     )
