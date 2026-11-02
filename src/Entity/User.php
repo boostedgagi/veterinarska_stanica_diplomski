@@ -335,7 +335,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        // updated_at is mapped as Types::DATETIME_MUTABLE; DBAL 4 rejects DateTimeImmutable there
+        $this->updatedAt = new \DateTime();
     }
 
     #[Groups(
