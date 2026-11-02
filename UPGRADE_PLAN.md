@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0, S1, S2, S3 done.
+Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0–S3 done; S4 in progress (core 7.4, Nelmio 5, mobile-detect 8, twig extras, minor bumps and framework/security/routing/mailer/messenger/translation/twig/validator recipes done; remaining: recipes for console, phpunit-bridge, phpunit, flex, apache-pack, dama, foundry; then S4 gate, S5).
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
