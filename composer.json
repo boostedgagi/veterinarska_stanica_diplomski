@@ -12,7 +12,6 @@
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.13",
         "endroid/qr-code-bundle": "^4.1",
-        "gedmo/doctrine-extensions": "^3.11",
         "jms/serializer-bundle": "^5.3",
         "knplabs/knp-paginator-bundle": "^6.2",
         "league/csv": "^9.0",
