@@ -12,7 +12,7 @@ COMPOSE_FILES := -f docker-compose.yml -f docker-compose.override.yml \
 COMPOSE  := docker compose $(COMPOSE_FILES)
 
 .DEFAULT_GOAL := help
-.PHONY: help install db-up db-down cache warmup lint test phpstan rector rector-check check
+.PHONY: help install db-up db-down cache warmup lint test phpstan phpstan-baseline rector rector-check check
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -42,6 +42,12 @@ test: ## Run the PHPUnit suite
 
 phpstan: ## Static analysis
 	$(COMPOSER) phpstan
+
+phpstan-baseline: ## Regenerate phpstan-baseline.neon (line-ending independent)
+	vendor/bin/phpstan analyse --memory-limit=1G --generate-baseline phpstan-baseline.neon
+	@# PHPDoc parse-error messages contain a column offset that differs between CRLF and
+	@# LF checkouts (core.autocrlf), so match any offset.
+	sed -i -E 's/at offset [0-9]+ on line/at offset \\d+ on line/' phpstan-baseline.neon
 
 rector: warmup ## Apply Rector
 	$(COMPOSER) rector
