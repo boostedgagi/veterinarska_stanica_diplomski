@@ -16,6 +16,7 @@ use App\Entity\User;
  * @method HealthRecord|null findOneBy(array $criteria, array $orderBy = null)
  * @method HealthRecord[]    findAll()
  * @method HealthRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<HealthRecord>
  */
 class HealthRecordRepository extends ServiceEntityRepository
 {

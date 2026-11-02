@@ -217,13 +217,13 @@ parameters:
 			path: src/EventSubscriber/PostHealthRecordCreationSubscriber.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(\$entityManager EntityManagerInterface\)\: Unexpected token "\$entityManager", expected type at offset 20 on line 2$#'
+			message: '#^PHPDoc tag @var has invalid value \(\$entityManager EntityManagerInterface\)\: Unexpected token "\$entityManager", expected type at offset 21 on line 2$#'
 			identifier: phpDoc.parseError
 			count: 1
 			path: src/EventSubscriber/PostHealthRecordCreationSubscriber.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(\$healthRecord HealthRecord\)\: Unexpected token "\$healthRecord", expected type at offset 20 on line 2$#'
+			message: '#^PHPDoc tag @var has invalid value \(\$healthRecord HealthRecord\)\: Unexpected token "\$healthRecord", expected type at offset 21 on line 2$#'
 			identifier: phpDoc.parseError
 			count: 1
 			path: src/EventSubscriber/PostHealthRecordCreationSubscriber.php
@@ -349,12 +349,6 @@ parameters:
 			path: src/Repository/ContactMessageRepository.php
 
 		-
-			message: '#^Class App\\Repository\\ExaminationRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Repository/ExaminationRepository.php
-
-		-
 			message: '#^Class App\\Repository\\ExaminationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -389,12 +383,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Repository/ExaminationRepository.php
-
-		-
-			message: '#^Class App\\Repository\\HealthRecordRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Repository/HealthRecordRepository.php
 
 		-
 			message: '#^Class App\\Repository\\HealthRecordRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
@@ -563,12 +551,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Repository/TokenEntityRepository.php
-
-		-
-			message: '#^Class App\\Repository\\UserRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Repository/UserRepository.php
 
 		-
 			message: '#^Class App\\Repository\\UserRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
