@@ -1,0 +1,458 @@
+# Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
+
+Status: **Phase 3 – awaiting approval** (open questions answered 2026-11-02, see D5–D10). No application code has been changed yet.
+Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
+
+---
+
+## 0. Decisions already made
+
+| # | Decision | Chosen |
+|---|----------|--------|
+| D1 | Target version | **7.4 LTS** (bug fixes until 11/2028, security fixes until 11/2029). 8.x will be decided after 7.4 is green. |
+| D2 | `cboden/ratchet` | **Remove**, together with `bin/chat-server.php`, `bin/push-server.php` and `src/Chat/*`. |
+| D3 | Databases for upgrade work | New WSL containers on **13326 / 13396** through `var/upgrade/compose.ports.yml` plus untracked `.env.dev.local` / `.env.test.local`. The old Docker Desktop DBs on 3326/3396 are left alone. |
+| D4 | Old Docker Desktop dev DB | FK `FK_8D93D64940369CAB` restored after the accidental partial migration (see §1.6). Nothing else touched. |
+| D5 | Production platform | **PHP 8.4, MySQL 8.4** → PHP 8.4 package lines, `config.platform.php: 8.4`, `server_version: '8.4'`, Rector `php84` set |
+| D6 | Tests | Fix test **setup** (Foundry-seeded data, schema once per run, `AppFixtures`); **assertions unchanged** |
+| D7 | Removals approved | `/api/token/refresh` route (+ gesdinet bundle), `symfony/notifier` (+ its unused injection) |
+| D8 | Infra approved | Makefile (host PHP) + GitHub Actions CI; Rector CI gate enabled at the end (S5) |
+| D9 | Not approved / leave as-is | `src/Security/AppAuthenticator.php` stays untouched |
+| D10 | Messenger queue | Not fixed in the upgrade branch; written up as a follow-up in §9 |
+
+Why not 8.1 now: the newest stable is **8.1.10**, a short-support release with EOL **01/2027**. 8.2 is due late Nov 2026 and isn't tagged yet (only `8.2.x-dev`). Every route to 8.x passes through 7.4 anyway, because 7.4 is where the 8.0 removals are announced as deprecations.
+
+---
+
+## 1. Current state (baseline)
+
+### 1.1 Versions (from `composer.lock`, vendor in sync)
+
+| Package | Installed | Notes |
+|---|---|---|
+| PHP (host CLI) | 8.4.17 | `config.platform.php` is pinned to **8.2.0**. There's no PHP container: PHP runs on the WSL host. |
+| symfony/* | 6.4.13–6.4.15 | `extra.symfony.require: 6.4.*`. **6.4 bug-fix support ends 11/2026 (in 28 days)**; security fixes continue until 11/2027. |
+| symfony/notifier | **6.0.19** | Pinned `6.0.*` next to FrameworkBundle 6.4. Breaks `lint:container` (§1.3). |
+| symfony/security-bundle | 6.4.13 | Not in `composer.json`; only a transitive dependency. |
+| doctrine/orm / dbal | 2.19.7 / 3.9.1 | |
+| doctrine/doctrine-bundle / migrations-bundle | 2.13.0 / 3.3.1 | |
+| doctrine/annotations | 1.14.4 | Abandoned; not used by our code. |
+| phpunit/phpunit | 9.6.20 | `symfony/phpunit-bridge` 6.4 |
+| rector/rector | 1.2.10 | Latest is **2.8.3** |
+| phpstan/phpstan | 1.12.11 | Level 6, `phpstan.dist.neon` |
+| zenstruck/foundry | 1.38.3 | 4 factories still extend deprecated `ModelFactory` |
+| API Platform | — | Not used |
+
+Third-party bundles: lexik/jwt 2.18, nelmio/api-doc 4.26, nelmio/cors 2.5, jms/serializer-bundle 5.4, knp-paginator 6.2, endroid/qr-code-bundle 4.3 (qr-code 4.8), tattali/mobile-detect 2.3, willdurand/geocoder-bundle 5.20, gesdinet/jwt-refresh-token 1.3, gedmo/doctrine-extensions 3.16, beberlei/doctrineextensions `dev-master`, league/csv 9.16, nebkam/symfony-traits 4.1, nebkam/fluent-test 4.2, dama/doctrine-test-bundle 7.3.
+
+### 1.2 Architecture and patterns (keep these)
+
+- **Layout**: `Controller/` (8 controllers, all `AbstractController`), `Entity/` + `Repository/` (`ServiceEntityRepository`), `Form/` (16 form types used as input DTO validators), `Model/` (DTOs), `Service/`, `Factory/` (a mix of Foundry factories and plain domain "factories"), `Event/` + `EventSubscriber/`, `Command/` (3, all `#[AsCommand]`), `Message/` + `MessageHandler/` (`#[AsMessageHandler]`), `Enum/`.
+- **Routing**: PHP attributes (`config/routes.yaml` → `type: attribute`). 7 files import the deprecated alias `Symfony\Component\Routing\Annotation\Route`; `SearchController` already uses `Routing\Attribute\Route`.
+- **DI**: autowire + autoconfigure for `App\`. Explicit service tags in `services.yaml` duplicate autoconfigure for both subscribers and add the `UserChecker` tag. No `$this->get()`, no `ContainerAwareInterface`. Controllers get dependencies through the constructor or action arguments.
+- **Doctrine**: attribute mapping only (`#[ORM\…]`), no annotations, lifecycle callbacks on most entities, one native SQL query (`UserRepository::getNearbyVets`), DQL `RAND()` from beberlei extensions.
+- **Input**: JSON → Symfony Form through `Nebkam\SymfonyTraits\FormTrait::handleJSONForm()`. Validation errors go through `Nebkam\…\ValidationExceptionListener`.
+- **Output**: `$this->json($data, status, [], ['groups' => ContextGroup::X])` using the Symfony Serializer with `#[Groups]` (9 files import the deprecated `Serializer\Annotation\Groups`). **The serialization groups are the public API contract.** Note that `ContextGroup::SHOW_PET === CREATE_PET` ('create_pet'); this is existing behaviour and must stay as-is.
+- **API docs**: NelmioApiDoc 4 with `OpenApi\Attributes as OA` plus `Nelmio\ApiDocBundle\Annotation\{Model,Security}` (8 imports).
+- **Security**: new authenticator system. `json_login` on `^/login_check` with Lexik success/failure handlers and a `UserChecker`. A stateless `jwt` firewall on `^/`. `access_control` rules plus `#[IsGranted]`. `src/Security/AppAuthenticator.php` is an **unused, non-working stub** (methods have no return).
+- **Mail**: `TemplatedEmail` + Twig (inky/cssinliner), QR codes from endroid.
+- **Messenger**: Doctrine transport `async`. `App\Message\Message` is routed async.
+- **Scheduled jobs** (cron, outside the repo): `NotifyExaminationByEmail --time-range=…`, `MonthlyHealthRecordExportCommand`, `DeleteExpiredTokensCommand`.
+- **Tests**: `KernelTestCase`/`WebTestCase` with nebkam/fluent-test, DAMA transactions, a custom `DatabasePrimer` (runs `SchemaTool::updateSchema`), Foundry factories.
+
+**Legacy items flagged:** `security.enable_authenticator_manager`, `Routing/Serializer\Annotation` aliases, Nelmio `Annotation\*`, Foundry `ModelFactory`, DBAL `Statement::execute()->fetchAll()`, `User::eraseCredentials()` (deprecated in 7.3), `symfony/proxy-manager-bridge` (removed in 7.0), `doctrine/annotations` + `framework.annotations` integration, `config/routes/framework.yaml` → `errors.xml` (XML routing is deprecated in 7.4), DoctrineBundle `controller_resolver.auto_mapping` deprecation. None of the following were found: `sensio/framework-extra-bundle`, Guard, `ContainerAwareInterface`, `AbstractController::get()`, string form types, SwiftMailer, `Command::$defaultName`.
+
+### 1.3 Baseline: what passes, what fails
+
+Run on host PHP 8.4.17, Symfony 6.4.15. Saved in `var/upgrade/baseline-*` (git-ignored).
+
+| Check | Result |
+|---|---|
+| `bin/console about` | ✅ |
+| `lint:yaml config` | ✅ 30 files |
+| `lint:twig templates` | ✅ 11 files |
+| `lint:container` | ❌ **Already failing**: `notifier.channel.browser`: class `…\FlashMessage\DefaultFlashMessageImportanceMapper` does not exist. Cause: `symfony/notifier` 6.0 next to FrameworkBundle 6.4. |
+| `doctrine:schema:validate` (mapping) | ✅ |
+| Migrations on an **empty** DB | ✅ All 12 apply. Remaining drift: only the `messenger_messages` `DC2Type` comments. |
+| Migrations on the **old populated dev DB** | ❌ `Version20240215143949` fails: `user.popularity` has values like `"16.00%"` that can't convert to `DOUBLE`. |
+| PHPUnit (9.6) | ❌ **2 pass / 6 fail, then the run aborts**. Controller tests hard-code IDs (`vet: 12`, `pet: 1`, `examination: 3`) from an undocumented dataset. Entity tests crash the run ("There is no active transaction") because `DatabasePrimer` DDL implicitly commits inside DAMA's transaction. `doctrine:fixtures:load` is also broken: `AppFixtures` calls `HealthRecordFactory::createMany()`, but that class isn't a Foundry factory. |
+| PHPStan level 6 | ❌ 120 errors (top: `User.php` 13, `Chat/Pusher.php` 13, `UserRepository.php` 12) |
+| Rector (existing `rector.php`) | ❌ Can't run: "No paths definition". It enables `deadCode/codeQuality/typeDeclarations`, which conflicts with the upgrade-branch rules below. |
+| `bin/console debug:router` | 62 routes, saved as the API-contract baseline (`var/upgrade/baseline-routes.{txt,json}`) |
+
+### 1.4 Deprecations (`debug:container --deprecations`, 6.4)
+
+**Our code / our config** (to fix):
+- `security.enable_authenticator_manager` option (security-bundle 6.2)
+- `framework.annotations` integration enabled → `annotations.*` services, `setDoctrineAnnotationReader()`, Routing/Serializer loaders receiving a Doctrine `Reader`. Caused by `doctrine/annotations` being installed.
+- `doctrine.dbal.memory` + `url` (`config/packages/config_test.yaml`, which is loaded in **all** envs despite its name)
+- `doctrine.orm.controller_resolver.auto_mapping` default changing / automapping deprecated (DoctrineBundle 2.12/2.13). Affects `?Pet $pet` / `?User` action arguments.
+- `App\Entity\User::eraseCredentials()`: missing `void` return type
+- `App\Factory\{User,Pet,Log,Examination}Factory extends ModelFactory` (Foundry)
+- PHP 8.4: implicit nullable parameters in `tests/Unit/BaseTestCase::makeMockUser()`
+
+**Vendor** (fixed by upgrading the package, not by us): symfony/notifier 6.0 (≈20 implicit-nullable messages), endroid/qr-code 4 (≈22), lexik/jwt 2.x (≈12), knp-components, geocoder (+bundle), tattali/mobile-detect, Foundry internals, gesdinet `AbstractRefreshToken`, doctrine/lexer `Token` ArrayAccess, mobiledetectlib, DAMA, Faker, PHPUnit 9 `E_STRICT`.
+
+### 1.5 What's already migrated / half done
+
+- Already done: attribute mapping/routes, `#[AsCommand]`, `#[AsMessageHandler]`, the new authenticator system, `handle_all_throwables`, `http_method_override: false`, `enable_lazy_ghost_objects: true`, `email_validation_mode: html5`.
+- **Half done**: Rector 1.2 was installed and `rector.php` was started, but it was never runnable and never applied. `react/zmq` was removed (commits `ebd522a`, `a5f4e60`), but `bin/push-server.php` still uses it. Branches `feature/doc-and-refactor` and `feature/vet_repo_expanding` contain only query work (`6bf37ea`, `2905c59`); there's no upgrade work on them.
+
+### 1.6 Incident during the audit (resolved)
+
+While establishing the baseline I ran `doctrine:migrations:migrate` expecting a fresh container. WSL localhost forwarding sent `127.0.0.1:3326` to an **older Docker Desktop MySQL with existing dev data**. `Version20240215143949` partly applied before failing:
+- created `messenger_messages` (empty; kept)
+- dropped `on_call.chat_count` (table had 0 rows → no data lost; the column isn't mapped)
+- dropped `FK_8D93D64940369CAB` → **restored** (verified 0 orphans first).
+
+From now on, every DB-writing command is preceded by a `SELECT @@hostname` check against the expected container.
+
+### 1.7 Other findings
+
+- `.env` (untracked) holds **real production SMTP credentials** in plain text. Move them to `config/secrets/prod` or server env vars, and rotate the password.
+- `public/images/*` and `public/exports/*` (health-record CSVs, i.e. personal data) were committed before the ignore rules existed. They're now untracked in the index (staged, not committed) and still in **git history**.
+- `error_log` files from the hosting server are tracked in 10 directories.
+- `config/packages/doctrine.yaml` `when@prod` sets `server_version: '14'` for **MySQL** (that's a PostgreSQL version number). Under DBAL 4 this decides the SQL platform, so it becomes `'8.4'` (production is MySQL 8.4, D5).
+- There's no Dockerfile, Makefile or CI. Production looks like shared Apache hosting (`symfony/apache-pack`, `error_log` files).
+
+---
+
+## 2. Upgrade path
+
+There's one major step. Doctrine and test tooling are upgraded **on 6.4 first**, so the Symfony bump itself stays small.
+
+| Step | Symfony | PHP | What |
+|---|---|---|---|
+| S0 | 6.4 | 8.4 | Housekeeping: fix the broken baseline, remove dead packages, platform pin → 8.4, Rector 2.8 + PHPStan 2 tooling, Makefile |
+| S1 | 6.4 | 8.4 | Test tooling: PHPUnit 12, DAMA 8, Foundry 2; make tests self-seeding → **green baseline** |
+| S2 | 6.4 | 8.4 | Fix every 6.4 deprecation in our code (Rector + by hand) → deprecation-free on 6.4 |
+| S3 | 6.4 | 8.4 | Doctrine: ORM 3, DBAL 4, DoctrineBundle 3, Migrations-bundle 4; local DB containers → MySQL 8.4 |
+| S4 | **7.4** | 8.4 | `symfony/*` 7.4, bundles to their 7.4-compatible lines, recipes, Rector composer-based run |
+| S5 | 7.4 | 8.4 | Clean up 7.x deprecations (8.0 preparation), `php84` Rector set, CI with Rector gate |
+
+PHP: production runs **8.4** (D5). The host CLI is 8.4.17 too, so `config.platform.php` moves from `8.2.0` to `8.4.0` in S0. That makes PHP 8.4-only package lines (DoctrineBundle 3, Migrations-bundle 4) available. Symfony 7.4 itself only needs 8.2. Because 8.x also needs 8.4, a later 7.4 → 8.x step won't need another PHP upgrade.
+
+### Target versions (Symfony 7.4 + PHP 8.4; checked on Packagist 2026-11-02)
+
+| Package | From | To | Notes |
+|---|---|---|---|
+| symfony/* | 6.4 | 7.4.* | `symfony/notifier` removed (D7) |
+| doctrine/orm | 2.19 | ^3.7 | |
+| doctrine/dbal | 3.9 | ^4.5 | |
+| doctrine/doctrine-bundle | 2.13 | ^3.3 | Requires PHP 8.4, DBAL 4, ORM ≥ 3.4.4, persistence 4; supports Symfony ^6.4 \|\| ^7 \|\| ^8 |
+| doctrine/doctrine-migrations-bundle | 3.3 | ^4.0 | Requires PHP 8.4, DBAL 4 |
+| doctrine/doctrine-fixtures-bundle | 3.6 | ^4.3 | |
+| beberlei/doctrineextensions | dev-master | ^1.5 | Pin to a stable tag (supports ORM 3) |
+| lexik/jwt-authentication-bundle | 2.18 | ^3.2 | |
+| nelmio/api-doc-bundle | 4.26 | ^5.13 | **BC**: `Annotation\*` namespace removed → `Attribute\*` |
+| nelmio/cors-bundle | 2.5 | ^2.6 | |
+| knplabs/knp-paginator-bundle | 6.2 | ^6.11 | |
+| endroid/qr-code-bundle | 4.3 | ^6.0 | **BC**: qr-code 6 Builder API (`->data()->build()` → `->build(data: …)`) |
+| tattali/mobile-detect-bundle | 2.3 | ^8.0 | 8.x requires symfony ^7.4 → bump **in S4** |
+| jms/serializer-bundle | 5.4 | ^5.5 | Or remove (Q5) |
+| twig/extra-bundle, inky-extra, cssinliner-extra | 3.x | ^3.29 | Stay on 3.x (4.0 is alpha) |
+| nebkam/symfony-traits / fluent-test | 4.1 / 4.2 | ^4.1.2 / ^4.2.1 | Support Symfony 8 too |
+| league/csv | 9.16 | ^9.29 | |
+| phpunit/phpunit | 9.6 | ^12.5 | DAMA 8.7 allows `^11.5.41 \|\| ^12.3.14 \|\| ^13.0`; Foundry 2.15 allows `^12` but only `~13.1`, so we use 12 |
+| dama/doctrine-test-bundle | 7.3 | ^8.7 | PHPUnit 10+ extension format |
+| zenstruck/foundry | 1.38 | ^2.15 | Factories migrated to `PersistentProxyObjectFactory` (or `PersistentObjectFactory`) |
+| symfony/maker-bundle | 1.61 | ^1.68 | Requires 7.4 → bump in S4 |
+| rector/rector | 1.2 | ^2.8 | |
+| phpstan/phpstan | 1.12 | ^2.1 | |
+
+**Removed** (unused or incompatible; each one gets its own commit):
+
+| Package | Why |
+|---|---|
+| cboden/ratchet (+ `bin/chat-server.php`, `bin/push-server.php`, `src/Chat/*`, unused `use Ratchet\…` in `MessageHandler`) | Blocks Symfony 7+ (`symfony/http-foundation ≤ ^6`). Decision D2. |
+| symfony/proxy-manager-bridge | Removed in Symfony 7.0; lazy ghost objects are already on. |
+| doctrine/annotations | Abandoned; nothing uses it. Removing it also clears the `framework.annotations` deprecations. |
+| gesdinet/jwt-refresh-token-bundle | Not registered in `bundles.php`, no entity, no firewall config. The route `/api/token/refresh` in `config/routes/gesdinet_jwt_refresh_token.yaml` has no controller → remove the route file too. **Public route change approved (D7).** |
+| willdurand/geocoder-bundle | Registered, but its config is empty and the code doesn't use it. |
+| gedmo/doctrine-extensions | Not registered and not used. |
+| nyholm/psr7 | Not used (`php-http/discovery` provides PSR-17 factories). |
+| symfony/notifier (+ `config/packages/notifier.yaml`, the unused `NotifierInterface` constructor argument in `NotifyExaminationByEmailCommand`) | Only injected, never called. Its 6.0 pin breaks `lint:container`. Approved (D7). |
+
+There are no incompatible bundles left without an alternative.
+
+---
+
+## 3. Rector strategy
+
+### 3.1 What the installed Rector actually provides (read from vendor, 2.8.3)
+
+Rector 2.8.3 was installed in a scratch directory to read `vendor/rector/rector/vendor/rector/rector-symfony/`:
+
+- `Rector\Symfony\Set\SymfonySetList` contains only: `CONFIGS`, `COMPOSER_BASED`, `SYMFONY_CODE_QUALITY`, `SYMFONY_CONSTRUCTOR_INJECTION`, `ANNOTATIONS_TO_ATTRIBUTES`.
+- **There are no `SYMFONY_64` / `SYMFONY_74` / `SYMFONY_80` constants and no `SymfonyLevelSetList` any more.** All version rules live in `config/sets/symfony/composer-based.php` as `withComposerBasedRule(rule, config, 'symfony/<pkg>', '>=X.Y')`. That file has rules gated up to `>=8.2`. The rules relevant to us: `>=6.4` (Routing `Annotation\Route` → `Attribute\Route`, HttpFoundation/ErrorHandler class renames, Form return types), `>=7.0` (Serializer annotation → attribute renames, DI/Routing attribute renames), `>=7.1`–`>=7.4` (renames for Serializer, Mailer, Notifier, Console, FrameworkBundle, Routing).
+- Doctrine and PHPUnit work the same way (`rector-doctrine/config/sets/composer-based.php`, `rector-phpunit/config/sets/composer-based.php`). Twig has no composer-based set in this version, so `twig: true` is a no-op.
+
+**Consequence: we bump the composer constraints first, then run Rector.** The template's "add `SymfonySetList::SYMFONY_XX`" approach doesn't exist in this Rector version. In every step, `withComposerBased()` turns on only the rules whose gate the **installed** version satisfies:
+- S2 (still on 6.4): the `>=6.4` and older rules → the Route/Serializer attribute renames that are already valid on 6.4.
+- S4 (after `composer update` to 7.4): the `>=7.0 … >=7.4` rules run.
+- Doctrine composer-based rules run after S3 (ORM 3 / DBAL 4 installed); PHPUnit rules run after S1 (PHPUnit 11 installed).
+
+### 3.2 Container metadata
+
+`var/cache/dev/App_KernelDevDebugContainer.xml` exists (704 KB). It's rebuilt with `bin/console cache:warmup` (dev) before every Rector run. `withSymfonyContainerPhp()` isn't needed: there's no `$this->get()` or string form types for it to resolve.
+
+### 3.3 Final `rector.php` (draft; replaces the current non-runnable one in S0)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Rector\Config\RectorConfig;
+use Rector\Renaming\Rector\Name\RenameClassRector;
+use Rector\Symfony\Set\SymfonySetList;
+
+return RectorConfig::configure()
+    ->withPaths([
+        __DIR__ . '/src',
+        __DIR__ . '/tests',
+        __DIR__ . '/config',
+    ])
+    ->withSkip([
+        __DIR__ . '/config/bundles.php',
+        __DIR__ . '/config/preload.php',
+        __DIR__ . '/var',
+        __DIR__ . '/migrations',            // never rewrite executed migrations
+        '*/error_log',                      // hosting log files, not PHP
+    ])
+    ->withSymfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml')
+    // version rules are gated by the *installed* package versions (see §3.1)
+    ->withComposerBased(symfony: true, doctrine: true, phpunit: true)
+    ->withAttributesSets(symfony: true, doctrine: true, phpunit: true)
+    ->withSets([
+        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,   // expected no-op; kept as a guard
+    ])
+    // Nelmio 5 removes Nelmio\ApiDocBundle\Annotation\*; no Rector set covers it.
+    // Enabled only in the commit that bumps nelmio/api-doc-bundle to ^5 (S4).
+    ->withConfiguredRule(RenameClassRector::class, [
+        'Nelmio\ApiDocBundle\Annotation\Model' => 'Nelmio\ApiDocBundle\Attribute\Model',
+        'Nelmio\ApiDocBundle\Annotation\Security' => 'Nelmio\ApiDocBundle\Attribute\Security',
+    ])
+    // Enabled last, each as its own commit (S5):
+    // ->withPreparedSets(symfonyCodeQuality: true, symfonyConfigs: true)
+    // ->withPhpSets(php84: true)   // production runs PHP 8.4 (D5)
+    ->withImportNames(importShortClasses: false, removeUnusedImports: true)
+    ->withParallel()
+    ->withCache(__DIR__ . '/var/cache/rector');
+```
+
+Deliberately **not** enabled on this branch: `deadCode`, `codeQuality`, `codingStyle`, `typeDeclarations`, `privatization`, `naming` (they go in a later, separate branch). The current `rector.php` enables three of these plus two `TypeDeclaration` rules, and that config is replaced.
+
+### 3.4 Order of runs (one set per commit)
+
+1. S0: replace `rector.php` and commit it **without running it** against `src/` (dry-run output is attached to the commit message for review).
+2. S2: `withComposerBased(symfony)` on 6.4 → expected: 7× `Routing\Annotation\Route` → `Routing\Attribute\Route`. Commit `rector: apply symfony composer-based rules (6.4)`.
+3. S2: `withAttributesSets(...)` → expected near no-op (code is already attribute-based). Commit only if there's a diff.
+4. S1/S2: `withComposerBased(phpunit)` after PHPUnit 11 → test-method annotations/attributes, `@dataProvider`, etc.
+5. S3: `withComposerBased(doctrine)` after ORM 3 / DBAL 4.
+6. S4: after `composer update` to 7.4 → `withComposerBased(symfony)` again (the 7.0–7.4 rules: `Serializer\Annotation\{Groups,SerializedName}` → `Serializer\Attribute\…`). Same commit as the Nelmio bump: the `RenameClassRector` for Nelmio.
+7. S5: `symfonyCodeQuality`, then `symfonyConfigs`, then `withPhpSets(...)`. Three separate commits.
+
+After each run: `vendor/bin/rector process --dry-run` → review → `process` → CS fixer (see 3.6) → tests → commit `rector: …`.
+
+### 3.5 Custom rules
+
+**None planned.** The repeated project-specific patterns are covered by built-ins (`RenameClassRector` for Nelmio). The single endroid call site (`src/Model/QRCode.php:38`) and the single DBAL call site (`src/Repository/UserRepository.php:97-107`) are fixed by hand, because a custom rule plus fixtures would be more code than the fix. `utils/rector/` won't be created unless the S4 diff shows a repeated pattern.
+
+### 3.6 Workflow integration
+
+- `composer.json` scripts: `"rector": "rector process"`, `"rector:check": "rector process --dry-run"`, `"phpstan": "phpstan analyse"`.
+- **Makefile** (approved, D8): none exists today and PHP runs on the host, so targets call `php`/`vendor/bin/*` directly (`make rector`, `make rector-check`, `make test`, `make lint`, `make phpstan`, `make db-up` using `var/upgrade/compose.ports.yml`). No PHP container gets added.
+- **CS fixer**: none configured. To keep "match the project style" without a big reformat, add **PHP-CS-Fixer with a minimal `@Symfony`-free ruleset** (only `no_unused_imports`, `ordered_imports`) and run it only on files Rector touched. Alternatively, skip it (Q7).
+- **CI** (approved, D8): none exists (GitHub remote). Add `.github/workflows/ci.yml` (PHP 8.4, `mysql:8.4` service, `composer validate`, lint:*, PHPStan, PHPUnit) once S1 has a green suite. The `vendor/bin/rector process --dry-run` step is added **only in S5**, once the codebase is clean.
+
+---
+
+## 4. Blockers and risks
+
+| Area | Risk | Where | Mitigation |
+|---|---|---|---|
+| Blocker | Ratchet blocks Symfony 7 | `composer.json`, `bin/*-server.php`, `src/Chat/*` | Remove (D2) |
+| Broken baseline | `lint:container` fails | notifier 6.0 | S0: remove notifier (D7) |
+| Broken baseline | Tests can't run reproducibly; fixtures broken | `tests/**`, `AppFixtures.php` | S1: tests seed their own data through Foundry. **Assertions stay unchanged** (D6) |
+| DBAL 4 BC | `Statement::execute()` / `Result::fetchAll()` removed | `src/Repository/UserRepository.php:97-107` (`/vets/nearby` endpoint) | `$conn->executeQuery($sql, [...])->fetchAllAssociative()`; same result shape (assoc arrays) |
+| DBAL 4 | `DC2Type` column comments dropped → schema diff | `messenger_messages` + every `datetime_immutable` column | Generates a comment-only migration. **Shown to you before commit.** |
+| DBAL 4 | Wrong `server_version: '14'` for MySQL in prod | `config/packages/doctrine.yaml` `when@prod` | Set to `'8.4'` (D5). `DATABASE_URL` in your untracked `.env.local` also says `serverVersion=14`; that's yours to change (my `.env.dev.local` override already uses a real version). |
+| Env parity | Local containers are **Percona 8.0**, production is **MySQL 8.4** | `docker-compose.yml` (untracked) | S3: switch the upgrade override `var/upgrade/compose.ports.yml` to `mysql:8.4` images, so migrations and `schema:validate` run against the production engine. Your `docker-compose.yml` stays untouched. |
+| DBAL 4 | `doctrine.dbal.memory` + sqlite driver in `config_test.yaml` (loaded in every env) | `config/packages/config_test.yaml` | Delete the file; `url` already wins today, so behaviour doesn't change (verify the test env still uses MySQL) |
+| ORM 3 | `ManyToOne` typed `private User $vet` but the column is nullable / `ON DELETE SET NULL` | `src/Entity/HealthRecord.php:27-29` | Unchanged behaviour in ORM 3. Listed under "found along the way", not fixed here. |
+| DoctrineBundle | `controller_resolver.auto_mapping` default changes | `?Pet $pet` / `?User` arguments with `{id}` in 8 controllers | Set `auto_mapping: false` explicitly. `{id}` → `find()` keeps working; any route that relies on mapping **other** params by name gets `#[MapEntity]`. Verify against the route baseline. |
+| DoctrineBundle 2.19 config | `auto_generate_proxy_classes`, `enable_lazy_ghost_objects`, `report_fields_where_declared` are deprecated/no-op with ORM 3 | `doctrine.yaml` | Apply the recipe update; keep the custom `dql`, `naming_strategy` and `when@prod` settings |
+| Security | `enable_authenticator_manager` removed in 7.0 | `security.yaml:2` | Delete the line (no behaviour change; the new system is already on) |
+| Security | `UserInterface::eraseCredentials()` deprecated in 7.3 | `src/Entity/User.php:208` | Empty body → add `#[\Deprecated]` / remove after 7.3 per UPGRADE-7.3; a no-op today |
+| Security | `AppAuthenticator` stub (no return values) | `src/Security/AppAuthenticator.php` | Not wired in `security.yaml`. **Left untouched (D9)**; excluded from Rector via `withSkip` if Rector tries to change it. |
+| Serializer/API contract | Rector renames `Serializer\Annotation\Groups` → `Attribute\Groups` | 9 files | Pure namespace alias; verify JSON output of the smoke tests is byte-identical |
+| API docs | Nelmio 5 removes `Annotation\*`; may describe models differently, especially with JMS installed | 5 controllers, `/doc`, `/doc.json` | Diff `/doc.json` before and after |
+| QR | endroid/qr-code 6 Builder API | `src/Model/QRCode.php:38`, `config/packages/endroid_qr_code.yaml` (option names changed in 5/6) | Hand fix + recipe; smoke-test `POST /qr-code` (mail to Mailcatcher). Also check that the bundle route `qr_code_generate` (`/qr-code/{builder}/{data}`, from `config/routes/endroid_qr_code.yaml`) survives bundle 6. |
+| Routing | `@FrameworkBundle/Resources/config/routing/errors.xml` deprecated (7.3/7.4) | `config/routes/framework.yaml` | Recipe → `errors.php` (dev only) |
+| Routing | Duplicate route name `app.swagger_ui` | `config/routes.yaml` + `config/routes/nelmio_api_doc.yaml` | Existing; the later definition wins. Unchanged. |
+| Data | `user.popularity` legacy `"NN.00%"` strings break `Version20240215143949` on old DBs | migrations | Doesn't affect prod if prod already ran it (Q2b). Migrations are **never** edited. |
+| Messenger | No worker, no failure transport → chat messages may never be persisted | §9 | Behaviour stays unchanged in this branch; the messenger recipe update in S4 is merged without changing the transport/routing |
+| Data | Health-record CSV exports and pet images in git history | `public/exports`, `public/images` | Now untracked. A history rewrite is a separate decision (Q10). |
+| Secrets | Real SMTP password in `.env` | `.env` (untracked) | Move to secrets / server env and rotate (Q10) |
+| Deploy | Production runs PHP 8.4 / MySQL 8.4 (D5) | hosting | Check that `ext-intl`, `ext-gd` (QR PNG), `pdo_mysql` are enabled on the host's PHP 8.4 before deploying |
+
+---
+
+## 5. Ordered task checklist
+
+Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once green) + `lint:container` + PHPStan don't get worse.
+
+### S0: Housekeeping on 6.4
+- [ ] Create branch `upgrade/symfony-7.4` from `main`
+- [ ] chore: commit the already-staged untracking of `public/images`, `public/exports` + the `.gitignore` `/.env.*.local` rule
+- [ ] chore: untrack `**/error_log` + ignore rule
+- [ ] build: `config.platform.php` `8.2.0` → `8.4.0`, `require.php` → `>=8.4` (D5)
+- [ ] fix: remove `symfony/notifier`, `config/packages/notifier.yaml` and the unused `NotifierInterface` argument (D7) → `lint:container` ✅
+- [ ] chore: remove `cboden/ratchet` + `bin/chat-server.php`, `bin/push-server.php`, `src/Chat/`, unused `use Ratchet\…`
+- [ ] chore: remove `symfony/proxy-manager-bridge`
+- [ ] chore: remove `doctrine/annotations` (+ check `framework.annotations` is off)
+- [ ] chore: remove `gesdinet/jwt-refresh-token-bundle` + its route/config files (D7)
+- [ ] chore: remove `willdurand/geocoder-bundle` (+ bundle registration, config)
+- [ ] chore: remove `gedmo/doctrine-extensions`, `nyholm/psr7`
+- [ ] chore: pin `beberlei/doctrineextensions` to `^1.5`
+- [ ] chore: require `symfony/security-bundle: 6.4.*` explicitly (it's used directly)
+- [ ] chore: delete `config/packages/config_test.yaml` (sqlite `memory` + `url` deprecation)
+- [ ] build: Rector `^2.8`, PHPStan `^2.1`, new `rector.php` (§3.3), composer scripts, Makefile
+- [ ] build: PHPStan baseline file (`phpstan-baseline.neon`) so new errors are caught without fixing the 120 old ones
+
+### S1: Test tooling on 6.4 (gets to a green baseline)
+- [ ] test: PHPUnit `^12.5`, `phpunit.xml.dist` migrated (`--migrate-configuration`; drop the PHPUnit 9 `<listeners>` / `convertDeprecationsToExceptions`), symfony/phpunit-bridge config
+- [ ] rector: apply phpunit composer-based rules
+- [ ] test: DAMA `^8.7` (extension `DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension` for PHPUnit 10+)
+- [ ] test: Foundry `^2.15`: migrate the 4 `ModelFactory` classes. `HealthRecordFactory` (a domain helper, not a Foundry factory) is **not** renamed. Fix `AppFixtures` so it creates health records without calling a non-existent method (D6).
+- [ ] test: schema created once per run (migrations or SchemaTool in bootstrap) instead of `DatabasePrimer` per test; controller tests seed their own entities through Foundry. Assertions unchanged.
+- [ ] **Gate: full suite green on 6.4**
+- [ ] ci: GitHub Actions workflow (lint, PHPStan with baseline, PHPUnit on PHP 8.4 + `mysql:8.4`), without the Rector gate yet (D8)
+
+### S2: Clean up 6.4 deprecations
+- [ ] rector: apply symfony composer-based rules (6.4): `Routing\Annotation\Route` → `Routing\Attribute\Route`
+- [ ] rector: attributes sets (expected no-op)
+- [ ] fix: remove `security.enable_authenticator_manager`
+- [ ] fix: `User::eraseCredentials(): void`
+- [ ] fix: `doctrine.orm.controller_resolver.auto_mapping: false` + `#[MapEntity]` where needed; route baseline diff = empty
+- [ ] fix: implicit nullable params in tests (PHP 8.4)
+- [ ] **Gate: `debug:container --deprecations` has no entries from `App\` or our config**
+
+### S3: Doctrine ORM 3 / DBAL 4 (still on Symfony 6.4)
+- [ ] local: switch `var/upgrade/compose.ports.yml` to `mysql:8.4` images (prod parity, D5), recreate the WSL DBs, verify with `SELECT @@hostname, @@version`
+- [ ] deps: `doctrine/orm ^3.7`, `doctrine/dbal ^4.5`, `doctrine-bundle ^3.3`, `migrations-bundle ^4.0`, `fixtures-bundle ^4.3`, `persistence ^4`
+- [ ] recipes: `doctrine/doctrine-bundle`, `doctrine/doctrine-migrations-bundle` (merge by hand; keep `dql`, `naming_strategy`, `when@prod` pools; drop options removed in bundle 3)
+- [ ] fix: `UserRepository::getNearbyVets()` → `executeQuery()->fetchAllAssociative()`
+- [ ] fix: `server_version: '8.4'` in `when@prod` (D5)
+- [ ] rector: apply doctrine composer-based rules
+- [ ] db: generate the DBAL 4 comment-removal migration → **show it to you before committing**
+- [ ] **Gate: `doctrine:schema:validate` OK on a fresh DB built from migrations; tests green**
+
+### S4: Symfony 7.4
+- [ ] deps: `extra.symfony.require: 7.4.*`, all `symfony/*` → `7.4.*`; `composer update "symfony/*" -W`
+- [ ] deps: lexik `^3.2`, knp-paginator `^6.11`, tattali `^8.0`, endroid bundle `^6.0`, maker `^1.68`, twig extras `^3.29`, jms `^5.5`, nelmio-cors `^2.6`, league/csv `^9.29`
+- [ ] deps+rector: nelmio/api-doc-bundle `^5.13` + `RenameClassRector` (Annotation → Attribute) + `with_annotation` → `with_attribute` if present
+- [ ] fix: endroid qr-code 6 Builder API in `QRCode::generate()` + `endroid_qr_code.yaml` option names
+- [ ] rector: apply symfony composer-based rules (7.0–7.4): Serializer attribute namespace, etc.
+- [ ] recipes, **one commit per package**: framework-bundle, security-bundle, console, routing, mailer, messenger (transport/routing unchanged, see §9), twig-bundle, translation, validator, phpunit-bridge, flex, apache-pack, lexik, nelmio
+- [ ] **Gate: `cache:clear`, container XML rebuilt, tests green, `lint:container`, `doctrine:schema:validate`, PHPStan ≤ baseline, route list identical to baseline (except the `/api/token/refresh` removal approved in D7)**
+
+### S5: 7.x deprecations / tooling gate
+- [ ] fix: remaining 7.x deprecations in our code (8.0 preparation)
+- [ ] rector: `symfonyCodeQuality` (own commit)
+- [ ] rector: `symfonyConfigs` (own commit)
+- [ ] rector: `withPhpSets(php84: true)` (own commit, D5)
+- [ ] ci: enable the `vendor/bin/rector process --dry-run` gate (D8)
+- [ ] docs: README "Symfony 6.4" → 7.4; deployment notes
+
+---
+
+## 6. Verification strategy
+
+**Each step**: `composer validate`, `lint:container`, `lint:yaml config`, `lint:twig templates`, `doctrine:schema:validate` (on a fresh DB from migrations), PHPUnit, PHPStan (no new errors versus the baseline), `debug:container --deprecations` (our code = 0), `debug:router` diffed against `var/upgrade/baseline-routes.json`.
+
+**Smoke tests** (curl against `symfony serve` / `php -S`, dev env, local WSL DB with fixtures, mail → Mailcatcher). Each response's status code and JSON body is recorded before (6.4) and after (7.4) and diffed:
+
+| Flow | Requests |
+|---|---|
+| Auth | `POST /login_check` (valid / invalid / unverified user → `UserChecker`), JWT on a protected route, `#[IsGranted('ROLE_ADMIN')]` route as user → 403 |
+| Owners | register user (`POST /user`, welcome mail), `GET /user/me`, update user, verify account, forgotten-password flow |
+| Pets | create / edit / get / upload image / `GET /found_pet`, `POST /qr-code` (QR mail) |
+| Vets | list vets, `/vets/simplified`, nearby vets (**DBAL 4 change**), free vets in a time range |
+| Appointments (health records) | create (`PostHealthRecordCreationEvent` → popularity), edit, cancel, list per user/pet, paginated list, delete |
+| Examinations | CRUD (admin) |
+| On-call / chat | create on-call, send contact message (Messenger `async` → run `messenger:consume async --limit=1`), list messages per chat |
+| Search | the `SearchController` endpoints |
+| API docs | `GET /doc.json` diff (Nelmio 5) |
+| Scheduled jobs | `NotifyExaminationByEmail --time-range=…`, `MonthlyHealthRecordExportCommand` (CSV), `DeleteExpiredTokensCommand`, all with `--env=dev` on the local DB |
+
+(The exact paths come from `var/upgrade/baseline-routes.txt`; this table lists the flows.)
+
+**Phase 5**: fresh `docker compose down -v && up -d` (WSL stack with the ports override), migrations, fixtures, full suite, the smoke table above, `rector --dry-run` = 0 changes.
+
+---
+
+## 7. Open questions
+
+Answered 2026-11-02: Q1 → PHP 8.4, Q2 → MySQL 8.4, Q3/Q4 → remove, Q6 → Makefile + CI, Q8 → fix test setup, Q9 → leave `AppAuthenticator` (see D5–D10).
+
+Still open (each has a default that I'll use unless you say otherwise):
+
+1. **Q2b – Has production already run `Version20240215143949` and later?** (i.e. is `user.popularity` already `DOUBLE`?) Default: check `doctrine:migrations:status` on prod **read-only** before deploying; never edit migrations.
+2. **Q5 – JMS serializer:** unused by our code, but its presence can change how Nelmio documents models. *Default: keep it (safer for `/doc.json`).*
+3. **Q7 – CS fixer:** *Default: add a minimal PHP-CS-Fixer config (imports only) and run it only on files Rector touched.*
+4. **Q10 – Secrets / history:** rotate the SMTP password and move it out of `.env`; optionally rewrite git history to purge the health-record CSVs and images. *Default: outside the upgrade, so I won't touch it.*
+
+## 8. Found along the way (not fixed in this branch)
+
+- `HealthRecord::$vet` is typed `User` (non-nullable) but mapped `nullable: true, onDelete: SET NULL`.
+- `UserRepository::findByRole()` returns `getResult()[0]` (undefined index when empty); `TokenEntityRepository` runs the same query twice.
+- `ContextGroup::SHOW_PET` and `CREATE_PET` have the same value.
+- `NotifyExaminationByEmailCommand` has the placeholder description "Add a short description for your command" and manually instantiates `TemplatedEmailService`.
+- Explicit `kernel.event_subscriber` tags in `services.yaml` duplicate autoconfigure.
+- `services.yaml` overrides the `kernel.environment` parameter with `%env(APP_ENV)%`.
+- The duplicate `app.swagger_ui` route is defined twice.
+- `UserController` and the access_control in `security.yaml` have overlapping/ordered rules (`^/vets/` before `^/vets/free`).
+- PHPStan: 120 level-6 errors.
+- The `popularity` column history (`VARCHAR` "NN.00%" → `DOUBLE`).
+
+---
+
+## 9. Follow-up (separate branch after the upgrade): Messenger chat queue
+
+Asked for on 2026-11-02 ("fix the queue system for messaging … or write somewhere for later refactor"). It isn't fixed in the upgrade branch because the fix changes runtime behaviour and depends on what the hosting allows.
+
+**Current flow**: `POST /message` (`OnCallController::sendMessage`) → `MessageType` form fills `App\Message\Message` → `MessageBusInterface::dispatch()` → transport `async` = `doctrine://default?auto_setup=0` (`.env`; table `messenger_messages`, created by `Version20240215143949`) → `App\MessageHandler\MessageHandler` persists a `ContactMessage`. The response is always `"message sent"` (200). Clients read messages through `GET /chat/{chatId}`.
+
+**Problems found**
+
+| # | Problem | Where | Effect |
+|---|---|---|---|
+| M1 | No worker defined anywhere: the compose `messenger-consumer` is commented out, and there's no supervisor/cron in the repo | `docker-compose.yml`, hosting | Unless prod runs `messenger:consume async`, messages are **never persisted** (they pile up in `messenger_messages`) |
+| M2 | No `failure_transport`, no `retry_strategy` | `config/packages/messenger.yaml` | Failed messages are dropped after the default 3 retries, without a trace |
+| M3 | `getUser()` returns `find()` typed as `User` | `src/MessageHandler/MessageHandler.php:43-46` | An unknown sender/receiver ID → `TypeError` inside the worker → retried, then lost |
+| M4 | `Message::getCreatedAt()` returns a non-nullable type, but `createdAt` defaults to `null` and is never set before dispatch | `src/Message/Message.php:74-86` | A latent `TypeError` if anything calls it |
+| M5 | The real-time push (Ratchet/ZMQ) is gone; the frontend relies on reload/polling | `OnCallController.php:99-104` (commented-out ZMQ) | Not a bug after the Ratchet removal; replacing it (e.g. Mercure) is a feature decision |
+| M6 | `messenger_messages` columns keep `DC2Type` comments | DB | Fixed by the DBAL 4 migration in S3 |
+
+**Proposed fix (branch `fix/messenger-chat-queue`, after 7.4 is merged)**
+1. Decide where the work runs (needs your input):
+   - **(a)** The host can run a long-lived process → supervisor/systemd `messenger:consume async --time-limit=3600 --memory-limit=128M`.
+   - **(b)** Shared hosting with only cron → cron every minute: `messenger:consume async --limit=50 --time-limit=55`.
+   - **(c)** No async needed → route `App\Message\Message` to `sync://`, so the message is persisted inside the request. This is the simplest option and matches the `"message sent"` response.
+2. Add `failure_transport: failed` (`doctrine://default?queue_name=failed`) + `retry_strategy` (3 retries, ×2 backoff).
+3. Handler: look up sender/receiver as `?User`; on `null`, throw `UnrecoverableMessageHandlingException` (no pointless retries).
+4. Tests: an in-memory transport test for the handler + a functional test for `POST /message` → `GET /chat/{chatId}`.
+5. Optional (feature): Mercure for real-time delivery instead of the removed Ratchet push.
+
+---
+
+## 10. Decision log
+
+| Date | Decision |
+|---|---|
+| 2026-11-02 | Target 7.4 LTS first (D1); remove Ratchet (D2); work on WSL DBs at 13326/13396 (D3); restore FK on old dev DB (D4) |
+| 2026-11-02 | Rector 2.8 has no `SYMFONY_XX` sets → strategy is "bump constraints, then run `withComposerBased`" |
+| 2026-11-02 | Git: `core.filemode=false` set in the local repo config (the Windows IDE showed false mode changes for 755 files) |
+| 2026-11-02 | D5–D10: prod PHP 8.4 + MySQL 8.4 → PHP 8.4 package lines (DoctrineBundle 3, Migrations-bundle 4, PHPUnit 12.5); fix test setup; remove `/api/token/refresh` + notifier; Makefile + CI; leave `AppAuthenticator`; Messenger queue written up as §9 |
