@@ -1,3 +1,6 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: 6
     paths:
@@ -6,3 +9,8 @@ parameters:
         - public/
         - src/
         - tests/
+    excludePaths:
+        # Unused, non-functional authenticator stub (methods have no return statements,
+        # which PHPStan reports as non-ignorable). Left untouched on purpose during the
+        # Symfony upgrade (UPGRADE_PLAN.md, D9); remove this line when it is fixed or deleted.
+        - src/Security/AppAuthenticator.php
