@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0, S1, S2 done.
+Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0, S1, S2, S3 done.
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -358,15 +358,24 @@ Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once 
 - [x] fix: implicit nullable params in tests (part of `2b3e74f`)
 - [x] **Gate passed:** `debug:container --deprecations` has 0 entries from `App\` or our config. The 37 left are vendor (endroid/qr-code 21, Lexik 13, Knp 2, mobile-detect 1), all fixed by the S4 bumps
 
-### S3: Doctrine ORM 3 / DBAL 4 (still on Symfony 6.4)
-- [ ] local: switch `var/upgrade/compose.ports.yml` to `mysql:8.4` images (prod parity, D5), recreate the WSL DBs, verify with `SELECT @@hostname, @@version`
-- [ ] deps: `doctrine/orm ^3.7`, `doctrine/dbal ^4.5`, `doctrine-bundle ^3.3`, `migrations-bundle ^4.0`, `fixtures-bundle ^4.3`, `persistence ^4`
-- [ ] recipes: `doctrine/doctrine-bundle`, `doctrine/doctrine-migrations-bundle` (merge by hand; keep `dql`, `naming_strategy`, `when@prod` pools; drop options removed in bundle 3)
-- [ ] fix: `UserRepository::getNearbyVets()` → `executeQuery()->fetchAllAssociative()`
-- [ ] fix: `server_version: '8.4'` in `when@prod` (D5)
-- [ ] rector: apply doctrine composer-based rules
-- [ ] db: generate the DBAL 4 comment-removal migration → **show it to you before committing**
-- [ ] **Gate: `doctrine:schema:validate` OK on a fresh DB built from migrations; tests green**
+### S3: Doctrine ORM 3 / DBAL 4 (still on Symfony 6.4) ✅ (2026-11-02)
+- [x] local: WSL DB containers → `mysql:8.4` (fresh volumes); the 6.4/DBAL 3 baseline was re-verified on 8.4 first (12 migrations from scratch, fixtures, tests)
+- [x] fix: `User`/`Pet::preUpdate()` wrote `DateTimeImmutable` into `DATETIME_MUTABLE` columns, which DBAL 4 rejects; now `DateTime` (`1e34a07`), see deviation 1
+- [x] deps: `doctrine/orm 3.7.6`, `doctrine/dbal 4.5.0`, `doctrine-bundle 3.3.4`, `migrations-bundle 4.0.1`, `fixtures-bundle 4.3.1`, `persistence 4.2` + `doctrine.yaml` per UPGRADE-3.0/3.1 (`4515f28`)
+- [x] recipes: `doctrine/doctrine-bundle`, merged by hand (`13c88f4`), see deviation 2
+- [x] recipes: `doctrine/doctrine-migrations-bundle`, **namespace change rejected** (`d702b70`), see deviation 3
+- [x] fix: `getNearbyVets()`, already done by Rector in S2 (`5add8ea`)
+- [x] fix: `server_version: '8.4'` + `collate` → `collation` in `when@prod` (`4515f28`); the prod container builds and lints
+- [x] rector: doctrine composer-based rules with ORM 3 installed → **0 changes**
+- [x] db: `Version20261102205151` (DC2Type comments, messenger index), **approved before commit** (`ef9813b`); up/down/up tested; row counts unchanged
+- [x] **Gate passed:** `schema:validate` fully in sync on a fresh DB built from migrations; tests green; CI simulation 12/12 (`var/upgrade/ci-sim.sh`)
+
+**S3 deviations / findings**
+1. **Real DBAL 4 BC break found by the tests:** every User/Pet update would have thrown `InvalidType` (the vet popularity update after creating a health record hit it first). This wasn't in the plan's risk list.
+2. The doctrine-bundle recipe **silently** switched `naming_strategy` to `underscore` during auto-merge. That was reverted to our `underscore_number_aware`. The recipe's prod query/result cache drivers weren't taken (deliberately commented out in this project).
+3. The migrations-bundle 3.7 recipe moves migrations to `src/Migrations` / `App\Migrations`. That would make all executed migrations look new in production (the versions table stores FQCNs), so only the recipe version in `symfony.lock` was recorded.
+4. All 20 custom repository queries return identical data on ORM 2.19/DBAL 3 and ORM 3.7/DBAL 4 (`var/upgrade/repo-probe.php`). The only difference is that ORM 3 returns real classes instead of `Proxies\__CG__\…`; no code depends on that.
+5. Recreating a container keeps anonymous volumes. The first MySQL 8.4 start upgraded the old 8.0 data dir in place, which incidentally showed that an **8.0 → 8.4 data upgrade works** with this schema.
 
 ### S4: Symfony 7.4
 - [ ] deps: `extra.symfony.require: 7.4.*`, all `symfony/*` → `7.4.*`; `composer update "symfony/*" -W`
