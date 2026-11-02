@@ -2057,39 +2057,43 @@
         },
         {
             "name": "league/csv",
-            "version": "9.16.0",
+            "version": "9.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/csv.git",
-                "reference": "998280c6c34bd67d8125fdc8b45bae28d761b440"
+                "reference": "13d5600d2c935c8785707e7d1d44ca1f2a22d6f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/csv/zipball/998280c6c34bd67d8125fdc8b45bae28d761b440",
-                "reference": "998280c6c34bd67d8125fdc8b45bae28d761b440",
+                "url": "https://api.github.com/repos/thephpleague/csv/zipball/13d5600d2c935c8785707e7d1d44ca1f2a22d6f4",
+                "reference": "13d5600d2c935c8785707e7d1d44ca1f2a22d6f4",
                 "shasum": ""
             },
             "require": {
                 "ext-filter": "*",
-                "php": "^8.1.2"
+                "php": "^8.2.0"
             },
             "require-dev": {
-                "doctrine/collections": "^2.2.2",
                 "ext-dom": "*",
                 "ext-xdebug": "*",
-                "friendsofphp/php-cs-fixer": "^3.57.1",
-                "phpbench/phpbench": "^1.2.15",
-                "phpstan/phpstan": "^1.11.1",
-                "phpstan/phpstan-deprecation-rules": "^1.2.0",
-                "phpstan/phpstan-phpunit": "^1.4.0",
-                "phpstan/phpstan-strict-rules": "^1.6.0",
-                "phpunit/phpunit": "^10.5.16 || ^11.1.3",
-                "symfony/var-dumper": "^6.4.6 || ^7.0.7"
+                "friendsofphp/php-cs-fixer": "^3.92.3",
+                "phpbench/phpbench": "^1.4.3",
+                "phpstan/phpstan": "^2.2.8",
+                "phpstan/phpstan-deprecation-rules": "^2.0.5",
+                "phpstan/phpstan-phpunit": "^2.0.18",
+                "phpstan/phpstan-strict-rules": "^2.0.12",
+                "phpunit/phpunit": "^11.5.22 || ^12.5.4 || ^13.3.1",
+                "rector/rector": "^2.6.3",
+                "symfony/var-dumper": "^6.4.8 || ^7.4.0 || ^8.0"
             },
             "suggest": {
                 "ext-dom": "Required to use the XMLConverter and the HTMLConverter classes",
                 "ext-iconv": "Needed to ease transcoding CSV using iconv stream filters",
-                "ext-mbstring": "Needed to ease transcoding CSV using mb stream filters"
+                "ext-mbstring": "Needed to ease transcoding CSV using mb stream filters",
+                "ext-mysqli": "Requiered to use the package with the MySQLi extension",
+                "ext-pdo": "Required to use the package with the PDO extension",
+                "ext-pgsql": "Requiered to use the package with the PgSQL extension",
+                "ext-sqlite3": "Required to use the package with the SQLite3 extension"
             },
             "type": "library",
             "extra": {
@@ -2103,7 +2107,10 @@
                 ],
                 "psr-4": {
                     "League\\Csv\\": "src"
-                }
+                },
+                "classmap": [
+                    "polyfill"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2141,7 +2148,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-05-24T11:04:54+00:00"
+            "time": "2026-10-28T08:56:24+00:00"
         },
         {
             "name": "lexik/jwt-authentication-bundle",
@@ -2378,28 +2385,28 @@
         },
         {
             "name": "nebkam/symfony-traits",
-            "version": "4.1.0",
+            "version": "4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nebkam/symfony-traits.git",
-                "reference": "4e2ed706d566ff1d103500b7677864e3b1de48df"
+                "reference": "9ad430105785ef9709f5cc4bf8e604ac295efee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nebkam/symfony-traits/zipball/4e2ed706d566ff1d103500b7677864e3b1de48df",
-                "reference": "4e2ed706d566ff1d103500b7677864e3b1de48df",
+                "url": "https://api.github.com/repos/nebkam/symfony-traits/zipball/9ad430105785ef9709f5cc4bf8e604ac295efee5",
+                "reference": "9ad430105785ef9709f5cc4bf8e604ac295efee5",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "symfony/form": "5.* || 6.* || 7.*",
-                "symfony/http-foundation": "5.* || 6.* || 7.*",
-                "symfony/http-kernel": "5.* || 6.* || 7.*",
-                "symfony/validator": "5.* || 6.* || 7.*"
+                "symfony/form": "5.* || 6.* || 7.* || 8.*",
+                "symfony/http-foundation": "^5.4.46 || ^6.4.14 || >=7.1.7 || 8.*",
+                "symfony/http-kernel": "5.* || 6.* || 7.* || 8.*",
+                "symfony/validator": "^5.4.43 || ^6.4.11 || >=7.1.4 || 8.*"
             },
             "require-dev": {
-                "symfony/framework-bundle": "5.* || 6.* || 7.*",
-                "symfony/phpunit-bridge": "5.* || 6.* || 7.*"
+                "symfony/framework-bundle": "5.* || 6.* || 7.* || 8.*",
+                "symfony/phpunit-bridge": "5.* || 6.* || 7.* || 8.*"
             },
             "type": "library",
             "autoload": {
@@ -2414,9 +2421,9 @@
             "description": "Helper trait to ease writing APIs in Symfony",
             "support": {
                 "issues": "https://github.com/nebkam/symfony-traits/issues",
-                "source": "https://github.com/nebkam/symfony-traits/tree/4.1.0"
+                "source": "https://github.com/nebkam/symfony-traits/tree/4.1.2"
             },
-            "time": "2024-08-09T05:45:34+00:00"
+            "time": "2025-11-29T22:32:04+00:00"
         },
         {
             "name": "nelmio/api-doc-bundle",
@@ -2542,25 +2549,28 @@
         },
         {
             "name": "nelmio/cors-bundle",
-            "version": "2.5.0",
+            "version": "2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioCorsBundle.git",
-                "reference": "3a526fe025cd20e04a6a11370cf5ab28dbb5a544"
+                "reference": "3d80dbcd5d1eb5f8b20ed5199e1778d44c2e4d1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioCorsBundle/zipball/3a526fe025cd20e04a6a11370cf5ab28dbb5a544",
-                "reference": "3a526fe025cd20e04a6a11370cf5ab28dbb5a544",
+                "url": "https://api.github.com/repos/nelmio/NelmioCorsBundle/zipball/3d80dbcd5d1eb5f8b20ed5199e1778d44c2e4d1c",
+                "reference": "3d80dbcd5d1eb5f8b20ed5199e1778d44c2e4d1c",
                 "shasum": ""
             },
             "require": {
                 "psr/log": "^1.0 || ^2.0 || ^3.0",
-                "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0"
+                "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0 || ^8.0"
             },
             "require-dev": {
-                "mockery/mockery": "^1.3.6",
-                "symfony/phpunit-bridge": "^5.4 || ^6.0 || ^7.0"
+                "phpstan/phpstan": "^1.11.5",
+                "phpstan/phpstan-deprecation-rules": "^1.2.0",
+                "phpstan/phpstan-phpunit": "^1.4",
+                "phpstan/phpstan-symfony": "^1.4.4",
+                "phpunit/phpunit": "^8"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -2598,9 +2608,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nelmio/NelmioCorsBundle/issues",
-                "source": "https://github.com/nelmio/NelmioCorsBundle/tree/2.5.0"
+                "source": "https://github.com/nelmio/NelmioCorsBundle/tree/2.6.1"
             },
-            "time": "2024-06-24T21:25:28+00:00"
+            "time": "2026-01-12T15:59:08+00:00"
         },
         {
             "name": "nikic/php-parser",
