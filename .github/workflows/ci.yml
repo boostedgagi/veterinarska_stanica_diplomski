@@ -86,8 +86,7 @@ jobs:
         run: |
           php bin/console doctrine:database:create --if-not-exists
           php bin/console doctrine:migrations:migrate --no-interaction
-          # TODO(upgrade S3): drop --skip-sync once DBAL 4 removes the DC2Type comment drift
-          php bin/console doctrine:schema:validate --skip-sync
+          php bin/console doctrine:schema:validate
 
       - name: PHPStan
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
