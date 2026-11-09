@@ -8,6 +8,7 @@ use App\Enum\ContactMessageStatus;
 use App\Message\Message;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use App\Repository\UserRepository;
 
 #[AsMessageHandler]
@@ -41,6 +42,8 @@ class MessageHandler
 
     private function getUser(string $userId):User
     {
-        return $this->userRepo->find($userId);
+        // an unknown user will never appear: don't retry the message
+        return $this->userRepo->find($userId)
+            ?? throw new UnrecoverableMessageHandlingException(sprintf('User %s does not exist.', $userId));
     }
 }

@@ -187,6 +187,21 @@ class OwnershipTest extends WebTestCase
         self::assertSame(200, $this->callAs($this->owner, 'POST', '/message', $body($this->owner)));
     }
 
+    public function testSentMessageIsSavedImmediately(): void
+    {
+        // Messages are handled synchronously: before, they waited for a worker that never ran.
+        $body = ['sender' => (string) $this->owner->getId(), 'receiver' => (string) $this->vet->getId(), 'content' => 'Is Rex ok?', 'chatId' => '5151'];
+        self::assertSame(200, $this->callAs($this->owner, 'POST', '/message', $body));
+
+        self::assertSame(200, $this->callAs($this->vet, 'GET', '/chat/5151'));
+        $chat = json_decode((string) $this->client->getResponse()->getContent(), true);
+        self::assertCount(1, $chat);
+        self::assertSame('Is Rex ok?', $chat[0]['content']);
+
+        $body['receiver'] = '999999';
+        self::assertSame(400, $this->callAs($this->owner, 'POST', '/message', $body), 'unknown receiver');
+    }
+
     public function testChatsAreVisibleToTheirParticipantsOnly(): void
     {
         $message = persistent_factory(ContactMessage::class)

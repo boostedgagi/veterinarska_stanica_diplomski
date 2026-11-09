@@ -1,22 +1,13 @@
 framework:
     messenger:
-        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
-        # failure_transport: failed
-
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-             async: '%env(MESSENGER_TRANSPORT_DSN)%'
-            # failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
+            # Kept for later: needs a worker (`messenger:consume async`), see UPGRADE_PLAN.md section 9.
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            sync: 'sync://'
 
         routing:
-            # Route your messages to the transports
-             'App\Message\Message': async
-
-# when@test:
-#    framework:
-#        messenger:
-#            transports:
-#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
-#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
-#                async: 'in-memory://'
+            # Chat messages are handled inside the request: there is no worker running anywhere,
+            # so with 'async' they were never saved. To go async again: route to 'async', run a
+            # worker and add a failure_transport.
+            'App\Message\Message': sync

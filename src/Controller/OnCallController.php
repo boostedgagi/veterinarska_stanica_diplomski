@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Security\Voter\OnCallVoter;
 use App\Security\Voter\ContactMessageVoter;
@@ -97,7 +98,7 @@ class OnCallController extends AbstractController
         ]
     )]
     #[Route('/message', methods: Request::METHOD_POST)]
-    public function sendMessage(Request $request, MessageBusInterface $messageBus): Response
+    public function sendMessage(Request $request, MessageBusInterface $messageBus, UserRepository $userRepo): Response
     {
         $message = new Message();
 
@@ -106,6 +107,9 @@ class OnCallController extends AbstractController
         $currentUser = $this->getUser();
         if (!$currentUser instanceof User || $message->getSender() !== (string) $currentUser->getId()) {
             throw $this->createAccessDeniedException('You can only send messages as yourself.');
+        }
+        if (!$userRepo->find($message->getReceiver())) {
+            return $this->json('Unknown receiver.', Response::HTTP_BAD_REQUEST);
         }
 
         $messageBus->dispatch($message);
