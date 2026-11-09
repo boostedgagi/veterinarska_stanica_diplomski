@@ -1,6 +1,6 @@
-# Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
+# Symfony upgrade plan: 6.4 → 7.4 LTS → 8.1 (with Rector)
 
-Status: **S0–S5 done** (2026-11-09). Branch `upgrade/symfony-7.4` is on Symfony 7.4 / PHP 8.4 / Doctrine ORM 3, CI green with the Rector gate. Next: review/merge, deploy (see S5 deployment notes), then the 8.x decision (D1).
+Status: **S0–S6 done** (2026-11-09). `main` is on **Symfony 8.1** / PHP 8.4 / Doctrine ORM 3, CI green with the Rector gate (S6, §11). 7.4 was merged first (PR #2).
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -9,7 +9,7 @@ Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a sep
 
 | # | Decision | Chosen |
 |---|----------|--------|
-| D1 | Target version | **7.4 LTS** (bug fixes until 11/2028, security fixes until 11/2029). 8.x will be decided after 7.4 is green. |
+| D1 | Target version | **7.4 LTS** first, then **8.1** (owner, 2026-11-09). 8.1 is a short-support release (EOL 01/2027) → follow the minors: 8.2 (late Nov 2026), 8.3, then 8.4 LTS (Nov 2027). |
 | D2 | `cboden/ratchet` | **Remove**, together with `bin/chat-server.php`, `bin/push-server.php` and `src/Chat/*`. |
 | D3 | Databases for upgrade work | New WSL containers on **13326 / 13396** through `var/upgrade/compose.ports.yml` plus untracked `.env.dev.local` / `.env.test.local`. The old Docker Desktop DBs on 3326/3396 are left alone. |
 | D4 | Old Docker Desktop dev DB | FK `FK_8D93D64940369CAB` restored after the accidental partial migration (see §1.6). Nothing else touched. |
@@ -528,3 +528,25 @@ Asked for on 2026-11-02 ("fix the queue system for messaging … or write somewh
 | 2026-11-02 | Rector 2.8 has no `SYMFONY_XX` sets → strategy is "bump constraints, then run `withComposerBased`" |
 | 2026-11-02 | Git: `core.filemode=false` set in the local repo config (the Windows IDE showed false mode changes for 755 files) |
 | 2026-11-02 | D5–D10: prod PHP 8.4 + MySQL 8.4 → PHP 8.4 package lines (DoctrineBundle 3, Migrations-bundle 4, PHPUnit 12.5); fix test setup; remove `/api/token/refresh` + notifier; Makefile + CI; leave `AppAuthenticator`; Messenger queue written up as §9 |
+| 2026-11-09 | D1 extended: upgrade to 8.1 (8.0 already EOL); follow the minors up to 8.4 LTS |
+
+---
+
+## 11. S6: Symfony 7.4 → 8.1 ✅ (2026-11-09)
+
+- [x] `composer.json`: `symfony/*` `8.1.*`, `extra.symfony.require` `8.1.*`, `phpunit-bridge` `^8.1`, platform PHP `8.4.1` (Symfony 8 needs ≥ 8.4.1; the host has 8.4.17). Every third-party bundle already allowed 8.x; `masterminds/html5` and `polyfill-php83` dropped out.
+- [x] Rector (composer-based sets): `User::eraseCredentials()` removed (gone from `UserInterface` in 8.0). The empty `serialize()` stub the rule adds was removed by hand.
+- [x] Recipe `symfony/framework-bundle`: `Kernel::getAllowedEnvs()` (unknown `APP_ENV` fails at boot) + `AGENTS.md`; timezone `boot()` kept.
+- [x] Not applied: the `doctrine/doctrine-migrations-bundle` "update" would move the recipe from 3.7 back to 3.1. Ignore it.
+- [x] Verified: 46 tests, PHPStan, Rector dry-run, `lint:container`, CI simulation 13/13; the 48-request smoke run (`smoke-sf81`) and the CORS probe are byte-identical to 7.4.
+- Remaining deprecation (vendor): `Nelmio\ApiDocBundle\Attribute\Security` extends a swagger-php class removed in swagger-php 8 → fixed by a future NelmioApiDocBundle release, nothing to do here.
+
+**Next minors** (each is the same routine: bump `8.x.*`, `composer update -W`, Rector dry-run, `debug:container --deprecations`, tests, smoke diff):
+
+| Version | Released | Supported until |
+|---|---|---|
+| 8.1 | 05/2026 | 01/2027 |
+| 8.2 | late 11/2026 | 07/2027 |
+| 8.3 | 05/2027 | 01/2028 |
+| 8.4 LTS | 11/2027 | 11/2030 (security) |
+
