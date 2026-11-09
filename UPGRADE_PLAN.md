@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0–S3 done; S4 in progress (core 7.4, Nelmio 5, mobile-detect 8, twig extras, minor bumps and framework/security/routing/mailer/messenger/translation/twig/validator recipes done; remaining: recipes for console, phpunit-bridge, phpunit, flex, apache-pack, dama, foundry; then S4 gate, S5).
+Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0–S4 done (S4 gate passed 2026-11-09); next: S5.
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -377,14 +377,21 @@ Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once 
 4. All 20 custom repository queries return identical data on ORM 2.19/DBAL 3 and ORM 3.7/DBAL 4 (`var/upgrade/repo-probe.php`). The only difference is that ORM 3 returns real classes instead of `Proxies\__CG__\…`; no code depends on that.
 5. Recreating a container keeps anonymous volumes. The first MySQL 8.4 start upgraded the old 8.0 data dir in place, which incidentally showed that an **8.0 → 8.4 data upgrade works** with this schema.
 
-### S4: Symfony 7.4
-- [ ] deps: `extra.symfony.require: 7.4.*`, all `symfony/*` → `7.4.*`; `composer update "symfony/*" -W`
-- [ ] deps: lexik `^3.2`, knp-paginator `^6.11`, tattali `^8.0`, endroid bundle `^6.0`, maker `^1.68`, twig extras `^3.29`, jms `^5.5`, nelmio-cors `^2.6`, league/csv `^9.29`
-- [ ] deps+rector: nelmio/api-doc-bundle `^5.13` + `RenameClassRector` (Annotation → Attribute) + `with_annotation` → `with_attribute` if present
-- [ ] fix: endroid qr-code 6 Builder API in `QRCode::generate()` + `endroid_qr_code.yaml` option names
-- [ ] rector: apply symfony composer-based rules (7.0–7.4): Serializer attribute namespace, etc.
-- [ ] recipes, **one commit per package**: framework-bundle, security-bundle, console, routing, mailer, messenger (transport/routing unchanged, see §9), twig-bundle, translation, validator, phpunit-bridge, flex, apache-pack, lexik, nelmio
-- [ ] **Gate: `cache:clear`, container XML rebuilt, tests green, `lint:container`, `doctrine:schema:validate`, PHPStan ≤ baseline, route list identical to baseline (except the `/api/token/refresh` removal approved in D7)**
+### S4: Symfony 7.4 ✅ (2026-11-09)
+- [x] deps: `extra.symfony.require: 7.4.*`, all `symfony/*` → `7.4.22`; Lexik `3.2`, KnpPaginator `6.11`, endroid bundle `6.1` in the same step (their old lines cap Symfony at 6) (`7818a8b`)
+- [x] fix: endroid qr-code 6 `->build(data: $url)`; our `endroid_qr_code.yaml` values equal the v6 defaults (`7818a8b`)
+- [x] deps+rector: NelmioApiDocBundle `5.13` (swagger-php 7) + `RenameClassRector` (`8187fbf`); tattali mobile-detect `8` (`e555e44`); twig extras `3.29`, CVE-2026-46637 (`f591e7f`); nelmio-cors `2.6`, league/csv `9.29` (`d69065f`)
+- [x] rector: symfony composer-based rules 7.x: `Serializer\Annotation\Groups` → `Serializer\Attribute\Groups` (`a2b192e`); generated `config/reference.php` skipped and untracked (`7091fd8`, `0a8ee22`)
+- [x] recipes, one commit per package: framework-bundle (`e075c3e`), security-bundle (`46c646f`), routing (`4c0b9b5`), mailer (`29cf569`), messenger (`c8af47b`, transport/routing unchanged, §9), translation (`ca2a782`), twig-bundle (`867c12d`), validator (`4fbeb35`), console (`c24386e`), phpunit (`d3b498e`), phpunit-bridge (`0c2db77`), flex (`752ec0f`), apache-pack (`b6794b1`), dama (`3739907`), foundry (`2623f12`). `composer recipes -o` now lists only migrations-bundle (rejected on purpose, S3 deviation 3)
+- [x] **Gate passed:** `cache:clear`; CI simulation (`var/upgrade/ci-sim.sh`, clean clone, fresh DB from migrations): composer validate, lint:container/yaml/twig, `schema:validate`, PHPStan 0 new errors, PHPUnit 11/49 green; `rector --dry-run` = 0 changes; route list = baseline minus `/api/token/refresh` (D7, 62 → 61); API smoke test (48 requests) byte-identical to the pre-recipe run (`var/upgrade/smoke-s4-recipes` vs `smoke-minor`)
+
+**S4 deviations / findings**
+1. `symfony/form` ≥ 7.2 brings a `csrf.yaml` recipe that enables form CSRF protection. **Not taken**: every JSON form submission of the API (`FormTrait::handleJSONForm`) would fail.
+2. `templates/forgotten_password/index.html.twig` deleted: unused MakerBundle scaffold using the debug-only `file_link` filter, which fails `lint:twig` on 7.4.
+3. The phpunit-bridge 7.3 recipe deletes `bin/phpunit`; the launcher now belongs to the phpunit/phpunit recipe, so phpunit was updated **first** to keep every commit runnable.
+4. phpunit recipe: `failOnDeprecation/Notice/Warning="true"` and Doctrine/Symfony deprecation triggers taken; suite stays green. Its `method_exists(Dotenv::class, 'bootEnv')` guard is always true on 7.4 (PHPStan error), so `tests/bootstrap.php` calls `bootEnv()` directly (`673accf`).
+5. Not taken from recipes: flex's empty `.env.dev` (env files stay out of git), Foundry's empty `src/Story/AppStory.php` placeholder (`AppFixtures` stays the entry point), Foundry's `reset.mode: auto` (ours: `schema`, D6). Taken: `FoundryExtension` in `phpunit.xml.dist` (suite 7.7 s → 2.3 s) and apache-pack's `/index.php/…` redirect 301 → **308** (keeps method and body).
+6. `debug:container --deprecations` after S4: 2 left. `App\Security\UserChecker::checkPostAuth()` needs the `?TokenInterface $token` argument (**ours → S5**); `Nelmio\ApiDocBundle\Attribute\Security` extends a swagger-php class deprecated for 8.0 (vendor).
 
 ### S5: 7.x deprecations / tooling gate
 - [ ] fix: remaining 7.x deprecations in our code (8.0 preparation)
