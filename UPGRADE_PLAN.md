@@ -563,3 +563,24 @@ Done on owner's request while 8.2 is still in beta (only `v8.2.0-BETA1` tagged; 
 
 **To do when 8.2.0 is released:** `composer update "symfony/*" -W`, set `"minimum-stability": "stable"`, rerun the checks above, commit. Same for every later 8.2.x patch (`composer update`).
 
+---
+
+## 13. Backend follow-up after 8.2 (2026-11-09)
+
+Owner asked for all six recommendations; each is its own commit with tests and a smoke diff.
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `41e48af` | Rate limits: login throttling (5 failures / 15 min, 429), `#[RateLimited]` per IP on register, password reset request, token checks, contact form, found pet |
+| 2 | `20f2f02` | One JSON error shape `{code, message[, errors]}` (`App\EventListener\ApiExceptionListener`); 204 for empty successes |
+| 3 | `fbe15df` | Flow tests (`tests/Functional`) for registration, booking/availability, pets, vets, on-call/chat, mail commands |
+| 4 | `a216022` | Symfony Scheduler: `#[AsCronTask]` on the commands, one worker (`make scheduler`) |
+| 6 | `f1e2bd1` | Roles are the only user type; `typeOfUser` derived; migration `Version20261109214040` (permissions kept per user) |
+| 5 | `bf68be8` | Request DTOs (`#[MapRequestPayload]`/`#[MapQueryString]`) for the plain-data endpoints; `AccountTokenService` |
+
+**Bugs found on the way** (all with tests): account enumeration via password reset; unvalidated contact form (500 from the mailer) and contact mail sent "from" the visitor; `/assign` accepted any id; `/vets/free` missed overlapping appointments; partial `PUT` on appointments / on-call cleared fields (500/403); `/chat/{chatId}` unreachable (int vs 64-hex id) and guessable chat ids; chat messages without `id`; monthly CSV written into `public/` via a non-existent relative path; registration without password / with a taken e-mail was a 500 (User had no validation); `/vets/nearby` and `/vets/free` 500 on bad input; `PATCH /user` and `/assign` changed a detached user copy; expired reset token answered 204; new passwords unvalidated.
+
+**Environment:** `.env` / `.env.test` are git-ignored (never committed); the old Mailtrap *sandbox* credentials are in history until `c86e8fc` (2025) → rotate them. `.env` and `.env.test` now default to `MAILER_DSN=null://null`; the real SMTP stays in the untracked `.env.local`.
+
+**Still open (gradual):** entity endpoints (pet, appointment, user, examination, on-call, chat message) still use Symfony Forms (`handleJSONForm`); move them to DTOs + services when they are next changed. `HealthRecordService::cancel()` is unused since the cancel route was removed (2025): delete it or bring the route back.
+

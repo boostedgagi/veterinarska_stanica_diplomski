@@ -33,6 +33,21 @@ The backend now rejects calls without a token (401), blocks other users' data (4
 
 Already fixed on the backend (commit after `1a6b898`): the home page, vets page and contact form work without a token again (`GET /vets`, `/examination`, `/examination/{id}`, `/search/examination`, `POST /contact_message`, `/initialize_chat_id` are public).
 
+**API changes from the later backend work** (commits `41e48af`…`bf68be8`), also part of F1:
+
+| Change | What the frontend does |
+|---|---|
+| Every error is `{"code": 404, "message": "..."}`; validation adds `"errors": [{"field", "message"}]` (422, or 400 for query strings) | read `message` / `errors` in the interceptor's error handler, show field errors next to the inputs |
+| `429 Too Many Requests` (+ `Retry-After`) on login (5 failures / 15 min), register, password reset, contact form, found pet | "Too many attempts, try again in N minutes" |
+| Some successes are `204 No Content` now: contact form, assign vet, QR mail, `/log` | don't read a body there |
+| `/password/make_new` with an expired token is `400` (was `204`); passwords must have 8+ characters (reset and change) | show the message; keep the existing `minLength(8)` |
+| `/password/request_new` always answers the same `201` (no more "User not found.") | show the message as is |
+| `PUT /health_record/{id}` and `PUT /on_call/{id}` accept partial bodies (only sent fields change) | the status change and "go off duty" already send partial bodies: they work now |
+| `POST /health_record/{id}/cancel` doesn't exist (removed in 2025) | `healthRecordService.cancelHealthRecord()` is dead: cancel with `PUT /health_record/{id}` `{"status": "canceled"}` |
+| `GET /chat/{chatId}` works now (64-hex ids) and messages carry `id` | the chat page can load a conversation and call `/message/{id}/seen` |
+| `roles` lists `ROLE_VET` / `ROLE_ADMIN` reliably; `typeOfUser` stays | keep using `typeOfUser`, or switch the guards to `roles` |
+| Recommended (backend + frontend together): ask for the current password in "change password" | add a `currentPassword` field, then the backend checks it |
+
 Changes:
 
 1. **`authInterceptor`** (functional interceptor, `provideHttpClient(withInterceptors(...))` or `HTTP_INTERCEPTORS` in `app.module.ts`):
