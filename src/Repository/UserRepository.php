@@ -89,7 +89,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         FROM
             user
         WHERE
-            type_of_user = 2
+            roles LIKE '%\"ROLE_VET\"%'
         HAVING distance < :dist
         ORDER BY distance
         LIMIT 0 , 5";
@@ -121,9 +121,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->leftJoin('u.healthRecords', 'hr', 'WITH',
                 'hr.startedAt < :to AND hr.finishedAt > :from AND hr.status != :canceled'
             )
-            ->where('u.typeOfUser = :type')
+            ->where('u.roles LIKE :vetRole')
             ->andWhere('hr.id IS NULL')
-            ->setParameter('type', User::TYPE_VET)
+            ->setParameter('vetRole', self::roleLike(User::ROLE_VET))
             ->setParameter('from', $from)
             ->setParameter('to', $to)
             ->setParameter('canceled', HealthRecordStatus::CANCELED->value);
@@ -137,7 +137,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $qb = $this->createQueryBuilder('u');
 
         $qb
-            ->andWhere('u.typeOfUser=2')
+            ->andWhere('u.roles LIKE :vetRole')
+            ->setParameter('vetRole', self::roleLike(User::ROLE_VET))
             ->orderBy('u.popularity', 'desc');
 
         return $qb->getQuery()->getResult();
@@ -150,7 +151,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $qb
             ->andWhere($qb->expr()->like('u.roles', ':role'))
-            ->setParameter('role', '%' . $role . '%')
+            ->setParameter('role', self::roleLike($role))
             ->orderBy('u.firstName', 'ASC')
             ->setMaxResults(1);
 
@@ -171,8 +172,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->setParameter('firstName', '%' . $firstName . '%')
                 ->orWhere('u.lastName like :lastName')
                 ->setParameter('lastName', '%' . $lastName . '%')
-                ->andWhere('u.typeOfUser=:userType')
-                ->setParameter('userType', User::TYPE_USER);
+                // owners only: neither vet nor admin
+                ->andWhere('u.roles NOT LIKE :vetRole AND u.roles NOT LIKE :adminRole')
+                ->setParameter('vetRole', self::roleLike(User::ROLE_VET))
+                ->setParameter('adminRole', self::roleLike(User::ROLE_ADMIN));
 
             return $qb->getQuery()->getResult();
         }
@@ -189,5 +192,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('email', $email);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /** LIKE pattern for a role in the JSON roles column (quoted, so ROLE_VET doesn't match ROLE_VETERAN). */
+    private static function roleLike(string $role): string
+    {
+        return '%"' . $role . '"%';
     }
 }

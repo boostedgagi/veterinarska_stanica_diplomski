@@ -9,18 +9,14 @@ use App\Entity\User;
  */
 final class AccessHelper
 {
-    /**
-     * Admin status is stored in two ways in this project: ROLE_ADMIN in roles
-     * (used by #[IsGranted('ROLE_ADMIN')]) or typeOfUser = TYPE_ADMIN. Either counts.
-     */
     public static function isAdmin(User $user): bool
     {
-        return $user->isAdmin() || in_array('ROLE_ADMIN', $user->getRoles(), true);
+        return $user->isAdmin();
     }
 
     public static function isVet(User $user): bool
     {
-        return $user->getTypeOfUser() === User::TYPE_VET;
+        return $user->isVet();
     }
 
     public static function same(?User $a, ?User $b): bool

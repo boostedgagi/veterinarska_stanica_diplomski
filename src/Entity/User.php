@@ -25,6 +25,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const TYPE_VET = 2;
     public const TYPE_USER = 3;
 
+    // roles are the only stored "type": typeOfUser (1/2/3) is derived from them for the API/frontend
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_VET = 'ROLE_VET';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -54,9 +58,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $allowed = null;
-
-    #[ORM\Column]
-    private ?int $typeOfUser = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
@@ -114,7 +115,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->onCalls = new ArrayCollection();
         $this->setAllowed(true);
         $this->setVerified(false);
-        $this->setTypeOfUser(3);
     }
 
     #[Groups(
@@ -283,7 +283,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isAdmin(): bool
     {
-        return $this->typeOfUser === $this::TYPE_ADMIN;
+        return in_array(self::ROLE_ADMIN, $this->roles, true);
+    }
+
+    public function isVet(): bool
+    {
+        return in_array(self::ROLE_VET, $this->roles, true);
     }
 
     public function setAllowed(bool $allowed): self
@@ -349,7 +354,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     public function getUserHierarchy(): string
     {
-        return $this->getTypeOfUser() === 2 ? 'veterinarian' : 'person';
+        return $this->isVet() ? 'veterinarian' : 'person';
     }
 
     #[Groups(
@@ -359,14 +364,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::ME
         ]
     )]
-    public function getTypeOfUser(): ?int
+    /** 1 admin, 2 vet, 3 owner: derived from the roles (kept in the API for the frontend). */
+    public function getTypeOfUser(): int
     {
-        return $this->typeOfUser;
+        return match (true) {
+            $this->isAdmin() => self::TYPE_ADMIN,
+            $this->isVet() => self::TYPE_VET,
+            default => self::TYPE_USER,
+        };
     }
 
+    /** Sets the role that belongs to the type (admin and vet roles are exclusive "types"). */
     public function setTypeOfUser(int $typeOfUser): self
     {
-        $this->typeOfUser = $typeOfUser;
+        $roles = array_values(array_diff($this->roles, [self::ROLE_ADMIN, self::ROLE_VET]));
+        $roles = match ($typeOfUser) {
+            self::TYPE_ADMIN => [...$roles, self::ROLE_ADMIN],
+            self::TYPE_VET => [...$roles, self::ROLE_VET],
+            self::TYPE_USER => $roles,
+            default => throw new \InvalidArgumentException(sprintf('Unknown user type %d.', $typeOfUser)),
+        };
+        $this->roles = $roles;
 
         return $this;
     }
@@ -650,10 +668,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setAdditionalVetData():self
     {
-        $this->setRoles(["ROLE_VET"]);
+        $this->setTypeOfUser(self::TYPE_VET);
         $this->setAllowed(true);
         $this->setVerified(true);
-        $this->setTypeOfUser(2);
 
         return $this;
     }

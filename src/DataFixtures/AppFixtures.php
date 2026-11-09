@@ -20,16 +20,17 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         UserFactory::createMany(30);
+        $vets = UserFactory::createMany(5, ['typeOfUser' => User::TYPE_VET, 'allowed' => true, 'verified' => true]);
         PetFactory::createMany(20);
         ExaminationFactory::createMany(6);
 
         // App\Factory\HealthRecordFactory is a domain helper, not a Foundry factory,
         // so health records are created with an anonymous Foundry factory.
-        persistent_factory(HealthRecord::class)->many(30)->create(static function (): array {
+        persistent_factory(HealthRecord::class)->many(30)->create(static function () use ($vets): array {
             $startedAt = DateTime::createFromInterface(faker()->dateTimeBetween('-1 month', '+1 month'));
 
             return [
-                'vet' => UserFactory::randomOrCreate(['typeOfUser' => User::TYPE_VET]),
+                'vet' => faker()->randomElement($vets),
                 'pet' => PetFactory::random(),
                 'examination' => ExaminationFactory::random(),
                 'startedAt' => $startedAt,
