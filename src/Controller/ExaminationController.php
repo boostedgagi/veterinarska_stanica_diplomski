@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\Examination;
 use App\Entity\User;
@@ -9,12 +11,9 @@ use App\Form\ExaminationType;
 use App\Repository\ExaminationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -47,7 +46,7 @@ class ExaminationController extends AbstractController
         ]
     )]
     #[Route('/examination', methods: 'GET')]
-    public function showAllExaminations(ExaminationRepository $examinationRepo, Request $request): Response
+    public function showAllExaminations(ExaminationRepository $examinationRepo): Response
     {
         $allExaminations = $examinationRepo->findAll();
 

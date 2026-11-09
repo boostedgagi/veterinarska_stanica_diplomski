@@ -4,10 +4,10 @@ namespace App\Model;
 
 class VerifyAccount
 {
-    private ?int $tokenId;
-    private ?string $token;
-    private ?string $expires;
-    private ?int $userId;
+    private readonly ?int $tokenId;
+    private readonly ?string $token;
+    private readonly ?string $expires;
+    private readonly ?int $userId;
 
     public function __construct(array $data)
     {

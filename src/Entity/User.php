@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Serializer\Attribute\Groups;
 use App\ContextGroup;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -12,8 +13,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
-use OpenApi\Attributes as OA;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -205,7 +204,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
     }
@@ -336,7 +335,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        // updated_at is mapped as Types::DATETIME_MUTABLE; DBAL 4 rejects DateTimeImmutable there
+        $this->updatedAt = new \DateTime();
     }
 
     #[Groups(

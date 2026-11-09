@@ -2,24 +2,23 @@
 
 namespace App\Controller;
 
+use Detection\MobileDetect;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Nelmio\ApiDocBundle\Attribute\Security;
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\UserRegisterEvent;
-use App\EventSubscriber\RegisterEventSubscriber;
 use App\Form\AdminUserType;
 use App\Form\AssignVetType;
 use App\Form\ContactMessageType;
 use App\Form\LoginType;
-use App\Form\PasswordType;
 use App\Form\UserType;
-use App\Helper;
 use App\Model\AssignVet;
 use App\Model\ContactMessage;
-use App\Model\VetAvailability;
 use App\Repository\UserRepository;
-use App\Security\UserChecker;
 use App\Service\LogHandler;
 use App\Service\PaginationService;
 use App\Service\UploadImage;
@@ -27,10 +26,7 @@ use App\Service\UserService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,7 +36,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Service\TemplatedEmailService;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -708,7 +703,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/log', methods: 'POST')]
-    public function takeLocation(MobileDetectorInterface $detector): JsonResponse
+    public function takeLocation(MobileDetect $detector): JsonResponse
     {
         $logHandler = new LogHandler();
 

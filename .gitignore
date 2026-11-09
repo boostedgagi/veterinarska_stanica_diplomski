@@ -3,6 +3,7 @@
 /.env
 /.env.local
 /.env.test
+/.env.*.local
 /symfony.lock
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
@@ -25,12 +26,16 @@
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
+/.phpunit.cache/
 ###< symfony/phpunit-bridge ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
+/.phpunit.cache/
 ###< phpunit/phpunit ###
 
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+error_log
+/config/reference.php

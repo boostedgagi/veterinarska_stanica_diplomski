@@ -2,13 +2,10 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Token;
 use App\Event\UserRegisterEvent;
 use App\Factory\TokenFactory;
 use App\Service\TemplatedEmailService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class RegisterEventSubscriber implements EventSubscriberInterface

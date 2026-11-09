@@ -1,0 +1,4 @@
+# Files that must keep LF line endings even with core.autocrlf=true
+Makefile    text eol=lf
+bin/*       text eol=lf
+*.sh        text eol=lf

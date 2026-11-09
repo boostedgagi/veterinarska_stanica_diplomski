@@ -7,11 +7,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'delete-expired-tokens',
@@ -20,18 +17,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DeleteExpiredTokensCommand extends Command
 {
-    private EntityManagerInterface $em;
-    private TokenEntityRepository $tokenEntityRepo;
-
     /**
      * @param EntityManagerInterface $em
      * @param TokenEntityRepository $tokenEntityRepo
      */
-    public function __construct(EntityManagerInterface $em, TokenEntityRepository $tokenEntityRepo)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly TokenEntityRepository $tokenEntityRepo)
     {
-        $this->em = $em;
-        $this->tokenEntityRepo = $tokenEntityRepo;
-
         parent::__construct();
     }
 

@@ -28,7 +28,7 @@ class TemplatedEmailService
      */
     public function sendWelcomeEmail(User $user, Token $token): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($user->getEmail())
             ->subject('Welcome to the vetShop.')
             ->htmlTemplate('email/welcome.html.twig')
@@ -45,7 +45,7 @@ class TemplatedEmailService
      */
     public function sendMailToNewVet(User $vet, string $password): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
 //            ->from('boostedgagi@boostedgagi.com')
             ->to($vet->getEmail())
             ->subject('Welcome to the vetShop')
@@ -63,7 +63,7 @@ class TemplatedEmailService
      */
     public function sendQrCodeWithMail(Pet $pet, ResultInterface $qrCodePath): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($pet->getOwner()->getEmail())
             ->subject('Your pet\'s QR code.')
             ->htmlTemplate('email/qrCode.html.twig')
@@ -81,7 +81,7 @@ class TemplatedEmailService
      */
     public function sendCancelMailByVet(Pet $pet, string $cancelMessage): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
 //            ->from('cancel@vetshop.com')
             ->to($pet->getOwner()->getEmail())
             ->subject('Examination of your pet is canceled.')
@@ -96,7 +96,7 @@ class TemplatedEmailService
      */
     public function notifyUserAboutAppointment(HealthRecord $healthRecord): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($healthRecord->getPet()->getOwner()->getEmail())
             ->subject('Appointment notification')
             ->htmlTemplate('email/scheduledAppointment.html.twig')
@@ -112,7 +112,7 @@ class TemplatedEmailService
     {
         $pet = $healthRecord->getPet();
 
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($pet->getOwner()->getVet()->getEmail())
             ->subject('Appointment notification')
             ->htmlTemplate('email/scheduledAppointmentForVet.html.twig')
@@ -127,7 +127,7 @@ class TemplatedEmailService
      */
     public function sendPasswordRequest(Token $token, string $emailAddress): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to($emailAddress)
             ->subject('Your password renewal request.')
             ->htmlTemplate('email/passwordRenewalRequest.html.twig')
@@ -144,7 +144,7 @@ class TemplatedEmailService
      */
     public function sendMonthlyCSVByMail(string $CSVPath): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to('boostedgagi@boostedgagi.com')
             ->subject('Monthly report of all examinations.')
             ->htmlTemplate('base.html.twig')
@@ -160,7 +160,7 @@ class TemplatedEmailService
      */
     public function sendContactMail(ContactMessage $contactMessage): void
     {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->to('boostedgagi@boostedgagi.com')
             ->from($contactMessage->getEmail())
             ->subject('Message from '.$contactMessage->getName())

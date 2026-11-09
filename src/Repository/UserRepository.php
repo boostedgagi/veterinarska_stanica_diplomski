@@ -3,14 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use App\Model\VetAvailability;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use function get_class;
 
 
 /**
@@ -18,6 +16,7 @@ use function get_class;
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<User>
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
@@ -41,7 +40,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }
 
         $user->setPassword($newHashedPassword);
@@ -101,10 +100,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $stmt->bindValue('longitude', $longitude);
         $stmt->bindValue('dist', $distance);
 
-        $nearbyVets = $stmt->execute();
+        $nearbyVets = $stmt->executeQuery();
 
         //returns all from select clause with distance rounded by two decimal places
-        return $nearbyVets->fetchAll();
+        return $nearbyVets->fetchAllAssociative();
     }
 
     /**

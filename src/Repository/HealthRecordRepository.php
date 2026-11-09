@@ -6,10 +6,8 @@ use App\Entity\HealthRecord;
 use App\Enum\NotifyingTimeRange;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 
@@ -18,6 +16,7 @@ use App\Entity\User;
  * @method HealthRecord|null findOneBy(array $criteria, array $orderBy = null)
  * @method HealthRecord[]    findAll()
  * @method HealthRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<HealthRecord>
  */
 class HealthRecordRepository extends ServiceEntityRepository
 {

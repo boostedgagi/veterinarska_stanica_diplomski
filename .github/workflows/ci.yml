@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'upgrade/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: vet_shop_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+
+    env:
+      APP_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, pdo_mysql, gd, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      # .env / .env.test are git-ignored in this project (.env holds real secrets),
+      # so CI creates throwaway ones. Nothing here is a real credential.
+      - name: Create CI environment files
+        run: |
+          cat > .env <<'EOF'
+          APP_ENV=test
+          APP_SECRET=ci-not-a-secret
+          APP_TIMEZONE=Europe/Belgrade
+          DATABASE_URL="mysql://root:root@127.0.0.1:3306/vet_shop?serverVersion=8.4&charset=utf8mb4"
+          CORS_ALLOW_ORIGIN='^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+          MAILER_DSN=null://null
+          MESSENGER_TRANSPORT_DSN=in-memory://
+          JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+          JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+          JWT_PASSPHRASE=ci-passphrase
+          EOF
+          cat > .env.test <<'EOF'
+          KERNEL_CLASS='App\Kernel'
+          APP_SECRET=ci-not-a-secret
+          MAILER_DSN=null://null
+          DATABASE_URL="mysql://root:root@127.0.0.1:3306/vet_shop_test?serverVersion=8.4&charset=utf8mb4"
+          EOF
+
+      - run: composer validate --no-check-publish
+      - run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Generate throwaway JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+      - name: Lint
+        run: |
+          php bin/console lint:container
+          php bin/console lint:yaml config --parse-tags
+          php bin/console lint:twig templates
+
+      - name: Migrations apply on an empty database and match the mapping
+        env:
+          APP_ENV: dev
+          # same transport as production, so the messenger_messages table is part of the schema
+          MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
+        run: |
+          php bin/console doctrine:database:create --if-not-exists
+          php bin/console doctrine:migrations:migrate --no-interaction
+          php bin/console doctrine:schema:validate
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      # rector.php reads the dev container XML (var/cache/dev), so build it first.
+      - name: Rector (no pending changes)
+        run: |
+          APP_ENV=dev php bin/console cache:warmup
+          vendor/bin/rector process --dry-run --no-progress-bar
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit

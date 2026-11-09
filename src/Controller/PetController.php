@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\Pet;
 use App\Entity\User;
@@ -13,17 +15,13 @@ use App\Service\TemplatedEmailService;
 use App\Service\UploadImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
-use Http\Discovery\Exception\NotFoundException;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use OpenApi\Context;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 
 class PetController extends AbstractController
@@ -254,7 +252,7 @@ class PetController extends AbstractController
         ]
     )]
     #[Route('/pet', methods: 'GET')]
-    public function showAllPets(Request $request, PetRepository $repo): Response
+    public function showAllPets(PetRepository $repo): Response
     {
         $pets = $repo->findAll();// Todo paginate this
 
@@ -343,7 +341,7 @@ class PetController extends AbstractController
         if(!$pet)
             {
 //            return $this->json("Pet is not existing in our database.",Response::HTTP_NOT_FOUND);
-            throw new NotFoundException('Pet is not existing in our database.');
+            throw new \RuntimeException('Pet is not existing in our database.');
             }
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::FOUND_PET]);

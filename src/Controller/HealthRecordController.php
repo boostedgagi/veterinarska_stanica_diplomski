@@ -2,29 +2,22 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\HealthRecord;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\PostHealthRecordCreationEvent;
-use App\EventSubscriber\PostHealthRecordCreationSubscriber;
 use App\Factory\HealthRecordFactory;
-use App\Form\CancelHealthRecordType;
 use App\Form\HealthRecordType;
-use App\Model\CancelHealthRecord;
-use App\Model\PaginatedResult;
-use App\Model\PaginationQueryParams;
 use App\Repository\HealthRecordRepository;
-use App\Service\HealthRecordService;
 use App\Service\PaginationService;
 use App\Service\TemplatedEmailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,9 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class HealthRecordController extends AbstractController
 {

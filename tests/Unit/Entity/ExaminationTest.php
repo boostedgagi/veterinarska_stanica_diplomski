@@ -4,8 +4,6 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Examination;
 use App\Tests\Unit\BaseTestCase;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ExaminationTest extends BaseTestCase
 {

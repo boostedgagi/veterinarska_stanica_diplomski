@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use Detection\MobileDetect;
 use App\Entity\Log;
-use MobileDetectBundle\DeviceDetector\MobileDetectorInterface;
 
 class LogHandler
 {
-    public function getMyLoginLocation(MobileDetectorInterface $detector):Log
+    public function getMyLoginLocation(MobileDetect $detector):Log
     {
         $deviceDetect = new MobileDetectRepository($detector);
 

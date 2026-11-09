@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Model;
+use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
 use App\Entity\ContactMessage;
 use App\Entity\OnCall;
@@ -16,13 +18,11 @@ use App\Repository\OnCallRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\SymfonyTraits\FormTrait;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 
 class OnCallController extends AbstractController
@@ -122,7 +122,7 @@ class OnCallController extends AbstractController
     #[Route('/initialize_chat_id',methods: Request::METHOD_POST)]
     public function initializeChatId():Response
     {
-        $chat = (new MessageChat())
+        $chat = new MessageChat()
             ->setChatId(
                 Helper::makeHashedChatId()
             );

@@ -5,7 +5,6 @@ namespace App\Model;
 use App\ApiClient;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Endroid\QrCode\Writer\Result\ResultInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class QRCode
 {
@@ -35,7 +34,7 @@ class QRCode
     public function generate():ResultInterface
     {
         $url = $this->makeUrl();
-        return $this->builder->data($url)->build();
+        return $this->builder->build(data: $url);
     }
 
 }

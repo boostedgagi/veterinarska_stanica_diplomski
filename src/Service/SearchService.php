@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Model\PaginatedResult;
 use App\Repository\ExaminationRepository;
 use App\Repository\HealthRecordRepository;
-use Doctrine\ORM\Mapping\Entity;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 

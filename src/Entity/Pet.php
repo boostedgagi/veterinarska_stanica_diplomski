@@ -2,20 +2,14 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Serializer\Attribute\Groups;
 use App\ContextGroup;
 use App\Repository\PetRepository;
-
-//use DateTime;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Query\Expr\OrderBy;
-use OpenApi\Context;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: PetRepository::class)]
@@ -218,7 +212,8 @@ class Pet
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        // updated_at is mapped as Types::DATETIME_MUTABLE; DBAL 4 rejects DateTimeImmutable there
+        $this->updatedAt = new \DateTime();
     }
 
     #[Groups(

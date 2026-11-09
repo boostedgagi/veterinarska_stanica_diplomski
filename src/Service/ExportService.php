@@ -2,12 +2,7 @@
 
 namespace App\Service;
 
-use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
-use League\Csv\UnavailableStream;
-use League\Csv\Writer;
-use phpDocumentor\Reflection\File;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportService
 {
@@ -33,7 +28,8 @@ class ExportService
                     'notified_week_before',
                     'notified_day_before',
                     'is made by vet'
-                ]
+                ],
+                escape: '\\'
             );
             foreach ($healthRecords as $healthRecord) {
                 fputcsv($csv,
@@ -47,7 +43,8 @@ class ExportService
                         $healthRecord["notifiedWeekBefore"] == 0 ? 'not notified ' : 'notified',
                         $healthRecord["notifiedDayBefore"] == 0 ? 'not notified ' : 'notified',
                         $healthRecord["madeByVet"] ? 'made by vet' : 'scheduled'
-                    ]
+                    ],
+                    escape: '\\'
                 );
             }
             return self::PATH . $fileName;

@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Enum\ContactMessageStatus;
 use App\Message\Message;
 use Doctrine\ORM\EntityManagerInterface;
-use Ratchet\ConnectionInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use App\Repository\UserRepository;
 

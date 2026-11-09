@@ -2,10 +2,6 @@
 
 namespace App\Model;
 
-use App\ContextGroup;
-use App\Entity\User;
-use Symfony\Component\Serializer\Annotation\Groups;
-
 class CancelHealthRecord
 {
     public string $cancelMessage;

@@ -3,31 +3,31 @@
 namespace App\Tests\Unit;
 
 use App\Entity\Examination;
-use App\Entity\HealthRecord;
 use App\Entity\User;
-use App\Tests\DatabasePrimer;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
-use Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 class BaseTestCase extends KernelTestCase
 {
+    // Schema is (re)built once per run from the mapping; DAMA rolls back every test.
+    use ResetDatabase;
+    use Factories;
+
     protected ?EntityManagerInterface $em;
 
     protected function setUp(): void
     {
         $kernel = self::bootKernel();
-        DatabasePrimer::prime($kernel);
 
         $this->em = $kernel->getContainer()->get('doctrine')->getManager();
     }
 
-    protected function makeMockUser(string $email = null,User $vet = null): User
+    protected function makeMockUser(?string $email = null,?User $vet = null): User
     {
-        $user = (new User())
+        $user = new User()
             ->setEmail($email ?: 'marko.patarcic27@gmail.com')
             ->setFirstName('Marko')
             ->setLastName('Patarcic')
@@ -35,6 +35,7 @@ class BaseTestCase extends KernelTestCase
             ->setTypeOfUser(User::TYPE_USER)
             ->setAllowed(1)
             ->setPhone('0643387626')
+            ->setVerified(true) // user.verified is NOT NULL
             ->setVet($vet);
 
         $this->em->persist($user);
@@ -48,7 +49,7 @@ class BaseTestCase extends KernelTestCase
      */
     protected function makeMockVet(): User
     {
-        $mockVet = (new User())
+        $mockVet = new User()
             ->setFirstName('Marko')
             ->setLastName('Milosevic')
             ->setTypeOfUser(2)
@@ -57,6 +58,7 @@ class BaseTestCase extends KernelTestCase
             ->setVet(null)
             ->setAllowed(true)
             ->setPhone('0631669825')
+            ->setVerified(true) // user.verified is NOT NULL
             ->setCreatedAt(new DateTimeImmutable());
 
         $this->em->persist($mockVet);
@@ -70,7 +72,7 @@ class BaseTestCase extends KernelTestCase
      */
     protected function makeMockExamination(): Examination
     {
-        $examination = (new Examination())
+        $examination = new Examination()
             ->setName('mockExamination')
             ->setPrice(1000)
             ->setDuration(60);

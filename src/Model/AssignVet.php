@@ -2,10 +2,6 @@
 
 namespace App\Model;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-
 class AssignVet
 {
     private int $vet;

@@ -12,22 +12,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PaginationService
 {
-    private PaginatorInterface $paginator;
-
-    private Request $request;
-
-    private ArrayCollection|Collection|array $recordCollection;
-
     /**
      * @param PaginatorInterface $paginator
      * @param Request $request
      * @param ArrayCollection|Collection|array $recordCollection
      */
-    public function __construct(PaginatorInterface $paginator, Request $request,ArrayCollection|Collection|array $recordCollection)
+    public function __construct(private readonly PaginatorInterface $paginator, private readonly Request $request, private readonly ArrayCollection|Collection|array $recordCollection)
     {
-        $this->paginator = $paginator;
-        $this->request = $request;
-        $this->recordCollection = $recordCollection;
     }
 
     private function paginate():PaginationInterface{
