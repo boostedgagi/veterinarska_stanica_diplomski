@@ -460,19 +460,14 @@ Still open (each has a default that I'll use unless you say otherwise):
 - `NotifyExaminationByEmailCommand` has the placeholder description "Add a short description for your command" and manually instantiates `TemplatedEmailService`.
 - Explicit `kernel.event_subscriber` tags in `services.yaml` duplicate autoconfigure.
 - `services.yaml` overrides the `kernel.environment` parameter with `%env(APP_ENV)%`.
-- The duplicate `app.swagger_ui` route is defined twice.
+- ~~The duplicate `app.swagger_ui` route is defined twice.~~ Fixed (`e2a1901`).
 - `UserController` and the access_control in `security.yaml` have overlapping/ordered rules (`^/vets/` before `^/vets/free`).
 - PHPStan: 120 level-6 errors.
 - The `popularity` column history
 - `GET /found_pet?id=<unknown>` answers 500 (an uncaught RuntimeException); the commented-out line above it shows a 404 was intended.
 - `src/Entity/Token.php` imports a non-existent `App\Model\Token as ModelToken` (unused, so it's harmless).
 - ~~**Security:** the `access_control` rule `^/health_records` (plural) didn't match the `/health_record/...` routes~~ → **fixed** on branch `fix/health-record-access-control` (`0ccc35d`, Swagger `15a3ee5`): all 8 health-record routes require login; 7 of them answered 200 to anonymous requests before. Still open: any logged-in user can read/edit/delete **any** health record (no owner/vet check).
-- **Security (wider, needs a decision):** most other routes are reachable without a token either. `php var/upgrade/route-auth-audit.php` lists every route with no `access_control` role and no `#[IsGranted]` / non-nullable `#[CurrentUser]`. As of 2026-11-09:
-  - probably public on purpose: `POST /user` (register), `GET /verify_account`, `GET /found_pet` (QR scan), `POST /password/*`, `/login_check`, `GET /vets/simplified`, `GET /active_vets`, `POST /log`
-  - **should not be public:** `DELETE /user/{id}`, `PATCH /user/{id}`, `GET /user/{id}`, `POST /user/{id}/upload_image|remove_image`, `ANY /user/{id}/pets`, `GET /user_autocomplete`, `DELETE|PUT /pet/{id}`, `GET /pet`, `POST /pet`, `POST /pet_upload_image/{id}`, `POST /qr-code`, `POST /message`, `POST /message/{id}/seen`, `GET /chat/{chatId}`, `POST /contact_message`, `POST /initialize_chat_id`, `POST|PUT /on_call[/{id}]`, `ANY /vet/{id}`, `GET /vets`
-  - unclear: `GET /examination[/{id}]`, `GET /search/examination`, `GET /pet/{id}`
-  - dead rules: `^/pets/`, `^/make_vet`, `^/engage_vet`, `^/get/` match no route; `^/vets/` doesn't match `/vets` itself
-  - Proposal: default-deny (`- { path: ^/, roles: ROLE_USER }` last) with explicit `PUBLIC_ACCESS` rules for the first group, plus ownership checks (voters) for user/pet/health-record changes. Changes the API for the frontend → separate branch.
+- ~~**Security (wider):** most other routes were reachable without a token~~ → **fixed** on `main` 2026-11-09 (`e2a1901`, Swagger `d36bf6c`): default-deny `access_control` with a public allow-list (login, registration, account verification, password reset, `/found_pet`, `/vets/simplified`, `/active_vets`, `/doc[.json]`). `tests/Unit/Security/AccessControlTest.php` sends an anonymous request to every route and expects 401 unless allow-listed. Dead rules and the duplicate `app.swagger_ui` / controller-less `api_login_check` routes removed. Still open: **ownership checks** (any logged-in user can change another user's pets, profile, health records).
 - `UserTest::testCreatedUser` and `testCreatedUserWithVet` are `protected`, so PHPUnit never runs them.
 - `UserRepository::findByRole()` is declared `User|int` but returns `null` when nothing matches (TypeError).
 - `tests/Unit/BaseTestCase.php` imports the generated `Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig` without using it. (`VARCHAR` "NN.00%" → `DOUBLE`).
