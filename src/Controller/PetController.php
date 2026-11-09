@@ -116,7 +116,7 @@ class PetController extends AbstractController
     public function uploadProfileImage(Request $request,?Pet $pet): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.');
+            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $uploadImage = new UploadImage($request, $pet, $this->em);
@@ -160,7 +160,7 @@ class PetController extends AbstractController
     public function edit(?Pet $pet, Request $request): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.');
+            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $this->handleJSONForm($request, $pet, PetType::class);
@@ -198,7 +198,7 @@ class PetController extends AbstractController
     public function delete(?Pet $pet): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.');
+            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
 
@@ -350,12 +350,14 @@ class PetController extends AbstractController
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $petRepo): Response
     {
-        $pet = $petRepo->find($request->query->get('id'));
-        if(!$pet)
-            {
-//            return $this->json("Pet is not existing in our database.",Response::HTTP_NOT_FOUND);
-            throw new \RuntimeException('Pet is not existing in our database.');
-            }
+        $id = $request->query->getInt('id');
+        if ($id < 1) {
+            return $this->json('Missing pet id.', Response::HTTP_BAD_REQUEST);
+        }
+        $pet = $petRepo->find($id);
+        if (!$pet) {
+            return $this->json('Pet is not existing in our database.', Response::HTTP_NOT_FOUND);
+        }
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::FOUND_PET]);
     }

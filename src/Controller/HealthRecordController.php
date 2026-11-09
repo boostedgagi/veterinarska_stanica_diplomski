@@ -138,7 +138,7 @@ class HealthRecordController extends AbstractController
     public function edit(Request $request, ?HealthRecord $healthRecord, MailerInterface $mailer): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."]);
+            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
@@ -186,7 +186,7 @@ class HealthRecordController extends AbstractController
     public function showOne(?HealthRecord $healthRecord): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."]);
+            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::VIEW, $healthRecord);
 
@@ -218,7 +218,7 @@ class HealthRecordController extends AbstractController
     public function delete(?HealthRecord $healthRecord): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."]);
+            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::DELETE, $healthRecord);
         $this->em->remove($healthRecord);
@@ -290,7 +290,7 @@ class HealthRecordController extends AbstractController
     public function ownerHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
         if (!$user) {
-            return $this->json(["error" => "Health record not found."]);
+            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $allHealthRecords = $healthRecordRepo->findAllHealthRecordsForUser($user);

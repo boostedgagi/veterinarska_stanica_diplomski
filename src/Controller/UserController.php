@@ -182,7 +182,11 @@ class UserController extends AbstractController
     #[Route('/user', methods: 'PATCH')]
     public function edit(Request $request, #[CurrentUser] User $user): Response
     {
-        $this->handleJSONForm($request, $user, UserType::class);
+        // PATCH: only the fields that are sent change. The password is not changed here (it was
+        // stored unhashed); use POST /password/make_new_authenticated for that.
+        $passwordHash = $user->getPassword();
+        $this->handleJSONForm($request, $user, UserType::class, clearMissingFields: false);
+        $user->setPassword($passwordHash);
         $this->em->flush();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
@@ -193,7 +197,7 @@ class UserController extends AbstractController
     {
         // AdminUserType can set allowed/verified: admins only (users edit themselves via PATCH /user)
         $this->denyAccessUnlessGranted(UserVoter::MANAGE, $user);
-        $this->handleJSONForm($request, $user, AdminUserType::class);
+        $this->handleJSONForm($request, $user, AdminUserType::class, clearMissingFields: false);
         $this->em->flush();
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
@@ -311,7 +315,7 @@ class UserController extends AbstractController
     public function showOneUser(?User $user): Response
     {
         if (!$user) {
-            return $this->json("User not found");
+            return $this->json("User not found", Response::HTTP_NOT_FOUND);
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
