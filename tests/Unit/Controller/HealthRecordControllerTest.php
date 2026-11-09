@@ -13,6 +13,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Nebkam\FluentTest\RequestBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -22,6 +23,11 @@ class HealthRecordControllerTest extends WebTestCase
 {
     use ResetDatabase;
     use Factories;
+
+    private function seedLoggedInUser(): User
+    {
+        return UserFactory::createOne(['typeOfUser' => User::TYPE_USER, 'allowed' => true, 'verified' => true]);
+    }
 
     private function seedVet(): User
     {
@@ -59,6 +65,7 @@ class HealthRecordControllerTest extends WebTestCase
     public function testCreateHealthRecord(): void
     {
         $client = static::createClient();
+        $client->loginUser($this->seedLoggedInUser());
         $vet = $this->seedVet();
         $pet = $this->seedPet();
         $examination = ExaminationFactory::createOne();
@@ -100,6 +107,7 @@ class HealthRecordControllerTest extends WebTestCase
     public function testEditHealthRecord():void
     {
         $client = static::createClient();
+        $client->loginUser($this->seedLoggedInUser());
         $vet = $this->seedVet();
         $pet = $this->seedPet();
         $examination = ExaminationFactory::createOne();
@@ -135,6 +143,7 @@ class HealthRecordControllerTest extends WebTestCase
     public function testGetUserHealthRecords(): void
     {
         $client = static::createClient();
+        $client->loginUser($this->seedLoggedInUser());
         $user = UserFactory::createOne(['typeOfUser' => User::TYPE_USER]);
 
         $response = RequestBuilder::create($client)
@@ -150,6 +159,7 @@ class HealthRecordControllerTest extends WebTestCase
     public function testPetHealthRecords(): void
     {
         $client = static::createClient();
+        $client->loginUser($this->seedLoggedInUser());
         $pet = $this->seedPet();
 
         $response = RequestBuilder::create($client)
@@ -168,6 +178,7 @@ class HealthRecordControllerTest extends WebTestCase
     public function testDeleteHealthRecord():void
     {
         $client = static::createClient();
+        $client->loginUser($this->seedLoggedInUser());
         $existing = $this->seedHealthRecord($this->seedVet(), $this->seedPet(), ExaminationFactory::createOne());
 
         $response = RequestBuilder::create($client)
@@ -176,6 +187,32 @@ class HealthRecordControllerTest extends WebTestCase
             ->getResponse();
 
         self::assertResponseIsSuccessful();
+    }
+
+    /**
+     * Every route that reads or changes health records requires a logged-in user.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    public static function healthRecordRoutes(): iterable
+    {
+        yield 'create' => ['POST', '/health_record'];
+        yield 'show one' => ['GET', '/health_record/1'];
+        yield 'edit' => ['PUT', '/health_record/1'];
+        yield 'delete' => ['DELETE', '/health_record/1'];
+        yield 'per pet' => ['GET', '/pet/1/health_record'];
+        yield 'per vet' => ['GET', '/vet/1/health_record'];
+        yield 'per owner' => ['GET', '/user/1/health_records'];
+        yield 'search' => ['GET', '/search/health_record'];
+    }
+
+    #[DataProvider('healthRecordRoutes')]
+    public function testHealthRecordRoutesRequireAuthentication(string $method, string $uri): void
+    {
+        $client = static::createClient();
+        $client->request($method, $uri);
+
+        self::assertResponseStatusCodeSame(401);
     }
 
     public function tearDown(): void
