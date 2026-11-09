@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method App\\Repository\\HealthRecordRepository\:\:getLastMonthHealthRecords\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Command/MonthlyHealthRecordExportCommand.php
-
-		-
 			message: '#^Property App\\Controller\\HealthRecordController\:\:\$tokenStorage is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -674,24 +668,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Service\\PaginationService\:\:paginate\(\) return type with generic interface Knp\\Component\\Pager\\Pagination\\PaginationInterface does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Service/PaginationService.php
-
-		-
-			message: '#^Property App\\Service\\PaginationService\:\:\$recordCollection type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Service/PaginationService.php
-
-		-
-			message: '#^Property App\\Service\\PaginationService\:\:\$recordCollection type has no value type specified in iterable type array\|Doctrine\\Common\\Collections\\Collection\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Service/PaginationService.php
-
-		-
-			message: '#^Property App\\Service\\PaginationService\:\:\$recordCollection with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
 			identifier: missingType.generics
 			count: 1
 			path: src/Service/PaginationService.php

@@ -14,11 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class VerifyAccountController extends AbstractController
 {
 
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $entityManager;
     }
 
     #[Route('/verify_account', methods: 'GET')]

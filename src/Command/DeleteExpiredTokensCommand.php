@@ -17,18 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class DeleteExpiredTokensCommand extends Command
 {
-    private EntityManagerInterface $em;
-    private TokenEntityRepository $tokenEntityRepo;
-
     /**
      * @param EntityManagerInterface $em
      * @param TokenEntityRepository $tokenEntityRepo
      */
-    public function __construct(EntityManagerInterface $em, TokenEntityRepository $tokenEntityRepo)
+    public function __construct(private readonly EntityManagerInterface $em, private readonly TokenEntityRepository $tokenEntityRepo)
     {
-        $this->em = $em;
-        $this->tokenEntityRepo = $tokenEntityRepo;
-
         parent::__construct();
     }
 

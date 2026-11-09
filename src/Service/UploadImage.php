@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadImage
 {
-    private Filesystem $fs;
+    private readonly Filesystem $fs;
 
     public function __construct(
         private readonly Request                $request,

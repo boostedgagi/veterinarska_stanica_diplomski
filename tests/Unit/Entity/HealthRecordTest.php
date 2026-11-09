@@ -24,7 +24,7 @@ class HealthRecordTest extends BaseTestCase
 
     public function testMakeHealthRecord(): void
     {
-        $healthRecord = (new HealthRecord())
+        $healthRecord = new HealthRecord()
             ->setMadeByVet(false)
             ->setStatus('waiting')
             ->setNotifiedDayBefore(false)

@@ -22,7 +22,7 @@ class TokenFactory
 
     private function createToken(): Token
     {
-        return (new Token())
+        return new Token()
             ->setToken(md5(uniqid('', true) . mt_rand(10, 100)))
             ->setExpires(strtotime(date('Y-m-d h:i:s')) + (Helper::ONE_HOUR_IN_SECONDS / 2));
     }

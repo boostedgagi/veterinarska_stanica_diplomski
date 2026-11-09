@@ -122,7 +122,7 @@ class OnCallController extends AbstractController
     #[Route('/initialize_chat_id',methods: Request::METHOD_POST)]
     public function initializeChatId():Response
     {
-        $chat = (new MessageChat())
+        $chat = new MessageChat()
             ->setChatId(
                 Helper::makeHashedChatId()
             );

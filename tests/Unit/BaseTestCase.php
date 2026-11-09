@@ -27,7 +27,7 @@ class BaseTestCase extends KernelTestCase
 
     protected function makeMockUser(?string $email = null,?User $vet = null): User
     {
-        $user = (new User())
+        $user = new User()
             ->setEmail($email ?: 'marko.patarcic27@gmail.com')
             ->setFirstName('Marko')
             ->setLastName('Patarcic')
@@ -49,7 +49,7 @@ class BaseTestCase extends KernelTestCase
      */
     protected function makeMockVet(): User
     {
-        $mockVet = (new User())
+        $mockVet = new User()
             ->setFirstName('Marko')
             ->setLastName('Milosevic')
             ->setTypeOfUser(2)
@@ -72,7 +72,7 @@ class BaseTestCase extends KernelTestCase
      */
     protected function makeMockExamination(): Examination
     {
-        $examination = (new Examination())
+        $examination = new Examination()
             ->setName('mockExamination')
             ->setPrice(1000)
             ->setDuration(60);

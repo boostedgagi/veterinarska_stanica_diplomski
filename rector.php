@@ -35,6 +35,13 @@ return RectorConfig::configure()
         // changes the project's subscriber pattern and conflicts with the explicit
         // kernel.event_subscriber tags in config/services.yaml.
         \Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class,
+        // php84 set: promoting properties of entities/serialized models would reorder their
+        // declarations, i.e. the JSON key order of API responses, and move ORM mapping
+        // into constructors.
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__ . '/src/Entity',
+            __DIR__ . '/src/Model',
+        ],
     ])
     // run `bin/console cache:warmup` (dev) first so this file is current
     ->withSymfonyContainerXml(__DIR__ . '/var/cache/dev/App_KernelDevDebugContainer.xml')
@@ -57,7 +64,7 @@ return RectorConfig::configure()
     ])
     // Enabled last, each in its own commit:
     ->withPreparedSets(symfonyCodeQuality: true, symfonyConfigs: true)
-    // ->withPhpSets(php84: true)
+    ->withPhpSets(php84: true)
     ->withImportNames(importShortClasses: false, removeUnusedImports: true)
     ->withParallel()
     ->withCache(__DIR__ . '/var/cache/rector');

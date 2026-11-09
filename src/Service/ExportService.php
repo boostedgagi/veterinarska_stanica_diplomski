@@ -28,7 +28,8 @@ class ExportService
                     'notified_week_before',
                     'notified_day_before',
                     'is made by vet'
-                ]
+                ],
+                escape: '\\'
             );
             foreach ($healthRecords as $healthRecord) {
                 fputcsv($csv,
@@ -42,7 +43,8 @@ class ExportService
                         $healthRecord["notifiedWeekBefore"] == 0 ? 'not notified ' : 'notified',
                         $healthRecord["notifiedDayBefore"] == 0 ? 'not notified ' : 'notified',
                         $healthRecord["madeByVet"] ? 'made by vet' : 'scheduled'
-                    ]
+                    ],
+                    escape: '\\'
                 );
             }
             return self::PATH . $fileName;

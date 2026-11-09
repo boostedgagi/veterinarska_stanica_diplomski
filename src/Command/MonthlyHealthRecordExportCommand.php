@@ -33,7 +33,7 @@ class MonthlyHealthRecordExportCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $lastMonthHealthRecords = $this->healthRecordRepo->getLastMonthHealthRecords(7);
+        $lastMonthHealthRecords = $this->healthRecordRepo->getLastMonthHealthRecords();
 
         $fileName = sprintf('%s_%s_health_records.csv', date('n'), date("Y", time()));
 

@@ -28,11 +28,8 @@ class ForgottenPasswordController extends AbstractController
 {
     use FormTrait;
 
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
 

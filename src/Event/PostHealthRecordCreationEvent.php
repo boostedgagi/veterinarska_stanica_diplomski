@@ -9,16 +9,7 @@ class PostHealthRecordCreationEvent
 {
     public const NAME = 'healthrecord.postcreation';
 
-    public HealthRecord $healthRecord;
-
-    public EntityManagerInterface $em;
-
-    public function __construct(
-        HealthRecord $healthRecord,
-        EntityManagerInterface $em
-    )
+    public function __construct(public HealthRecord $healthRecord, public EntityManagerInterface $em)
     {
-        $this->healthRecord = $healthRecord;
-        $this->em = $em;
     }
 }
