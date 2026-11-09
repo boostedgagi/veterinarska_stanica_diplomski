@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'NotifyExaminationByEmail',
-    description: 'Add a short description for your command',
+    description: 'E-mail owners about upcoming appointments (--time-range=today|next_week)',
     aliases: ['examination:notify:email']
 )]
 class NotifyExaminationByEmailCommand extends Command

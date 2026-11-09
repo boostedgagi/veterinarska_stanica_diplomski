@@ -14,7 +14,7 @@ use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'MonthlyHealthRecordExport',
-    description: 'Add a short description for your command',
+    description: 'Export the last 30 days of health records to CSV and e-mail it',
     aliases: ['hr:export:csv']
 )]
 class MonthlyHealthRecordExportCommand extends Command
