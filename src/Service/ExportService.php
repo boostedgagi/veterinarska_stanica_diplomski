@@ -3,10 +3,18 @@
 namespace App\Service;
 
 use League\Csv\Exception;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ExportService
 {
-    public const PATH = 'public/exports/';
+    // outside public/: the CSV holds health records and is only mailed to the admin
+    private readonly string $dir;
+
+    public function __construct(#[Autowire('%kernel.project_dir%/var/exports')] string $dir)
+    {
+        $this->dir = rtrim($dir, '/') . '/';
+    }
 
     /**
      * @param array $healthRecords
@@ -16,7 +24,8 @@ class ExportService
     public function exportHealthRecords(array $healthRecords, string $fileName): string
     {
         try {
-            $csv = fopen(self::PATH . $fileName, 'w+');
+            new Filesystem()->mkdir($this->dir);
+            $csv = fopen($this->dir . $fileName, 'w+');
             fputcsv($csv,
                 [
                     'id',
@@ -47,7 +56,9 @@ class ExportService
                     escape: '\\'
                 );
             }
-            return self::PATH . $fileName;
+            fclose($csv);
+
+            return $this->dir . $fileName;
         }
         catch (Exception $e) {
             error_log($e->getMessage());

@@ -19,13 +19,11 @@ class HealthRecordFactory
      * @throws TransportExceptionInterface
      * @throws Exception
      */
-    public function setMadeByVet(HealthRecord $healthRecord, TemplatedEmailService $email, $env): void
+    public function setMadeByVet(HealthRecord $healthRecord, TemplatedEmailService $email): void
     {
         if(!$healthRecord->isMadeByVet() && !$healthRecord->getAtPresent()){
             $healthRecord->setMadeByVet(false);
-            if ($env !== 'test') {
-                $email->notifyUserAboutAppointment($healthRecord);
-            }
+            $email->notifyUserAboutAppointment($healthRecord);
         }
         else{
             $healthRecord->makeHealthRecordNow();

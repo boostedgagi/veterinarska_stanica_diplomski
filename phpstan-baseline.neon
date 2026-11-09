@@ -223,12 +223,6 @@ parameters:
 			path: src/EventSubscriber/PostHealthRecordCreationSubscriber.php
 
 		-
-			message: '#^Method App\\Factory\\HealthRecordFactory\:\:setMadeByVet\(\) has parameter \$env with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Factory/HealthRecordFactory.php
-
-		-
 			message: '#^Method Faker\\Generator\:\:firstNameMale\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1

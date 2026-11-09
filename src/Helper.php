@@ -2,7 +2,6 @@
 
 namespace App;
 
-use DateTime;
 use Exception;
 
 class Helper
@@ -14,14 +13,7 @@ class Helper
      */
     public static function makeHashedChatId(): string
     {
-        $someRandomNumber=random_int(1000,9000);
-
-        $now = new DateTime();
-        $plainChatId = $someRandomNumber.
-            strtotime(
-                $now->format('Y/m/d H:i:s')
-            );
-
-        return hash('sha256', $plainChatId);
+        // 64 hex chars like before, but random instead of time + 4-digit number (guessable)
+        return bin2hex(random_bytes(32));
     }
 }

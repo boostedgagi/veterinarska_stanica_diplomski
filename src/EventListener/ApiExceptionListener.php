@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Every error of the API has the same JSON shape (the one Lexik already uses for 401):
  *
  *     {"code": 404, "message": "Pet not found."}
- *     {"code": 422, "message": "Validation failed.", "errors": {"email": ["..."]}}
+ *     {"code": 422, "message": "Validation failed.", "errors": [{"field": "email", "message": "..."}]}
  *
  * Runs after the security listener (priority 1), which has already turned access errors
  * into 401 (no/invalid token, answered by Lexik) or 403 (AccessDeniedHttpException).
@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 final readonly class ApiExceptionListener
 {
     public function __construct(
-        #[Autowire('%kernel.debug%')]
+        #[Autowire(param: 'kernel.debug')]
         private bool $debug,
     ) {
     }

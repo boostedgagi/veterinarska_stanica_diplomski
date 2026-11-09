@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nebkam\SymfonyTraits\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
 use App\Security\Voter\UserVoter;
@@ -26,7 +27,6 @@ use App\Service\LogHandler;
 use App\Service\PaginationService;
 use App\Service\UploadImage;
 use App\Service\UserService;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Nebkam\SymfonyTraits\FormTrait;
@@ -87,7 +87,10 @@ class UserController extends AbstractController
 
         $this->handleJSONForm($request, $user, UserType::class);
 
-        $plainPassword = $user->getPassword();
+        $plainPassword = (string) $user->getPassword();
+        if (mb_strlen($plainPassword) < 8) {
+            throw new ValidationException(['password' => ['The password needs at least 8 characters.']]);
+        }
         $hashedPassword = $passwordHasher->hashPassword(
             $user,
             $plainPassword
@@ -181,8 +184,10 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/user', methods: 'PATCH')]
-    public function edit(Request $request, #[CurrentUser] User $user): Response
+    public function edit(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
+        // the managed entity, not the security token's copy (that one may be detached)
+        $user = $userRepo->find($currentUser->getId()) ?? throw $this->createNotFoundException('User not found.');
         // PATCH: only the fields that are sent change. The password is not changed here (it was
         // stored unhashed); use POST /password/make_new_authenticated for that.
         $passwordHash = $user->getPassword();
@@ -549,17 +554,14 @@ class UserController extends AbstractController
     #[Route('/vets/nearby', methods: 'GET')]
     public function nearbyVets(Request $request, UserRepository $userRepo): Response
     {
-        //to be killed in near future
-        $queryParams = (object)$request->query->all();
-        $distance = $queryParams->distance;
-        $latitude = $queryParams->latitude;
-        $longitude = $queryParams->longitude;
-
-        try {
-            $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, $distance);
-        } catch (Exception $e) {
-            return $this->json($e, Response::HTTP_OK);
+        $latitude = $request->query->get('latitude');
+        $longitude = $request->query->get('longitude');
+        $distance = $request->query->get('distance');
+        if (!is_numeric($latitude) || !is_numeric($longitude) || !is_numeric($distance)) {
+            throw new BadRequestHttpException('latitude, longitude and distance (km) must be numbers.');
         }
+
+        $nearbyVets = $userRepo->getNearbyVets($latitude, $longitude, (int) $distance);
 
         return $this->json($nearbyVets, Response::HTTP_OK, [], ['groups' => 'vet_nearby']);
     }
@@ -588,10 +590,11 @@ class UserController extends AbstractController
     #[Route('/vets/free', methods: 'GET')]
     public function getFreeVetsInTimeRange(Request $request, UserRepository $userRepo): Response
     {
-        $queryParams = (object)$request->query->all();
-
-        $from = $queryParams->from;
-        $to = $queryParams->to;
+        $from = $request->query->getString('from');
+        $to = $request->query->getString('to');
+        if (strtotime($from) === false || strtotime($to) === false || strtotime($from) >= strtotime($to)) {
+            throw new BadRequestHttpException('from and to must be date-times, from before to.');
+        }
 
         /**
          * @see need to pay attention to refactor this on frontend side
@@ -737,6 +740,8 @@ class UserController extends AbstractController
     #[Route('/assign', methods: Request::METHOD_POST)]
     public function assignVet(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
+        // the managed entity, not the security token's copy (that one may be detached)
+        $currentUser = $userRepo->find($currentUser->getId()) ?? throw $this->createNotFoundException('User not found.');
         $assignVet = new AssignVet();
         $this->handleJSONForm($request, $assignVet, AssignVetType::class);
 

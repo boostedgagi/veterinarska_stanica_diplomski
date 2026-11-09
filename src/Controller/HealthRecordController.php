@@ -79,7 +79,6 @@ class HealthRecordController extends AbstractController
     #[Route('/health_record', methods: 'POST')]
     public function create(Request $request, TemplatedEmailService $email): Response
     {
-        $env = $this->getParameter('kernel.environment');
         $healthRecord = new HealthRecord();
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
@@ -87,7 +86,7 @@ class HealthRecordController extends AbstractController
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
 
         $healthRecordFactory = new HealthRecordFactory($this->em);
-        $healthRecordFactory->setMadeByVet($healthRecord,$email,$env);
+        $healthRecordFactory->setMadeByVet($healthRecord, $email);
 
         //these two lines are behaving like a MySQL Trigger but in a Symfony way...
         $event = new PostHealthRecordCreationEvent($healthRecord, $this->em);
@@ -139,7 +138,7 @@ class HealthRecordController extends AbstractController
             throw $this->createNotFoundException('Health record not found.');
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
-        $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+        $this->handleJSONForm($request, $healthRecord, HealthRecordType::class, clearMissingFields: false);
         // again after the form: the record must not be moved to someone else's pet
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
 

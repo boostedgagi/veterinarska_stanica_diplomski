@@ -65,7 +65,7 @@ class ContactMessage
         $this->chatId = $chatId;
     }
 
-
+    #[Groups([ContextGroup::SHOW_MESSAGE, ContextGroup::CONTACT_MESSAGE_SENT])]
     public function getId(): ?int
     {
         return $this->id;

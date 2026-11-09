@@ -80,16 +80,19 @@ class ApiErrorResponsesTest extends WebTestCase
 
     public function testPatchOwnProfileChangesOnlySentFields(): void
     {
-        // Asserted on the response: with loginUser() the #[CurrentUser] is a copy restored from the
-        // test session, so its changes are not written (with a real JWT the user is loaded from the DB).
-        // That the password hash is kept was verified over HTTP with a real JWT.
         $user = UserFactory::createOne(['typeOfUser' => User::TYPE_USER, 'allowed' => true, 'verified' => true]);
         $email = $user->getEmail();
+        $passwordHash = $user->getPassword();
 
-        self::assertSame(201, $this->call($user, 'PATCH', '/user', ['firstName' => 'Renamed']));
+        self::assertSame(201, $this->call($user, 'PATCH', '/user', ['firstName' => 'Renamed', 'password' => 'plain-text']));
         $body = json_decode((string) $this->client->getResponse()->getContent(), true);
         self::assertSame('Renamed', $body['firstName']);
         self::assertSame($email, $body['email'], 'missing fields were cleared before');
+
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $reloaded = $em->find(User::class, $user->getId());
+        self::assertSame('Renamed', $reloaded->getFirstName(), 'saved');
+        self::assertSame($passwordHash, $reloaded->getPassword(), 'password hash kept');
     }
 
     public function testAdminPatchChangesOnlySentFields(): void

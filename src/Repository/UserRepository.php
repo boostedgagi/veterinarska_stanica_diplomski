@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Enum\HealthRecordStatus;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
@@ -115,15 +116,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getAvailableVets($from, $to): array
     {
+        // a vet is busy if any of their not-cancelled appointments overlaps [from, to)
         $qb = $this->createQueryBuilder('u')
             ->leftJoin('u.healthRecords', 'hr', 'WITH',
-                'hr.vet = u AND hr.startedAt BETWEEN :from AND :to OR hr.finishedAt BETWEEN :from AND :to'
+                'hr.startedAt < :to AND hr.finishedAt > :from AND hr.status != :canceled'
             )
             ->where('u.typeOfUser = :type')
             ->andWhere('hr.id IS NULL')
             ->setParameter('type', User::TYPE_VET)
             ->setParameter('from', $from)
-            ->setParameter('to', $to);
+            ->setParameter('to', $to)
+            ->setParameter('canceled', HealthRecordStatus::CANCELED->value);
 
         return  $qb->getQuery()->getResult();
     }

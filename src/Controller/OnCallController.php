@@ -72,7 +72,8 @@ class OnCallController extends AbstractController
     public function finishOnCallSession(Request $request,OnCall $onCall): Response
     {
         $this->denyAccessUnlessGranted(OnCallVoter::EDIT, $onCall);
-        $this->handleJSONForm($request, $onCall, OnCallType::class);
+        // only the sent fields change (the frontend sends just finishedAt)
+        $this->handleJSONForm($request, $onCall, OnCallType::class, clearMissingFields: false);
         $this->denyAccessUnlessGranted(OnCallVoter::EDIT, $onCall);
         $this->em->flush();
 
@@ -163,7 +164,7 @@ class OnCallController extends AbstractController
     }
 
     #[Route('/chat/{chatId}', methods: Request::METHOD_GET)]
-    public function getAllMessagesFromOneChat(int $chatId, ContactMessageRepository $messageRepo): JsonResponse
+    public function getAllMessagesFromOneChat(string $chatId, ContactMessageRepository $messageRepo): JsonResponse
     {
         /**
          * @var $chat Message[]
