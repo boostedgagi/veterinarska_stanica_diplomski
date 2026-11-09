@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Security\Voter\UserVoter;
+use App\Security\Voter\PetVoter;
+use App\Security\Voter\HealthRecordVoter;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
@@ -82,6 +85,8 @@ class HealthRecordController extends AbstractController
         $email = new TemplatedEmailService($mailer);
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+        // owner of the pet, the booked vet, or an admin
+        $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
 
         $healthRecordFactory = new HealthRecordFactory($this->em);
         $healthRecordFactory->setMadeByVet($healthRecord,$email,$env);
@@ -135,7 +140,10 @@ class HealthRecordController extends AbstractController
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
+        $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
+        // again after the form: the record must not be moved to someone else's pet
+        $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
 
         if($healthRecord->getCancelMessage()){
             $email = new TemplatedEmailService($mailer);
@@ -180,6 +188,7 @@ class HealthRecordController extends AbstractController
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
+        $this->denyAccessUnlessGranted(HealthRecordVoter::VIEW, $healthRecord);
 
         return $this->json($healthRecord, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
@@ -211,6 +220,7 @@ class HealthRecordController extends AbstractController
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."]);
         }
+        $this->denyAccessUnlessGranted(HealthRecordVoter::DELETE, $healthRecord);
         $this->em->remove($healthRecord);
         $this->em->flush();
 
@@ -262,6 +272,7 @@ class HealthRecordController extends AbstractController
         if (!$pet) {
             throw new NotFoundHttpException('Pet not found');
         }
+        $this->denyAccessUnlessGranted(PetVoter::VIEW, $pet);
 
         /**
          * Very important notice is that every collection of data that we want to paginate,
@@ -281,6 +292,7 @@ class HealthRecordController extends AbstractController
         if (!$user) {
             return $this->json(["error" => "Health record not found."]);
         }
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $allHealthRecords = $healthRecordRepo->findAllHealthRecordsForUser($user);
 
         return $this->json($allHealthRecords, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);

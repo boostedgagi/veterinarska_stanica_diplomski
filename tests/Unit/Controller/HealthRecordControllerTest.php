@@ -34,10 +34,9 @@ class HealthRecordControllerTest extends WebTestCase
         return UserFactory::createOne(['typeOfUser' => User::TYPE_VET, 'allowed' => true, 'verified' => true]);
     }
 
-    private function seedPet(): Pet
+    private function seedPet(?User $owner = null): Pet
     {
-        UserFactory::createOne(['typeOfUser' => User::TYPE_USER]); // PetFactory picks a random owner
-        return PetFactory::createOne();
+        return PetFactory::createOne(['owner' => $owner ?? UserFactory::createOne(['typeOfUser' => User::TYPE_USER])]);
     }
 
     private function seedHealthRecord(User $vet, Pet $pet, Examination $examination): HealthRecord
@@ -65,9 +64,10 @@ class HealthRecordControllerTest extends WebTestCase
     public function testCreateHealthRecord(): void
     {
         $client = static::createClient();
-        $client->loginUser($this->seedLoggedInUser());
+        $owner = $this->seedLoggedInUser();
+        $client->loginUser($owner);
         $vet = $this->seedVet();
-        $pet = $this->seedPet();
+        $pet = $this->seedPet($owner);
         $examination = ExaminationFactory::createOne();
 
         $response = RequestBuilder::create($client)
@@ -107,9 +107,10 @@ class HealthRecordControllerTest extends WebTestCase
     public function testEditHealthRecord():void
     {
         $client = static::createClient();
-        $client->loginUser($this->seedLoggedInUser());
+        $owner = $this->seedLoggedInUser();
+        $client->loginUser($owner);
         $vet = $this->seedVet();
-        $pet = $this->seedPet();
+        $pet = $this->seedPet($owner);
         $examination = ExaminationFactory::createOne();
         $existing = $this->seedHealthRecord($vet, $pet, $examination);
 
@@ -143,8 +144,8 @@ class HealthRecordControllerTest extends WebTestCase
     public function testGetUserHealthRecords(): void
     {
         $client = static::createClient();
-        $client->loginUser($this->seedLoggedInUser());
         $user = UserFactory::createOne(['typeOfUser' => User::TYPE_USER]);
+        $client->loginUser($user);
 
         $response = RequestBuilder::create($client)
             ->setMethod('GET')
@@ -159,8 +160,9 @@ class HealthRecordControllerTest extends WebTestCase
     public function testPetHealthRecords(): void
     {
         $client = static::createClient();
-        $client->loginUser($this->seedLoggedInUser());
-        $pet = $this->seedPet();
+        $owner = $this->seedLoggedInUser();
+        $client->loginUser($owner);
+        $pet = $this->seedPet($owner);
 
         $response = RequestBuilder::create($client)
             ->setMethod('GET')
@@ -178,8 +180,9 @@ class HealthRecordControllerTest extends WebTestCase
     public function testDeleteHealthRecord():void
     {
         $client = static::createClient();
-        $client->loginUser($this->seedLoggedInUser());
-        $existing = $this->seedHealthRecord($this->seedVet(), $this->seedPet(), ExaminationFactory::createOne());
+        $vet = $this->seedVet();
+        $client->loginUser($vet);
+        $existing = $this->seedHealthRecord($vet, $this->seedPet(), ExaminationFactory::createOne());
 
         $response = RequestBuilder::create($client)
             ->setMethod('DELETE')

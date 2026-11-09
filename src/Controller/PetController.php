@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Security\Voter\UserVoter;
+use App\Security\Voter\PetVoter;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
@@ -63,6 +65,8 @@ class PetController extends AbstractController
         $pet = new Pet();
 
         $this->handleJSONForm($request, $pet, PetType::class);
+        // a pet can only be created for yourself (admins: for anyone)
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
 
         $this->em->persist($pet);
         $this->em->flush();
@@ -114,6 +118,7 @@ class PetController extends AbstractController
         if(!$pet){
             return $this->json('Pet not found.');
         }
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $uploadImage = new UploadImage($request, $pet, $this->em);
         $uploadImage->upload();
 
@@ -157,7 +162,10 @@ class PetController extends AbstractController
         if(!$pet){
             return $this->json('Pet not found.');
         }
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $this->handleJSONForm($request, $pet, PetType::class);
+        // again after the form: the owner field must not hand the pet to someone else
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
 
         $this->em->persist($pet);
         $this->em->flush();
@@ -192,6 +200,7 @@ class PetController extends AbstractController
         if(!$pet){
             return $this->json('Pet not found.');
         }
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
 
         $this->em->remove($pet);
         $this->em->flush();
@@ -231,6 +240,7 @@ class PetController extends AbstractController
         {
             return $this->json('Pet not found.',Response::HTTP_NOT_FOUND);
         }
+        $this->denyAccessUnlessGranted(PetVoter::VIEW, $pet);
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
     }
@@ -263,6 +273,7 @@ class PetController extends AbstractController
     #[Route('/user/{id}/pets')]
     public function showOneUserPets(User $user):JsonResponse
     {
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $pets = $user->getPets();
 
         return $this->json($pets,Response::HTTP_OK,[],['groups'=>ContextGroup::SHOW_MY_PETS]);

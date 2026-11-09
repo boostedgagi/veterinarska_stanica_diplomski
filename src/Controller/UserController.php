@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Security\Voter\UserVoter;
 use Detection\MobileDetect;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -190,6 +191,8 @@ class UserController extends AbstractController
     #[Route('/user/{id}', methods: 'PATCH')]
     public function editUserAdmin(Request $request, User $user): Response
     {
+        // AdminUserType can set allowed/verified: admins only (users edit themselves via PATCH /user)
+        $this->denyAccessUnlessGranted(UserVoter::MANAGE, $user);
         $this->handleJSONForm($request, $user, AdminUserType::class);
         $this->em->flush();
 
@@ -227,6 +230,7 @@ class UserController extends AbstractController
     #[Route('/user/{id}', methods: 'DELETE')]
     public function deleteUser(User $user): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         $this->em->remove($user);
         $this->em->flush();
@@ -309,6 +313,7 @@ class UserController extends AbstractController
         if (!$user) {
             return $this->json("User not found");
         }
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
         return $this->json($user, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_USER]);
     }
@@ -395,6 +400,7 @@ class UserController extends AbstractController
     #[Route('/user/{id}/upload_image', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
     public function uploadProfileImage(Request $request, User $user): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
         $uploadImage = new UploadImage($request, $user, $this->em);
 
         $uploadImage->upload();
@@ -405,6 +411,7 @@ class UserController extends AbstractController
     #[Route('/user/{id}/remove_image', requirements: ['id' => Requirements::NUMERIC], methods: 'POST')]
     public function removeProfileImage(Request $request, User $user): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
         $uploadImage = new UploadImage($request, $user, $this->em);
 
         $uploadImage->remove();
@@ -471,6 +478,8 @@ class UserController extends AbstractController
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(User $vet): Response
     {
+        // a vet's patient list: that vet or an admin
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $vet);
         $clients = $vet->getClients();
 
         $pets = [];
@@ -682,6 +691,11 @@ class UserController extends AbstractController
         if ($currentUser->getTypeOfUser() === USER::TYPE_USER) {
             return $this->json("Access forbidden", Response::HTTP_FORBIDDEN);
         }
+        if (!$vet) {
+            throw $this->createNotFoundException('Vet not found.');
+        }
+        // a vet's appointments: that vet or an admin
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $vet);
 
         $vetHealthRecords = $vet->getHealthRecords();
 
