@@ -47,6 +47,11 @@ Projekt je izgrađen korišćenjem sledećih tehnologija i Symfony komponenti:
 
 🔄 Periodični zadaci putem cron komandi
 
+# 📖 API dokumentacija
+
+Swagger UI (NelmioApiDocBundle) je dostupan na `GET /doc`, a OpenAPI specifikacija u JSON formatu na `GET /doc.json`.
+Rute označene katancem zahtevaju JWT: token se dobija preko `POST /login_check` i šalje kao `Authorization: Bearer <token>`.
+
 # 💡 Napomena
 
 Ovaj repozitorijum predstavlja demonstraciju backend arhitekture i logike korišćene u okviru diplomskog rada.
