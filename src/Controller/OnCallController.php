@@ -136,6 +136,7 @@ class OnCallController extends AbstractController
     /**
      * @throws Exception
      */
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/initialize_chat_id',methods: Request::METHOD_POST)]
     public function initializeChatId():Response
     {

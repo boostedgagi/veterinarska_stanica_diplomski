@@ -123,6 +123,7 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_MY_PETS,
+            ContextGroup::FOUND_PET,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -145,6 +146,7 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_MY_PETS,
+            ContextGroup::FOUND_PET,
             ContextGroup::SHOW_VET
         ]
     )]
@@ -222,7 +224,8 @@ class Pet
             ContextGroup::CREATE_PET,
             ContextGroup::SHOW_PET,
             ContextGroup::SHOW_VET,
-            ContextGroup::SHOW_MY_PETS
+            ContextGroup::SHOW_MY_PETS,
+            ContextGroup::FOUND_PET,
         ]
     )]
     public function getImage(): ?string

@@ -6,6 +6,7 @@ use App\ContextGroup;
 use App\Repository\ExaminationRepository;
 use App\Repository\HealthRecordRepository;
 use App\Service\SearchService;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,7 @@ class SearchController extends AbstractController
     {
     }
 
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/search/examination', methods: Request::METHOD_GET)]
     public function searchExamination(Request $request, ExaminationRepository $examinationRepo): Response
     {

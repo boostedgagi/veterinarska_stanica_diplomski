@@ -45,6 +45,9 @@ security:
         - { path: ^/found_pet$, methods: [GET], roles: PUBLIC_ACCESS }
         # vet lists shown before login
         - { path: ^/(vets/simplified|active_vets)$, methods: [GET], roles: PUBLIC_ACCESS }
+        # public pages of the frontend (home, vets, contact): vet list, examination catalog, contact form
+        - { path: ^/(vets|examination(/\d+)?|search/examination)$, methods: [GET], roles: PUBLIC_ACCESS }
+        - { path: ^/(contact_message|initialize_chat_id)$, methods: [POST], roles: PUBLIC_ACCESS }
         # API documentation (Swagger UI and OpenAPI JSON)
         - { path: ^/doc(\.json)?$, methods: [GET], roles: PUBLIC_ACCESS }
         # everything else

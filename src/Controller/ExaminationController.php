@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -45,6 +46,7 @@ class ExaminationController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/examination', methods: 'GET')]
     public function showAllExaminations(ExaminationRepository $examinationRepo): Response
     {
@@ -78,6 +80,7 @@ class ExaminationController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/examination/{id}', methods: 'GET')]
     public function showOne(Examination $examination): Response
     {

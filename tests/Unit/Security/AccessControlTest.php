@@ -27,6 +27,12 @@ class AccessControlTest extends WebTestCase
         'GET /found_pet',
         'GET /vets/simplified',
         'GET /active_vets',
+        'GET /vets',
+        'GET /examination',
+        'GET /examination/{id}',
+        'GET /search/examination',
+        'POST /contact_message',
+        'POST /initialize_chat_id',
         'GET /doc',
         'GET /doc.json',
     ];

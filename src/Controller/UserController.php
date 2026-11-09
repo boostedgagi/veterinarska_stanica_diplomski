@@ -629,6 +629,7 @@ class UserController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/vets', methods: 'GET')]
     public function showAllVets(Request $request, UserRepository $userRepo, PaginatorInterface $paginator): Response
     {
@@ -750,6 +751,7 @@ class UserController extends AbstractController
     /**
      * @throws TransportExceptionInterface
      */
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/contact_message',methods: Request::METHOD_POST)]
     public function sendContactMessage(Request $request,MailerInterface $mailer): Response
     {

@@ -224,6 +224,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::ME,
             ContextGroup::SHOW_MESSAGE,
             ContextGroup::USER_AUTOCOMPLETE,
+            ContextGroup::FOUND_PET,
         ]
     )]
     public function getFirstName(): ?string

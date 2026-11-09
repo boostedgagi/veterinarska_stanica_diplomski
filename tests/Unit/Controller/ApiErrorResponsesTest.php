@@ -51,6 +51,10 @@ class ApiErrorResponsesTest extends WebTestCase
         $pet = PetFactory::createOne(['owner' => UserFactory::createOne(['typeOfUser' => User::TYPE_USER])]);
 
         self::assertSame(200, $this->call(null, 'GET', '/found_pet?id=' . $pet->getId()));
+        $body = json_decode((string) $this->client->getResponse()->getContent(), true);
+        // what the frontend's found-pet page (QR code) shows; nothing else about the owner
+        self::assertEqualsCanonicalizing(['name', 'dateOfBirth', 'animal', 'breed', 'image', 'owner'], array_keys($body));
+        self::assertEqualsCanonicalizing(['firstName', 'email', 'phone'], array_keys($body['owner']));
         self::assertSame(404, $this->call(null, 'GET', '/found_pet?id=999999'), 'was 500');
         self::assertSame(400, $this->call(null, 'GET', '/found_pet'), 'was 500');
     }
