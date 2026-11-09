@@ -91,5 +91,11 @@ jobs:
       - name: PHPStan
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
+      # rector.php reads the dev container XML (var/cache/dev), so build it first.
+      - name: Rector (no pending changes)
+        run: |
+          APP_ENV=dev php bin/console cache:warmup
+          vendor/bin/rector process --dry-run --no-progress-bar
+
       - name: PHPUnit
         run: vendor/bin/phpunit
