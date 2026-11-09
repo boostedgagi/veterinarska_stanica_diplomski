@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\RateLimit\RateLimited;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Model\VerifyAccount;
@@ -19,6 +20,7 @@ class VerifyAccountController extends AbstractController
     }
 
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('token_check')]
     #[Route('/verify_account', methods: 'GET')]
     public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo): Response
     {

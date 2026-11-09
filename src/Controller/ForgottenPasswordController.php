@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\RateLimit\RateLimited;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
@@ -43,6 +44,7 @@ class ForgottenPasswordController extends AbstractController
      * without token and other things
      */
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('token_check')]
     #[Route('/password/make_new', methods: 'POST')]
     public function renewForgottenPassword(
         Request                     $request,
@@ -79,6 +81,7 @@ class ForgottenPasswordController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('password_request')]
     #[Route('/password/request_new', methods: 'POST')]
     public function requestNewPassword(Request $request, TemplatedEmailService $email, UserRepository $userRepo): Response
     {

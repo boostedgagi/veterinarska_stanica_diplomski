@@ -1,0 +1,37 @@
+# Limits for the public (no token) routes, counted per client IP.
+# Used through #[RateLimited('<name>')] on controller actions (App\RateLimit\RateLimitListener).
+# Login attempts are limited by the firewall instead (security.yaml, login_throttling).
+rate_limiter:
+    # POST /user
+    register:
+        policy: sliding_window
+        limit: 5
+        interval: '1 hour'
+    # POST /password/request_new (sends a mail)
+    password_request:
+        policy: sliding_window
+        limit: 3
+        interval: '15 minutes'
+    # POST /password/make_new, GET /verify_account (token checks)
+    token_check:
+        policy: sliding_window
+        limit: 10
+        interval: '15 minutes'
+    # POST /contact_message (mails the admin)
+    contact:
+        policy: sliding_window
+        limit: 3
+        interval: '1 hour'
+    # GET /found_pet (returns the owner's contact data)
+    found_pet:
+        policy: sliding_window
+        limit: 30
+        interval: '1 minute'
+
+when@test:
+    framework:
+        cache:
+            pools:
+                # counters live only as long as one kernel, so tests don't throttle each other
+                cache.rate_limiter:
+                    adapter: cache.adapter.array

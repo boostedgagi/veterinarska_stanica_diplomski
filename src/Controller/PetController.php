@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\RateLimit\RateLimited;
 use App\Security\Voter\AccessHelper;
 use App\Security\Voter\UserVoter;
 use App\Security\Voter\PetVoter;
@@ -356,6 +357,7 @@ class PetController extends AbstractController
         ]
     )]
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('found_pet')]
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $petRepo): Response
     {

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\RateLimit\RateLimited;
 use App\Security\Voter\UserVoter;
 use Detection\MobileDetect;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -77,6 +78,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('register')]
     #[Route('/user', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -750,6 +752,7 @@ class UserController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Security(name: null)] // public route, see security.yaml
+    #[RateLimited('contact')]
     #[Route('/contact_message',methods: Request::METHOD_POST)]
     public function sendContactMessage(Request $request, TemplatedEmailService $email): Response
     {

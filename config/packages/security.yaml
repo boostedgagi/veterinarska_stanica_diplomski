@@ -19,6 +19,10 @@ security:
             pattern: ^/login_check
             user_checker: App\Security\UserChecker
             stateless: true
+            # 5 failed logins per e-mail+IP (and 25 per IP) in 15 minutes, then 429
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             json_login:
                 check_path: /login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
