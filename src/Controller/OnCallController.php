@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Security\Voter\OnCallVoter;
+use App\Security\Voter\ContactMessageVoter;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
@@ -47,6 +50,8 @@ class OnCallController extends AbstractController
         $onCall = new OnCall();
 
         $this->handleJSONForm($request, $onCall, OnCallType::class);
+        // vets start their own on-call session (the vet comes from the request body)
+        $this->denyAccessUnlessGranted(OnCallVoter::EDIT, $onCall);
 
         $this->em->persist($onCall);
         $this->em->flush();
@@ -64,7 +69,9 @@ class OnCallController extends AbstractController
     #[Route('/on_call/{id}', methods: Request::METHOD_PUT)]
     public function finishOnCallSession(Request $request,OnCall $onCall): Response
     {
+        $this->denyAccessUnlessGranted(OnCallVoter::EDIT, $onCall);
         $this->handleJSONForm($request, $onCall, OnCallType::class);
+        $this->denyAccessUnlessGranted(OnCallVoter::EDIT, $onCall);
         $this->em->flush();
 
         return $this->json($onCall, Response::HTTP_CREATED, [], ['groups' => ContextGroup::ON_CALL]);
@@ -95,6 +102,11 @@ class OnCallController extends AbstractController
         $message = new Message();
 
         $this->handleJSONForm($request, $message, MessageType::class);
+        // the sender comes from the request body: it must be the logged-in user
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || $message->getSender() !== (string) $currentUser->getId()) {
+            throw $this->createAccessDeniedException('You can only send messages as yourself.');
+        }
 
         $messageBus->dispatch($message);
 //
@@ -134,6 +146,7 @@ class OnCallController extends AbstractController
     #[Route('/message/{id}/seen', methods: Request::METHOD_POST)]
     public function makeMessageSeen(ContactMessage $contactMessage): Response
     {
+        $this->denyAccessUnlessGranted(ContactMessageVoter::MARK_SEEN, $contactMessage);
         $contactMessage
             ->setStatus(ContactMessageStatus::SEEN->value)
             ->setUpdatedAt();
@@ -152,8 +165,10 @@ class OnCallController extends AbstractController
         $chat = [];
 
         $messages = $messageRepo->findBy(['chatId' => $chatId], ['createdAt' => 'DESC']);
-//
+
+        // only the people in the chat (or an admin) may read it
         foreach($messages as $message){
+            $this->denyAccessUnlessGranted(ContactMessageVoter::VIEW, $message);
             $chat[] = $message;
         }
 

@@ -2,7 +2,9 @@
 
 namespace App\Tests\Unit\Security;
 
+use App\Entity\ContactMessage;
 use App\Entity\HealthRecord;
+use App\Entity\OnCall;
 use App\Entity\Pet;
 use App\Entity\User;
 use App\Factory\ExaminationFactory;
@@ -164,5 +166,50 @@ class OwnershipTest extends WebTestCase
             self::assertSame(200, $this->callAs($this->admin, 'GET', $uri), $uri);
             self::assertSame(403, $this->callAs($this->otherVet, 'GET', $uri), $uri);
         }
+    }
+
+    public function testOnCallSessionsBelongToTheirVet(): void
+    {
+        self::assertSame(403, $this->callAs($this->otherVet, 'POST', '/on_call', ['vet' => $this->vet->getId()]), 'starting a session as another vet');
+        self::assertSame(201, $this->callAs($this->vet, 'POST', '/on_call', ['vet' => $this->vet->getId()]));
+
+        $session = persistent_factory(OnCall::class)->create(['vet' => $this->vet]);
+        $uri = '/on_call/' . $session->getId();
+        self::assertSame(403, $this->callAs($this->otherVet, 'PUT', $uri, ['vet' => $this->vet->getId()]));
+        self::assertSame(201, $this->callAs($this->vet, 'PUT', $uri, ['vet' => $this->vet->getId()]));
+    }
+
+    public function testMessagesCanOnlyBeSentAsYourself(): void
+    {
+        $body = fn (User $sender) => ['sender' => (string) $sender->getId(), 'receiver' => (string) $this->vet->getId(), 'content' => 'hi', 'chatId' => '4242'];
+
+        self::assertSame(403, $this->callAs($this->stranger, 'POST', '/message', $body($this->owner)), 'spoofed sender');
+        self::assertSame(200, $this->callAs($this->owner, 'POST', '/message', $body($this->owner)));
+    }
+
+    public function testChatsAreVisibleToTheirParticipantsOnly(): void
+    {
+        $message = persistent_factory(ContactMessage::class)
+            ->instantiateWith(fn () => new ContactMessage($this->owner, $this->vet, 'hello', 'sent', '4242'))
+            ->create();
+
+        self::assertSame(200, $this->callAs($this->owner, 'GET', '/chat/4242'));
+        self::assertSame(200, $this->callAs($this->vet, 'GET', '/chat/4242'));
+        self::assertSame(403, $this->callAs($this->stranger, 'GET', '/chat/4242'));
+
+        $seen = '/message/' . $message->getId() . '/seen';
+        self::assertSame(403, $this->callAs($this->stranger, 'POST', $seen));
+        self::assertSame(403, $this->callAs($this->owner, 'POST', $seen), 'only the receiver marks it seen');
+        self::assertSame(201, $this->callAs($this->vet, 'POST', $seen));
+    }
+
+    public function testQrCodeAndPetListing(): void
+    {
+        self::assertSame(403, $this->callAs($this->stranger, 'POST', '/qr-code', ['pet_id' => $this->pet->getId()]));
+        self::assertSame(200, $this->callAs($this->owner, 'POST', '/qr-code', ['pet_id' => $this->pet->getId()]));
+        self::assertSame(404, $this->callAs($this->owner, 'POST', '/qr-code', ['pet_id' => 999999]), 'was 500');
+
+        self::assertSame(403, $this->callAs($this->owner, 'GET', '/pet'), 'all pets with their owners');
+        self::assertSame(200, $this->callAs($this->admin, 'GET', '/pet'));
     }
 }

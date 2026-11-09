@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Security\Voter\AccessHelper;
 use App\Security\Voter\UserVoter;
 use App\Security\Voter\PetVoter;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -265,6 +266,11 @@ class PetController extends AbstractController
     #[Route('/pet', methods: 'GET')]
     public function showAllPets(PetRepository $repo): Response
     {
+        // every pet with its owner: admins only (owners use /my_pets, vets /vets/{id}/pets)
+        $currentUser = $this->getUser();
+        if (!$currentUser instanceof User || !AccessHelper::isAdmin($currentUser)) {
+            throw $this->createAccessDeniedException();
+        }
         $pets = $repo->findAll();// Todo paginate this
 
         return $this->json($pets, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_PET]);
@@ -313,6 +319,11 @@ class PetController extends AbstractController
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
 
         $pet = $petRepo->find($qrCode->getPetId());
+        if (!$pet) {
+            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
+        }
+        // the QR code of a pet is mailed on request of its owner (or an admin)
+        $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $generatedQRCode = $qrCode->generate();
 
         $email = new TemplatedEmailService($mailer);
