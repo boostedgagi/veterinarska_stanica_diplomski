@@ -483,6 +483,8 @@ The app is not hosted anywhere, so after the merge (PRs #1, #2) work continues d
 - PHPStan baseline (level 6) still has legacy entries; it only shrinks.
 - `user.popularity` legacy `"NN.00%"` strings on very old databases (see §4); irrelevant without a production DB.
 
+**Frontend** → see `FRONTEND_PLAN.md`. Default-deny had also closed routes the Angular app calls anonymously (home page, vets page, contact form); `GET /vets`, `/examination`, `/examination/{id}`, `/search/examination`, `POST /contact_message`, `/initialize_chat_id` are public again, and `/found_pet` returns what the found-pet page shows.
+
 ---
 
 ## 9. Messenger chat queue ✅ (2026-11-09, `f1ad6a7`)
