@@ -25,6 +25,7 @@ class ExaminationControllerTest extends WebTestCase
     public function testGetOneExamination():void
     {
         $client = static::createClient();
+        $client->loginUser(UserFactory::createOne(['typeOfUser' => User::TYPE_USER, 'allowed' => true, 'verified' => true]));
         $seededExamination = ExaminationFactory::createOne();
 
         $response = RequestBuilder::create($client)

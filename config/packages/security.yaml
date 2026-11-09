@@ -29,26 +29,27 @@ security:
             stateless: true
             jwt: ~
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # Only the *first* rule that matches a request is used.
+    # Default deny: every route needs a logged-in user (all users have ROLE_USER) unless it is
+    # listed as public here. Admin-only actions additionally carry #[IsGranted('ROLE_ADMIN')].
+    # tests/Unit/Security/AccessControlTest.php checks every route against this list.
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-#         - { path: ^/, roles: ROLE_USER }
-         - { path: ^/get/, roles: PUBLIC_ACCESS }
-         - { path: ^/vets/simplified, roles: PUBLIC_ACCESS }
-         - { path: ^/vets/, roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/vets/free, roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/pets/, roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/make_vet, roles: ROLE_ADMIN }
-         - { path: ^/login_check, roles: PUBLIC_ACCESS }
-         - { path: ^/password/, roles: PUBLIC_ACCESS }
-         - { path: ^/engage_vet, roles: ROLE_USER }
-         # Health records (appointments): every route that reads or changes them needs a logged-in user.
-         # The old rule '^/health_records' (plural) matched none of the actual routes.
-         - { path: ^/health_record(/|$), roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/(pet|vet)/[^/]+/health_record$, roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/user/[^/]+/health_records$, roles: [ROLE_USER,ROLE_ADMIN] }
-         - { path: ^/search/health_record, roles: [ROLE_USER,ROLE_ADMIN] }
+        # authentication
+        - { path: ^/login_check$, roles: PUBLIC_ACCESS }
+        # registration and account verification (link from the welcome mail)
+        - { path: ^/user$, methods: [POST], roles: PUBLIC_ACCESS }
+        - { path: ^/verify_account$, methods: [GET], roles: PUBLIC_ACCESS }
+        # forgotten password (request mail, then set the new one with the mailed token)
+        - { path: ^/password/(request_new|make_new)$, methods: [POST], roles: PUBLIC_ACCESS }
+        # page opened by scanning a pet's QR code
+        - { path: ^/found_pet$, methods: [GET], roles: PUBLIC_ACCESS }
+        # vet lists shown before login
+        - { path: ^/(vets/simplified|active_vets)$, methods: [GET], roles: PUBLIC_ACCESS }
+        # API documentation (Swagger UI and OpenAPI JSON)
+        - { path: ^/doc(\.json)?$, methods: [GET], roles: PUBLIC_ACCESS }
+        # everything else
+        - { path: ^/, roles: ROLE_USER }
+
 when@test:
     security:
         password_hashers:
