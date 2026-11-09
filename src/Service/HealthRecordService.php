@@ -8,11 +8,10 @@ use App\Enum\HealthRecordStatus;
 use App\Model\CancelHealthRecord;
 use DateTime;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 
 class HealthRecordService
 {
-    public function __construct(private readonly MailerInterface $mailer)
+    public function __construct(private readonly TemplatedEmailService $emailService)
     {
     }
 
@@ -29,9 +28,8 @@ class HealthRecordService
         }
         if ($canceler->getTypeOfUser() === User::TYPE_VET)
         {
-            $email = new TemplatedEmailService($this->mailer);
 
-            $email->sendCancelMailByVet(
+            $this->emailService->sendCancelMailByVet(
                 $healthRecord->getPet(),
                 $cancel->getCancelMessage()
             );

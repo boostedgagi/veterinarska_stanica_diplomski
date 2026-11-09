@@ -475,11 +475,11 @@ The app is not hosted anywhere, so after the merge (PRs #1, #2) work continues d
 | Config | Duplicate `app.swagger_ui` route, controller-less `api_login_check`, dead `access_control` rules | removed (`e2a1901`) |
 | Config | `kernel.environment` override, redundant subscriber tags, dead `security.user_checker.main` tag, placeholder command descriptions | removed / written (`533c8e8`) |
 | Build | `bin/phpunit` not executable (mode lost in the recipe commit) | `53fa086` |
+| Style | `TemplatedEmailService` was built by hand in 10 places (and the mailer passed around inside `UserRegisterEvent`); `NotifyExaminationByEmail` crashed without `--time-range` | injected everywhere; option validated (exit 2) |
 | Earlier | `TokenEntityRepository` ran its query twice; `Token.php` / `BaseTestCase.php` unused imports | gone with the token rewrite / Rector |
 
 **Still open**
 
-- `NotifyExaminationByEmailCommand` instantiates `TemplatedEmailService` by hand instead of injecting it (works; style).
 - PHPStan baseline (level 6) still has legacy entries; it only shrinks.
 - `user.popularity` legacy `"NN.00%"` strings on very old databases (see §4); irrelevant without a production DB.
 

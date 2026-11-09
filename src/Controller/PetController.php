@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 
 class PetController extends AbstractController
@@ -313,7 +312,7 @@ class PetController extends AbstractController
         ]
     )]
     #[Route('/qr-code', methods: 'POST')]
-    public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, MailerInterface $mailer, BuilderInterface $builder): Response
+    public function generateQRAndSendByMail(Request $request, PetRepository $petRepo, TemplatedEmailService $email, BuilderInterface $builder): Response
     {
         $qrCode = new QRCode($builder);
         $this->handleJSONForm($request, $qrCode, QRCodeType::class);
@@ -326,7 +325,6 @@ class PetController extends AbstractController
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $generatedQRCode = $qrCode->generate();
 
-        $email = new TemplatedEmailService($mailer);
         $email->sendQrCodeWithMail($pet, $generatedQRCode);
 
         return $this->json("", Response::HTTP_OK);

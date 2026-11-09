@@ -10,6 +10,12 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class RegisterEventSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly TokenFactory $tokenFactory,
+        private readonly TemplatedEmailService $emailService,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -22,10 +28,7 @@ class RegisterEventSubscriber implements EventSubscriberInterface
      */
     public function onUserRegistration(UserRegisterEvent $event): void
     {
-        $tokenFactory = new TokenFactory($event->em);
-        $token = $tokenFactory->save($event->user);
-
-        $email = new TemplatedEmailService($event->mailer);
-        $email->sendWelcomeEmail($event->user, $token);
+        $token = $this->tokenFactory->save($event->user);
+        $this->emailService->sendWelcomeEmail($event->user, $token);
     }
 }

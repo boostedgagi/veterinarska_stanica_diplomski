@@ -10,7 +10,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'MonthlyHealthRecordExport',
@@ -22,7 +21,7 @@ class MonthlyHealthRecordExportCommand extends Command
     public function __construct(
         public readonly HealthRecordRepository $healthRecordRepo,
         public readonly ExportService          $exportService,
-        public readonly MailerInterface        $mailer
+        public readonly TemplatedEmailService $emailService
     )
     {
         parent::__construct();
@@ -38,8 +37,7 @@ class MonthlyHealthRecordExportCommand extends Command
         $fileName = sprintf('%s_%s_health_records.csv', date('n'), date("Y", time()));
 
         $filePath = $this->exportService->exportHealthRecords($lastMonthHealthRecords, $fileName);
-        $email = new TemplatedEmailService($this->mailer);
-        $email->sendMonthlyCSVByMail($filePath);
+        $this->emailService->sendMonthlyCSVByMail($filePath);
 
         return Command::SUCCESS;
     }

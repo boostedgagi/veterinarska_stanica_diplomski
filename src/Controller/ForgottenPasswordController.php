@@ -21,7 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -81,7 +80,7 @@ class ForgottenPasswordController extends AbstractController
      */
     #[Security(name: null)] // public route, see security.yaml
     #[Route('/password/request_new', methods: 'POST')]
-    public function requestNewPassword(Request $request, MailerInterface $mailer, UserRepository $userRepo): Response
+    public function requestNewPassword(Request $request, TemplatedEmailService $email, UserRepository $userRepo): Response
     {
         $requestNewPassword = new RequestNewPassword();
         $this->handleJSONForm($request, $requestNewPassword, RequestNewPasswordType::class);
@@ -97,7 +96,6 @@ class ForgottenPasswordController extends AbstractController
         $this->em->persist($token);
         $this->em->flush();
 
-        $email = new TemplatedEmailService($mailer);
         $email->sendPasswordRequest($token, $requestNewPassword->email);
 
         return $this->json('Email successfully sent. Check your email inbox.', Response::HTTP_CREATED);

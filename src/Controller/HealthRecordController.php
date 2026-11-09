@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HealthRecordController extends AbstractController
@@ -78,11 +77,10 @@ class HealthRecordController extends AbstractController
      * todo refactor creation to factory
      */
     #[Route('/health_record', methods: 'POST')]
-    public function create(Request $request, MailerInterface $mailer): Response
+    public function create(Request $request, TemplatedEmailService $email): Response
     {
         $env = $this->getParameter('kernel.environment');
         $healthRecord = new HealthRecord();
-        $email = new TemplatedEmailService($mailer);
 
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
         // owner of the pet, the booked vet, or an admin
@@ -135,7 +133,7 @@ class HealthRecordController extends AbstractController
         ]
     )]
     #[Route('/health_record/{id}', methods: 'PUT')]
-    public function edit(Request $request, ?HealthRecord $healthRecord, MailerInterface $mailer): Response
+    public function edit(Request $request, ?HealthRecord $healthRecord, TemplatedEmailService $email): Response
     {
         if (!$healthRecord) {
             return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
@@ -146,7 +144,6 @@ class HealthRecordController extends AbstractController
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
 
         if($healthRecord->getCancelMessage()){
-            $email = new TemplatedEmailService($mailer);
             $email->sendCancelMailByVet($healthRecord->getPet(),$healthRecord->getCancelMessage());
 
             $healthRecord->setCancelMessage(null);

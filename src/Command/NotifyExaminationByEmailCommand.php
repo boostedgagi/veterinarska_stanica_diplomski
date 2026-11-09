@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'NotifyExaminationByEmail',
@@ -23,7 +22,7 @@ use Symfony\Component\Mailer\MailerInterface;
 class NotifyExaminationByEmailCommand extends Command
 {
     public function __construct(
-        private readonly MailerInterface        $mailer,
+        private readonly TemplatedEmailService $emailService,
         private readonly HealthRecordRepository $healthRecRepo,
         private readonly EntityManagerInterface $em
     )
@@ -42,7 +41,13 @@ class NotifyExaminationByEmailCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $timeRange = $input->getOption('time-range');
+        $range = NotifyingTimeRange::tryFrom((string) $input->getOption('time-range'));
+        if ($range === null) {
+            $output->writeln('<error>--time-range must be "today" or "next_week".</error>');
+
+            return Command::INVALID;
+        }
+        $timeRange = $range->value;
         $scheduledHealthRecords = $this->healthRecRepo->timeRangeHealthRecords($timeRange);
 
         if (count($scheduledHealthRecords) === 0) {
@@ -50,10 +55,9 @@ class NotifyExaminationByEmailCommand extends Command
         }
 
         foreach ($scheduledHealthRecords as $healthRecord) {
-            $email = new TemplatedEmailService($this->mailer);
 
             $this->setNotifiedByRange($healthRecord,$timeRange);
-            $email->notifyUserAboutAppointment($healthRecord);
+            $this->emailService->notifyUserAboutAppointment($healthRecord);
 
             $this->em->flush();
         }

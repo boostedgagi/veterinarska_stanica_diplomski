@@ -34,7 +34,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\TemplatedEmailService;
@@ -79,7 +78,7 @@ class UserController extends AbstractController
     )]
     #[Security(name: null)] // public route, see security.yaml
     #[Route('/user', methods: 'POST')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
 
@@ -95,7 +94,7 @@ class UserController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        $event = new UserRegisterEvent($user, $mailer, $this->em);
+        $event = new UserRegisterEvent($user);
         $this->eventDispatcher->dispatch($event, UserRegisterEvent::NAME);
 
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => ContextGroup::CREATE_USER]);
@@ -130,7 +129,7 @@ class UserController extends AbstractController
     )]
     #[IsGranted("ROLE_ADMIN")]
     #[Route('/vets/make_new', methods: 'POST')]
-    public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
+    public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, TemplatedEmailService $email): Response
     {
         $vet = new User();
 
@@ -147,7 +146,6 @@ class UserController extends AbstractController
 
         $this->em->persist($vet);
         $this->em->flush();
-        $email = new TemplatedEmailService($mailer);
         $email->sendMailToNewVet($vet, $plainPassword);
 
         return $this->json($vet, Response::HTTP_CREATED, [], ['groups' => ContextGroup::SHOW_USER]);
@@ -753,12 +751,11 @@ class UserController extends AbstractController
      */
     #[Security(name: null)] // public route, see security.yaml
     #[Route('/contact_message',methods: Request::METHOD_POST)]
-    public function sendContactMessage(Request $request,MailerInterface $mailer): Response
+    public function sendContactMessage(Request $request, TemplatedEmailService $email): Response
     {
         $contactMessage = new ContactMessage();
         $this->handleJSONForm($request,$contactMessage,ContactMessageType::class);
 
-        $email = new TemplatedEmailService($mailer);
         $email->sendContactMail($contactMessage);
 
         return $this->json(Response::HTTP_OK);
