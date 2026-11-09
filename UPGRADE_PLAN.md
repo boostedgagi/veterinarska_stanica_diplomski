@@ -452,28 +452,37 @@ Still open (each has a default that I'll use unless you say otherwise):
 3. **Q7 – CS fixer:** *Default: add a minimal PHP-CS-Fixer config (imports only) and run it only on files Rector touched.*
 4. **Q10 – Secrets / history:** rotate the SMTP password and move it out of `.env`; optionally rewrite git history to purge the health-record CSVs and images. *Default: outside the upgrade, so I won't touch it.*
 
-## 8. Found along the way (not fixed in this branch)
+## 8. Found along the way → follow-up work on `main` (2026-11-09)
 
-- `HealthRecord::$vet` is typed `User` (non-nullable) but mapped `nullable: true, onDelete: SET NULL`.
-- `UserRepository::findByRole()` returns `getResult()[0]` (undefined index when empty); `TokenEntityRepository` runs the same query twice.
-- `ContextGroup::SHOW_PET` and `CREATE_PET` have the same value.
-- `NotifyExaminationByEmailCommand` has the placeholder description "Add a short description for your command" and manually instantiates `TemplatedEmailService`.
-- Explicit `kernel.event_subscriber` tags in `services.yaml` duplicate autoconfigure.
-- `services.yaml` overrides the `kernel.environment` parameter with `%env(APP_ENV)%`.
-- ~~The duplicate `app.swagger_ui` route is defined twice.~~ Fixed (`e2a1901`).
-- `UserController` and the access_control in `security.yaml` have overlapping/ordered rules (`^/vets/` before `^/vets/free`).
-- PHPStan: 120 level-6 errors.
-- The `popularity` column history
-- `GET /found_pet?id=<unknown>` answers 500 (an uncaught RuntimeException); the commented-out line above it shows a 404 was intended.
-- `src/Entity/Token.php` imports a non-existent `App\Model\Token as ModelToken` (unused, so it's harmless).
-- ~~**Security:** the `access_control` rule `^/health_records` (plural) didn't match the `/health_record/...` routes~~ → **fixed** on branch `fix/health-record-access-control` (`0ccc35d`, Swagger `15a3ee5`): all 8 health-record routes require login; 7 of them answered 200 to anonymous requests before. Still open: any logged-in user can read/edit/delete **any** health record (no owner/vet check).
-- ~~**Security (wider):** most other routes were reachable without a token~~ → **fixed** on `main` 2026-11-09 (`e2a1901`, Swagger `d36bf6c`): default-deny `access_control` with a public allow-list (login, registration, account verification, password reset, `/found_pet`, `/vets/simplified`, `/active_vets`, `/doc[.json]`). `tests/Unit/Security/AccessControlTest.php` sends an anonymous request to every route and expects 401 unless allow-listed. Dead rules and the duplicate `app.swagger_ui` / controller-less `api_login_check` routes removed. Ownership checks → **fixed** (`8593524`): voters in `src/Security/Voter` for users, pets and health records, covered by `tests/Unit/Security/OwnershipTest.php`.
-- **Still open (ownership, smaller):** `GET /pet` lists all pets to any logged-in user; `POST /qr-code` mails the QR of any pet id to its owner; `GET /chat/{chatId}`, `POST /message/{id}/seen` and `PUT /on_call/{id}` don't check that the caller is part of the chat / on-call session.
-- `UserTest::testCreatedUser` and `testCreatedUserWithVet` are `protected`, so PHPUnit never runs them.
-- `UserRepository::findByRole()` is declared `User|int` but returns `null` when nothing matches (TypeError).
-- Found while writing the access tests (2026-11-09), all answer **500** instead of 4xx: `GET /verify_account` without `token` (TypeError), `GET /found_pet` without `id`, paginated lists without `?page=` (e.g. `/vet/{id}/health_record`, KNP `PageNumberInvalidException`). `PATCH /user/{id}` clears fields missing from the body (a partial body nulls `email` → 500).
-- "Not found" in `HealthRecordController` / `PetController` is often answered with **200** and an error JSON instead of 404.
-- `tests/Unit/BaseTestCase.php` imports the generated `Symfony\Config\ZenstruckFoundry\DatabaseResetterConfig` without using it. (`VARCHAR` "NN.00%" → `DOUBLE`).
+The app is not hosted anywhere, so after the merge (PRs #1, #2) work continues directly on `main`.
+
+**Fixed**
+
+| Area | Problem | Fix |
+|---|---|---|
+| Security | `access_control` `^/health_records` (plural) matched none of the `/health_record…` routes: health records were open to anonymous users | PR #2 (`0ccc35d`) |
+| Security | Most other routes reachable without a token (`DELETE /user/{id}`, `DELETE /pet/{id}`, chat, …) | Default-deny with a public allow-list (`e2a1901`); `AccessControlTest` checks every route; Swagger marks the same routes (`d36bf6c`) |
+| Security | Any logged-in user could read/change/delete other users' profiles, pets and appointments; any user could self-verify via `PATCH /user/{id}` | Voters for users, pets, health records (`8593524`); `OwnershipTest` |
+| **Security (critical)** | Reset/verification tokens had no owner: a token from your own reset mail could set **any** account's password (proven on the old code: admin takeover) or verify any account. Tokens were `md5(uniqid() . mt_rand(10,100))`, expiry used a 12-hour clock | Tokens bound to their user + migration `Version20261109201608`, `random_bytes` tokens, `time()` expiry (`1407419`); `TokenTest` |
+| API | 500s: `/found_pet` unknown/missing id, `/verify_account` without params, paginated lists without `?page=`, partial `PATCH /user[/{id}]` | 404 / 400 / defaults page 1, limit 10 / partial updates (`5440cd6`, `1407419`) |
+| API | "Not found" answered 200 with an error message | 404 (`5440cd6`) |
+| Security | `PATCH /user` stored a sent password unhashed (and broke the login) | Password ignored there; `POST /password/make_new_authenticated` changes it (`5440cd6`) |
+| Model | `HealthRecord::$vet` non-nullable but `ON DELETE SET NULL` → 500 after deleting a vet | `?User` (`0da4a80`) |
+| Model | `findByRole()` `getResult()[0]` / wrong return type | `?User` (`0da4a80`) |
+| Model | `ContextGroup::SHOW_PET` = `CREATE_PET` | Separate value, responses byte-identical (`0da4a80`) |
+| Tests | `UserTest` had 2 `protected` tests that never ran | public, passing (`0da4a80`) |
+| Config | Duplicate `app.swagger_ui` route, controller-less `api_login_check`, dead `access_control` rules | removed (`e2a1901`) |
+| Config | `kernel.environment` override, redundant subscriber tags, dead `security.user_checker.main` tag, placeholder command descriptions | removed / written (`533c8e8`) |
+| Build | `bin/phpunit` not executable (mode lost in the recipe commit) | `53fa086` |
+| Earlier | `TokenEntityRepository` ran its query twice; `Token.php` / `BaseTestCase.php` unused imports | gone with the token rewrite / Rector |
+
+**Still open**
+
+- Ownership, smaller: `GET /pet` lists all pets to any logged-in user; `POST /qr-code` mails the QR of any pet id (to that pet's owner); `GET /chat/{chatId}`, `POST /message/{id}/seen`, `PUT /on_call/{id}` don't check that the caller belongs to the chat / on-call session.
+- Messenger chat queue: §9.
+- `NotifyExaminationByEmailCommand` instantiates `TemplatedEmailService` by hand instead of injecting it (works; style).
+- PHPStan baseline (level 6) still has legacy entries; it only shrinks.
+- `user.popularity` legacy `"NN.00%"` strings on very old databases (see §4); irrelevant without a production DB.
 
 ---
 
