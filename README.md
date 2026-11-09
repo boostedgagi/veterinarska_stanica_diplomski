@@ -3,13 +3,13 @@
 Ovo je backend deo diplomskog rada koji sam izradio za potrebe završnog projekta na Visokoj tehničkoj školi u Subotici.
 Projekat predstavlja sistem za veterinarsku kliniku, koji omogućava zakazivanje pregleda, vođenje zdravstvenih kartona, komunikaciju sa veterinarima i praćenje istorije tretmana ljubimaca.
 
-Frontend deo aplikacije razvijen je zasebno u Angular framework-u, dok se ovaj repozitorijum odnosi isključivo na backend implementiran u Symfony 8.1.
+Frontend deo aplikacije razvijen je zasebno u Angular framework-u, dok se ovaj repozitorijum odnosi isključivo na backend implementiran u Symfony 8.2.
 
 # ⚙️ Tehnologije i komponente
 
 Projekt je izgrađen korišćenjem sledećih tehnologija i Symfony komponenti:
 
-🧩 Symfony 8.1 — PHP framework
+🧩 Symfony 8.2 — PHP framework
 
 💾 Doctrine ORM — rad sa MySQL bazom podataka
 

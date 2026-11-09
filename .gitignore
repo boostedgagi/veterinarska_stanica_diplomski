@@ -39,3 +39,4 @@ phpstan.neon
 ###< phpstan/phpstan ###
 error_log
 /config/reference.php
+/config/schema.json

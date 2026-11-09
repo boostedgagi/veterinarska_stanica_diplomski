@@ -1,6 +1,6 @@
-# Symfony upgrade plan: 6.4 → 7.4 LTS → 8.1 (with Rector)
+# Symfony upgrade plan: 6.4 → 7.4 LTS → 8.1 → 8.2 (with Rector)
 
-Status: **S0–S6 done** (2026-11-09). `main` is on **Symfony 8.1** / PHP 8.4 / Doctrine ORM 3, CI green with the Rector gate (S6, §11). 7.4 was merged first (PR #2).
+Status: **S0–S7 done** (2026-11-09). `main` is on **Symfony 8.2.0-BETA1** / PHP 8.4 / Doctrine ORM 3, CI green with the Rector gate (S6/S7, §11–12). When 8.2.0 is released: `composer update "symfony/*" -W`, then set `minimum-stability` back to `stable`. 7.4 was merged first (PR #2).
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -549,4 +549,17 @@ Asked for on 2026-11-02 ("fix the queue system for messaging … or write somewh
 | 8.2 | late 11/2026 | 07/2027 |
 | 8.3 | 05/2027 | 01/2028 |
 | 8.4 LTS | 11/2027 | 11/2030 (bugs), 11/2031 (security) |
+
+---
+
+## 12. S7: Symfony 8.1 → 8.2 (beta) ✅ (2026-11-09)
+
+Done on owner's request while 8.2 is still in beta (only `v8.2.0-BETA1` tagged; final due late Nov 2026).
+
+- [x] `composer.json`: `symfony/*` `8.2.*`, `extra.symfony.require` `8.2.*`, `phpunit-bridge` `^8.2`, **`minimum-stability: beta`** (with `prefer-stable: true` only Symfony itself is beta; every other package stays stable).
+- [x] Deprecations new in 8.2, fixed: `Symfony\Component\EventDispatcher\EventDispatcherInterface` → `Symfony\Contracts\...` in `HealthRecordController` / `UserController`; logout route loader `security.route_loader.logout` → `security.route_loader` (`config/routes/security.yaml`, route list identical).
+- [x] Recipe `symfony/security-csrf` 8.2 added `config/packages/csrf_protection.yaml`: deleted. CSRF stays off on purpose (stateless JWT API, `framework.yaml`); the file had no effect except to suggest otherwise. `config/schema.json` (generated, 634 KB, YAML autocomplete) is git-ignored like `config/reference.php`.
+- [x] Verified: 46 tests, PHPStan, Rector dry-run, `lint:container`, deprecations = only the vendor Nelmio one; smoke run (`smoke-sf82`) and CORS probe identical to 8.1.
+
+**To do when 8.2.0 is released:** `composer update "symfony/*" -W`, set `"minimum-stability": "stable"`, rerun the checks above, commit. Same for every later 8.2.x patch (`composer update`).
 
