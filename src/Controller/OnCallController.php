@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
@@ -159,6 +160,7 @@ class OnCallController extends AbstractController
         return $this->json($chat, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_MESSAGE]);
     }
 
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/active_vets', methods: Request::METHOD_GET)]
     public function getOnCallVet(OnCallRepository $onCallRepo): Response
     {

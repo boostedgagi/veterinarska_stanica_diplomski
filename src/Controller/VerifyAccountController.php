@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Model\VerifyAccount;
 use App\Repository\UserRepository;
@@ -18,6 +19,7 @@ class VerifyAccountController extends AbstractController
     {
     }
 
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/verify_account', methods: 'GET')]
     public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo): Response
     {

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
@@ -334,6 +335,7 @@ class PetController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/found_pet', methods: 'GET')]
     public function foundPet(Request $request, PetRepository $petRepo): Response
     {

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
 use App\Factory\TokenFactory;
@@ -43,6 +44,7 @@ class ForgottenPasswordController extends AbstractController
      * Here i should make a logic for registered user if logged in change password
      * without token and other things
      */
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/password/make_new', methods: 'POST')]
     public function renewForgottenPassword(
         Request                     $request,
@@ -83,6 +85,7 @@ class ForgottenPasswordController extends AbstractController
     /**
      * @throws TransportExceptionInterface
      */
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/password/request_new', methods: 'POST')]
     public function requestNewPassword(Request $request, MailerInterface $mailer, UserRepository $userRepo): Response
     {

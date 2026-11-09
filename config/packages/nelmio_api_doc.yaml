@@ -10,6 +10,10 @@ nelmio_api_doc:
                     type: http
                     scheme: bearer
                     bearerFormat: JWT
+        # Every operation needs a JWT unless its action says #[Security(name: null)]
+        # (mirrors the default-deny access_control in security.yaml).
+        security:
+            - Bearer: []
     areas:
         path_patterns:
                 - ^/

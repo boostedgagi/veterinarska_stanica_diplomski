@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Nelmio\ApiDocBundle\Attribute\Security;
 use App\ContextGroup;
 use App\Repository\ExaminationRepository;
 use App\Repository\HealthRecordRepository;
@@ -31,7 +30,6 @@ class SearchController extends AbstractController
         return $this->json($searchedData, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_EXAMINATION]);
     }
 
-    #[Security(name: 'Bearer')]
     #[Route('/search/health_record', methods: Request::METHOD_GET)]
     public function searchHealthRecord(Request $request, HealthRecordRepository $healthRecordRepository): Response
     {

@@ -76,6 +76,7 @@ class UserController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/user', methods: 'POST')]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -127,7 +128,6 @@ class UserController extends AbstractController
         ]
     )]
     #[IsGranted("ROLE_ADMIN")]
-    #[Security(name: "Bearer")]
     #[Route('/vets/make_new', methods: 'POST')]
     public function makeVet(Request $request, UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer): Response
     {
@@ -197,7 +197,6 @@ class UserController extends AbstractController
     }
 
 
-    #[Security(name: 'Bearer')]
     #[Route('/me', methods: 'GET')]
     public function getCurrentUser(#[CurrentUser] User $user): JsonResponse
     {
@@ -344,7 +343,6 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name: 'Bearer')]
     #[Route('/my_pets', requirements: ['page' => Requirements::NUMERIC, 'limit' => Requirements::NUMERIC], methods: 'GET')]
     public function showMyPets(Request $request, #[CurrentUser] User $user, PaginatorInterface $paginator): Response
     {
@@ -470,7 +468,6 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name: 'Bearer')]
     #[Route('/vets/{id}/pets', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function getVetPetsData(User $vet): Response
     {
@@ -526,6 +523,7 @@ class UserController extends AbstractController
             ),
         ]
     )]
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/login_check', methods: 'POST')]
     public function login(UserRepository $userRepo): JsonResponse
     {
@@ -629,6 +627,7 @@ class UserController extends AbstractController
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_VET]);
     }
 
+    #[Security(name: null)] // public route, see security.yaml
     #[Route('/vets/simplified', methods: 'GET')]
     public function showAllVetsSimplified(UserRepository $userRepo): Response
     {
@@ -677,7 +676,6 @@ class UserController extends AbstractController
             )
         ]
     )]
-    #[Security(name: 'Bearer')]
     #[Route('/vet/{id}/health_record', methods: 'GET')]
     public function getVetHealthRecords(?User $vet, PaginatorInterface $paginator, Request $request, #[CurrentUser] User $currentUser): Response
     {
@@ -716,7 +714,6 @@ class UserController extends AbstractController
         return $this->json("", Response::HTTP_OK);
     }
 
-    #[Security(name: 'Bearer')]
     #[Route('/assign', methods: Request::METHOD_POST)]
     public function assignVet(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
