@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Security\Voter\OnCallVoter;
@@ -109,7 +110,7 @@ class OnCallController extends AbstractController
             throw $this->createAccessDeniedException('You can only send messages as yourself.');
         }
         if (!$userRepo->find($message->getReceiver())) {
-            return $this->json('Unknown receiver.', Response::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('Unknown receiver.');
         }
 
         $messageBus->dispatch($message);

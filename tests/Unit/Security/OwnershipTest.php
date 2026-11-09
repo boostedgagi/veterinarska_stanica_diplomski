@@ -221,7 +221,7 @@ class OwnershipTest extends WebTestCase
     public function testQrCodeAndPetListing(): void
     {
         self::assertSame(403, $this->callAs($this->stranger, 'POST', '/qr-code', ['pet_id' => $this->pet->getId()]));
-        self::assertSame(200, $this->callAs($this->owner, 'POST', '/qr-code', ['pet_id' => $this->pet->getId()]));
+        self::assertSame(204, $this->callAs($this->owner, 'POST', '/qr-code', ['pet_id' => $this->pet->getId()]));
         self::assertSame(404, $this->callAs($this->owner, 'POST', '/qr-code', ['pet_id' => 999999]), 'was 500');
 
         self::assertSame(403, $this->callAs($this->owner, 'GET', '/pet'), 'all pets with their owners');

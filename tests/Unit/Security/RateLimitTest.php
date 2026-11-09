@@ -40,12 +40,12 @@ class RateLimitTest extends WebTestCase
         $message = ['name' => 'Ana', 'email' => 'ana@example.test', 'content' => 'Hello'];
 
         for ($i = 1; $i <= 3; ++$i) {
-            self::assertSame(200, $this->post('/contact_message', $message), "message $i");
+            self::assertSame(204, $this->post('/contact_message', $message), "message $i");
         }
         self::assertSame(429, $this->post('/contact_message', $message));
         self::assertGreaterThan(0, (int) $this->client->getResponse()->headers->get('Retry-After'));
 
-        self::assertSame(200, $this->post('/contact_message', $message, '198.51.100.9'), 'other IP is not affected');
+        self::assertSame(204, $this->post('/contact_message', $message, '198.51.100.9'), 'other IP is not affected');
     }
 
     public function testPasswordResetRequestsAreLimited(): void

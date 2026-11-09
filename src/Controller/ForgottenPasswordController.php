@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -59,7 +60,7 @@ class ForgottenPasswordController extends AbstractController
         // the token only resets the password of the account it was issued for
         if (!$token || !$token->getUser()
             || strcasecmp((string) $token->getUser()->getEmail(), $newPasswordEnvelope->email) !== 0) {
-            return $this->json('Token is not valid.', Response::HTTP_OK);
+            throw new BadRequestHttpException('Token is not valid.');
         }
         $user = $token->getUser();
 
@@ -83,25 +84,19 @@ class ForgottenPasswordController extends AbstractController
     #[Security(name: null)] // public route, see security.yaml
     #[RateLimited('password_request')]
     #[Route('/password/request_new', methods: 'POST')]
-    public function requestNewPassword(Request $request, TemplatedEmailService $email, UserRepository $userRepo): Response
+    public function requestNewPassword(Request $request, TemplatedEmailService $email, UserRepository $userRepo, TokenFactory $tokenFactory): Response
     {
         $requestNewPassword = new RequestNewPassword();
         $this->handleJSONForm($request, $requestNewPassword, RequestNewPasswordType::class);
 
+        // same answer whether the account exists or not, so the endpoint can't be used to find accounts
         $user = $userRepo->findOneBy(['email' => $requestNewPassword->email]);
-        if (!$user) {
-            return $this->json('User not found.', Response::HTTP_OK);
+        if ($user) {
+            $token = $tokenFactory->save($user);
+            $email->sendPasswordRequest($token, $requestNewPassword->email);
         }
 
-        $tokenFactory = new TokenFactory($this->em);
-        $token = $tokenFactory->save($user);
-
-        $this->em->persist($token);
-        $this->em->flush();
-
-        $email->sendPasswordRequest($token, $requestNewPassword->email);
-
-        return $this->json('Email successfully sent. Check your email inbox.', Response::HTTP_CREATED);
+        return $this->json('If an account with this e-mail exists, a reset link has been sent to it.', Response::HTTP_CREATED);
     }
 
     #[Route('/password/make_new_authenticated', methods: 'POST')]

@@ -136,7 +136,7 @@ class HealthRecordController extends AbstractController
     public function edit(Request $request, ?HealthRecord $healthRecord, TemplatedEmailService $email): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Health record not found.');
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::EDIT, $healthRecord);
         $this->handleJSONForm($request, $healthRecord, HealthRecordType::class);
@@ -183,7 +183,7 @@ class HealthRecordController extends AbstractController
     public function showOne(?HealthRecord $healthRecord): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Health record not found.');
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::VIEW, $healthRecord);
 
@@ -215,13 +215,13 @@ class HealthRecordController extends AbstractController
     public function delete(?HealthRecord $healthRecord): Response
     {
         if (!$healthRecord) {
-            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Health record not found.');
         }
         $this->denyAccessUnlessGranted(HealthRecordVoter::DELETE, $healthRecord);
         $this->em->remove($healthRecord);
         $this->em->flush();
 
-        return $this->json("", Response::HTTP_NO_CONTENT);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     #[OA\Get(
@@ -287,7 +287,7 @@ class HealthRecordController extends AbstractController
     public function ownerHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {
         if (!$user) {
-            return $this->json(["error" => "Health record not found."], Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Health record not found.');
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         $allHealthRecords = $healthRecordRepo->findAllHealthRecordsForUser($user);

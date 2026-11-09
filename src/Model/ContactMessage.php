@@ -2,77 +2,60 @@
 
 namespace App\Model;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * Contact form (public, mailed to the admin). Validated so a bad address is a 422,
+ * not a 500 from the mailer.
+ */
 class ContactMessage
 {
-    private string $name;
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
+    private ?string $name = null;
 
-    private string $email;
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 180)]
+    private ?string $email = null;
 
-    private string $content;
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 5000)]
+    private ?string $content = null;
 
-    /**
-     * @param string $name
-     * @param string $email
-     * @param string $contact
-     */
-//    public function __construct(string $name, string $email, string $contact)
-//    {
-//        $this->name = $name;
-//        $this->email = $email;
-//        $this->contact = $contact;
-//    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return ContactMessage
-     */
-    public function setName(string $name): ContactMessage
+    public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     * @return ContactMessage
-     */
-    public function setEmail(string $email): ContactMessage
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    /**
-     * @param string $content
-     * @return ContactMessage
-     */
-    public function setContent(string $content): ContactMessage
+    public function setContent(?string $content): self
     {
         $this->content = $content;
+
         return $this;
     }
 }

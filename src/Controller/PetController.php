@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
 use App\Security\Voter\AccessHelper;
 use App\Security\Voter\UserVoter;
@@ -117,7 +118,7 @@ class PetController extends AbstractController
     public function uploadProfileImage(Request $request,?Pet $pet): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $uploadImage = new UploadImage($request, $pet, $this->em);
@@ -161,7 +162,7 @@ class PetController extends AbstractController
     public function edit(?Pet $pet, Request $request): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
         $this->handleJSONForm($request, $pet, PetType::class);
@@ -199,14 +200,14 @@ class PetController extends AbstractController
     public function delete(?Pet $pet): Response
     {
         if(!$pet){
-            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
 
         $this->em->remove($pet);
         $this->em->flush();
 
-        return $this->json("", Response::HTTP_NO_CONTENT);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     #[OA\Get(
@@ -239,7 +240,7 @@ class PetController extends AbstractController
     {
         if(!$pet)
         {
-            return $this->json('Pet not found.',Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
         $this->denyAccessUnlessGranted(PetVoter::VIEW, $pet);
 
@@ -320,7 +321,7 @@ class PetController extends AbstractController
 
         $pet = $petRepo->find($qrCode->getPetId());
         if (!$pet) {
-            return $this->json('Pet not found.', Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
         // the QR code of a pet is mailed on request of its owner (or an admin)
         $this->denyAccessUnlessGranted(PetVoter::EDIT, $pet);
@@ -328,7 +329,7 @@ class PetController extends AbstractController
 
         $email->sendQrCodeWithMail($pet, $generatedQRCode);
 
-        return $this->json("", Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     #[OA\Get(
@@ -363,11 +364,11 @@ class PetController extends AbstractController
     {
         $id = $request->query->getInt('id');
         if ($id < 1) {
-            return $this->json('Missing pet id.', Response::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('Missing pet id.');
         }
         $pet = $petRepo->find($id);
         if (!$pet) {
-            return $this->json('Pet is not existing in our database.', Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Pet not found.');
         }
 
         return $this->json($pet, Response::HTTP_OK, [], ['groups' => ContextGroup::FOUND_PET]);

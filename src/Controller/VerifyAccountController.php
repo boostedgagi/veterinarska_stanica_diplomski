@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,7 +28,7 @@ class VerifyAccountController extends AbstractController
     {
         $queryParams = new VerifyAccount($request->query->all());
         if (!$queryParams->getToken() || !$queryParams->getUserId()) {
-            return $this->json("Missing token or user_id.", Response::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('Missing token or user_id.');
         }
 
         $savedToken = $verifyRepo->findOneByValue($queryParams->getToken());
@@ -46,6 +48,6 @@ class VerifyAccountController extends AbstractController
             return $this->json("Account verified.", Response::HTTP_OK);
         }
 
-        return $this->json("Account not verified.", Response::HTTP_FORBIDDEN);
+        throw new AccessDeniedHttpException('Invalid or expired token.');
     }
 }

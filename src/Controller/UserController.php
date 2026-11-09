@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
 use App\Security\Voter\UserVoter;
 use Detection\MobileDetect;
@@ -239,7 +240,7 @@ class UserController extends AbstractController
         $this->em->remove($user);
         $this->em->flush();
 
-        return $this->json("", Response::HTTP_NO_CONTENT);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     #[OA\Get(
@@ -276,7 +277,7 @@ class UserController extends AbstractController
     public function showAllUsers(UserRepository $repo, #[CurrentUser] User $user, Request $request, PaginatorInterface $paginator): Response
     {
         if (!$user->isAdmin()) {
-            return $this->json('Access forbidden', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException();
         }
         $allUsers = $repo->findAll();
 
@@ -315,7 +316,7 @@ class UserController extends AbstractController
     public function showOneUser(?User $user): Response
     {
         if (!$user) {
-            return $this->json("User not found", Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('User not found.');
         }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
 
@@ -694,7 +695,7 @@ class UserController extends AbstractController
     public function getVetHealthRecords(?User $vet, PaginatorInterface $paginator, Request $request, #[CurrentUser] User $currentUser): Response
     {
         if ($currentUser->getTypeOfUser() === USER::TYPE_USER) {
-            return $this->json("Access forbidden", Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException();
         }
         if (!$vet) {
             throw $this->createNotFoundException('Vet not found.');
@@ -721,7 +722,7 @@ class UserController extends AbstractController
         ]
     )]
     #[Route('/log', methods: 'POST')]
-    public function takeLocation(MobileDetect $detector): JsonResponse
+    public function takeLocation(MobileDetect $detector): Response
     {
         $logHandler = new LogHandler();
 
@@ -730,7 +731,7 @@ class UserController extends AbstractController
         $this->em->persist($log);
         $this->em->flush();
 
-        return $this->json("", Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/assign', methods: Request::METHOD_POST)]
@@ -740,12 +741,14 @@ class UserController extends AbstractController
         $this->handleJSONForm($request, $assignVet, AssignVetType::class);
 
         $vet = $userRepo->find($assignVet->getVet());
+        if (!$vet || $vet->getTypeOfUser() !== User::TYPE_VET) {
+            throw new BadRequestHttpException('Unknown vet.');
+        }
 
         $currentUser->setVet($vet);
         $this->em->flush();
 
-
-        return $this->json(Response::HTTP_CREATED);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -761,6 +764,6 @@ class UserController extends AbstractController
 
         $email->sendContactMail($contactMessage);
 
-        return $this->json(Response::HTTP_OK);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 }

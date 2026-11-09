@@ -194,6 +194,6 @@ class ExaminationController extends AbstractController
         $this->em->remove($examination);
         $this->em->flush();
 
-        return $this->json("", Response::HTTP_NO_CONTENT);
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 }
