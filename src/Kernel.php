@@ -14,4 +14,12 @@ class Kernel extends BaseKernel
         parent::boot();
         date_default_timezone_set($this->getContainer()->getParameter('timezone'));
     }
+
+    /**
+     * @return list<string> An array of allowed values for APP_ENV
+     */
+    private function getAllowedEnvs(): array
+    {
+        return ['prod', 'dev', 'test'];
+    }
 }
