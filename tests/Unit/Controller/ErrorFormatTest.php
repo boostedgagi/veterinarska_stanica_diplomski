@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Factory\UserFactory;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mime\Email;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -76,6 +77,29 @@ class ErrorFormatTest extends WebTestCase
         self::assertSame(422, $body['code']);
         self::assertSame('Validation failed.', $body['message']);
         self::assertNotEmpty($body['errors']);
+    }
+
+    public function testRequestPayloadErrorsHaveTheSameShape(): void
+    {
+        [$code, $body] = $this->call($this->user(), 'POST', '/assign', ['vet' => 'not-a-number']);
+        self::assertSame(422, $code);
+        self::assertSame('Validation failed.', $body['message']);
+        self::assertSame(['vet'], array_column($body['errors'], 'field'));
+
+        [$code, $body] = $this->call(null, 'GET', '/verify_account?token=abc');
+        self::assertSame(400, $code);
+        self::assertSame(['userId'], array_column($body['errors'], 'field'));
+    }
+
+    public function testContactMailRepliesToTheVisitor(): void
+    {
+        $this->call(null, 'POST', '/contact_message', ['name' => 'Ana', 'email' => 'ana@example.test', 'content' => 'Hi']);
+
+        self::assertResponseStatusCodeSame(204);
+        $mail = self::getMailerMessage();
+        self::assertEmailAddressContains($mail, 'Reply-To', 'ana@example.test');
+        self::assertInstanceOf(Email::class, $mail);
+        self::assertNotContains('ana@example.test', array_map(static fn ($a) => $a->getAddress(), $mail->getFrom()), 'was sent "from" the visitor');
     }
 
     public function testPasswordResetRequestDoesNotRevealAccounts(): void

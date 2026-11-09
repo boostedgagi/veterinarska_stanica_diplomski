@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Every error of the API has the same JSON shape (the one Lexik already uses for 401):
@@ -35,6 +36,17 @@ final readonly class ApiExceptionListener
 
         if ($exception instanceof ValidationException) {
             $event->setResponse($this->response(Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation failed.', ['errors' => $exception->getErrors()]));
+
+            return;
+        }
+
+        // #[MapRequestPayload] / #[MapQueryString]: same shape as form validation errors
+        if ($exception instanceof HttpExceptionInterface && $exception->getPrevious() instanceof ValidationFailedException) {
+            $errors = [];
+            foreach ($exception->getPrevious()->getViolations() as $violation) {
+                $errors[] = ['field' => $violation->getPropertyPath(), 'message' => $violation->getMessage()];
+            }
+            $event->setResponse($this->response($exception->getStatusCode(), 'Validation failed.', ['errors' => $errors]));
 
             return;
         }

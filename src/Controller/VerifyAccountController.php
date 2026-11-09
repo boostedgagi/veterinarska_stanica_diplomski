@@ -2,52 +2,34 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use App\RateLimit\RateLimited;
-use Nelmio\ApiDocBundle\Attribute\Security;
-use Symfony\Component\Routing\Attribute\Route;
+use App\Exception\InvalidTokenException;
 use App\Model\VerifyAccount;
-use App\Repository\TokenEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\RateLimit\RateLimited;
+use App\Service\AccountTokenService;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 class VerifyAccountController extends AbstractController
 {
-
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
-    }
-
+    /** Link from the welcome mail. */
     #[Security(name: null)] // public route, see security.yaml
     #[RateLimited('token_check')]
     #[Route('/verify_account', methods: 'GET')]
-    public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo): Response
-    {
-        $queryParams = new VerifyAccount($request->query->all());
-        if (!$queryParams->getToken() || !$queryParams->getUserId()) {
-            throw new BadRequestHttpException('Missing token or user_id.');
+    public function verifyAccount(
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_BAD_REQUEST)] VerifyAccount $query,
+        AccountTokenService $accounts,
+    ): Response {
+        try {
+            $verified = $accounts->verifyAccount($query);
+        } catch (InvalidTokenException $e) {
+            throw new AccessDeniedHttpException($e->getMessage(), $e);
         }
 
-        $savedToken = $verifyRepo->findOneByValue($queryParams->getToken());
-        if(!$savedToken){
-            return $this->json("Account already verified",Response::HTTP_OK);
-        }
-
-        // the token only verifies the account it was issued for
-        $user = $savedToken->getUser();
-        if ($user && $user->getId() === $queryParams->getUserId() && !$savedToken->isExpired())
-        {
-            $user->setVerified(true);
-
-            $this->em->remove($savedToken);
-            $this->em->flush();
-
-            return $this->json("Account verified.", Response::HTTP_OK);
-        }
-
-        throw new AccessDeniedHttpException('Invalid or expired token.');
+        // an unknown token was used already: the account is verified
+        return $this->json($verified ? 'Account verified.' : 'Account already verified', Response::HTTP_OK);
     }
 }

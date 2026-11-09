@@ -119,7 +119,19 @@ class TokenTest extends WebTestCase
 
     public function testPasswordResetRejectsExpiredTokens(): void
     {
-        $this->resetPassword($this->tokenFor($this->victim, expired: true), $this->victim, 'too-late-123');
+        $body = $this->resetPassword($this->tokenFor($this->victim, expired: true), $this->victim, 'too-late-123');
+        self::assertResponseStatusCodeSame(400, 'was 204 and looked like success');
+        self::assertStringContainsString('expired', $body);
         self::assertFalse($this->passwordIs($this->victim, 'too-late-123'));
+    }
+
+    public function testPasswordResetNeedsAProperPassword(): void
+    {
+        $token = $this->tokenFor($this->victim);
+
+        $body = json_decode($this->resetPassword($token, $this->victim, 'short'), true);
+        self::assertResponseStatusCodeSame(422, 'any password was accepted, even an empty one');
+        self::assertSame(['password'], array_column($body['errors'], 'field'));
+        self::assertNotNull($this->em()->getRepository(Token::class)->find($token->getId()), 'token still usable');
     }
 }

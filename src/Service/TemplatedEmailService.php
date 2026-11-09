@@ -162,11 +162,12 @@ class TemplatedEmailService
     {
         $email = new TemplatedEmail()
             ->to('boostedgagi@boostedgagi.com')
-            ->from($contactMessage->getEmail())
-            ->subject('Message from '.$contactMessage->getName())
+            // the visitor's address can't be the sender (SPF/DMARC, spoofing); replies go to it
+            ->replyTo($contactMessage->email)
+            ->subject('Message from '.$contactMessage->name)
             ->htmlTemplate('email/contactMail.html.twig')
             ->context([
-                'content'=>$contactMessage->getContent()
+                'content'=>$contactMessage->content
             ]);
 
         $this->mailer->send($email);

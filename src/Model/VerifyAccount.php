@@ -2,39 +2,18 @@
 
 namespace App\Model;
 
-class VerifyAccount
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/** GET /verify_account?token=…&user_id=… (link from the welcome mail; token_id / expires are ignored). */
+final readonly class VerifyAccount
 {
-    private readonly ?int $tokenId;
-    private readonly ?string $token;
-    private readonly ?string $expires;
-    private readonly ?int $userId;
-
-    public function __construct(array $data)
-    {
-        $this->tokenId = $data['token_id'] ?? null;
-        $this->token = $data['token'] ?? null;
-        $this->expires = $data['expires'] ?? null;
-        $this->userId = (int)($data['user_id'] ?? null);
+    public function __construct(
+        #[Assert\NotBlank(message: 'Missing token.')]
+        public string $token = '',
+        #[SerializedName('user_id')]
+        #[Assert\Positive(message: 'Missing user_id.')]
+        public int $userId = 0,
+    ) {
     }
-
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-    public function getTokenId(): ?int
-    {
-        return $this->tokenId;
-    }
-
-    public function getExpires(): ?int
-    {
-        return $this->expires;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->userId;
-    }
-
 }

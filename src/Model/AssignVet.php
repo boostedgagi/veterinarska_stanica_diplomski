@@ -2,28 +2,14 @@
 
 namespace App\Model;
 
-class AssignVet
+use Symfony\Component\Validator\Constraints as Assert;
+
+/** POST /assign: the vet the current user picks. */
+final readonly class AssignVet
 {
-    private int $vet;
-
-    /**
-     * @return int
-     */
-    public function getVet(): int
-    {
-        return $this->vet;
+    public function __construct(
+        #[Assert\Positive]
+        public int $vet = 0,
+    ) {
     }
-
-    /**
-     * @param int $vet
-     * @return AssignVet
-     */
-    public function setVet(int $vet): AssignVet
-    {
-        $this->vet = $vet;
-        return $this;
-    }
-
-
-
 }

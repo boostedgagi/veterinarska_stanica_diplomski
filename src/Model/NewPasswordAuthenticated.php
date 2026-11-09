@@ -2,27 +2,15 @@
 
 namespace App\Model;
 
-class NewPasswordAuthenticated
+use Symfony\Component\Validator\Constraints as Assert;
+
+/** POST /password/make_new_authenticated */
+final readonly class NewPasswordAuthenticated
 {
-    private string $newPassword;
-
-    /**
-     * @return string
-     */
-    public function getNewPassword(): string
-    {
-        return $this->newPassword;
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 8, max: 4096)]
+        public string $newPassword = '',
+    ) {
     }
-
-    /**
-     * @param string $newPassword
-     * @return NewPasswordAuthenticated
-     */
-    public function setNewPassword(string $newPassword): NewPasswordAuthenticated
-    {
-        $this->newPassword = $newPassword;
-        return $this;
-    }
-
-
 }

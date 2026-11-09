@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Nebkam\SymfonyTraits\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\RateLimit\RateLimited;
@@ -16,8 +17,6 @@ use App\Entity\Pet;
 use App\Entity\User;
 use App\Event\UserRegisterEvent;
 use App\Form\AdminUserType;
-use App\Form\AssignVetType;
-use App\Form\ContactMessageType;
 use App\Form\LoginType;
 use App\Form\UserType;
 use App\Model\AssignVet;
@@ -738,15 +737,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/assign', methods: Request::METHOD_POST)]
-    public function assignVet(Request $request, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
+    public function assignVet(#[MapRequestPayload] AssignVet $assignVet, #[CurrentUser] User $currentUser, UserRepository $userRepo): Response
     {
         // the managed entity, not the security token's copy (that one may be detached)
         $currentUser = $userRepo->find($currentUser->getId()) ?? throw $this->createNotFoundException('User not found.');
-        $assignVet = new AssignVet();
-        $this->handleJSONForm($request, $assignVet, AssignVetType::class);
-
-        $vet = $userRepo->find($assignVet->getVet());
-        if (!$vet || $vet->getTypeOfUser() !== User::TYPE_VET) {
+        $vet = $userRepo->find($assignVet->vet);
+        if (!$vet || !$vet->isVet()) {
             throw new BadRequestHttpException('Unknown vet.');
         }
 
@@ -762,11 +758,8 @@ class UserController extends AbstractController
     #[Security(name: null)] // public route, see security.yaml
     #[RateLimited('contact')]
     #[Route('/contact_message',methods: Request::METHOD_POST)]
-    public function sendContactMessage(Request $request, TemplatedEmailService $email): Response
+    public function sendContactMessage(#[MapRequestPayload] ContactMessage $contactMessage, TemplatedEmailService $email): Response
     {
-        $contactMessage = new ContactMessage();
-        $this->handleJSONForm($request,$contactMessage,ContactMessageType::class);
-
         $email->sendContactMail($contactMessage);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
