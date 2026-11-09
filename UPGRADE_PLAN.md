@@ -479,14 +479,17 @@ The app is not hosted anywhere, so after the merge (PRs #1, #2) work continues d
 
 **Still open**
 
-- Messenger chat queue: §9.
 - `NotifyExaminationByEmailCommand` instantiates `TemplatedEmailService` by hand instead of injecting it (works; style).
 - PHPStan baseline (level 6) still has legacy entries; it only shrinks.
 - `user.popularity` legacy `"NN.00%"` strings on very old databases (see §4); irrelevant without a production DB.
 
 ---
 
-## 9. Follow-up (separate branch after the upgrade): Messenger chat queue
+## 9. Messenger chat queue ✅ (2026-11-09, `f1ad6a7`)
+
+**Done on `main` with option (c)** (the app isn't hosted, so there is no worker): `App\Message\Message` → `sync://`, unknown receiver → 400, handler throws `UnrecoverableMessageHandlingException` for unknown users, `Message::getCreatedAt()` nullable (M1, M3, M4). Sender spoofing fixed separately. Going async later: route to `async`, run a worker (a/b below), add `failure_transport` + `retry_strategy` (M2). M5 (real-time push) remains a feature decision.
+
+Original analysis:
 
 Asked for on 2026-11-02 ("fix the queue system for messaging … or write somewhere for later refactor"). It isn't fixed in the upgrade branch because the fix changes runtime behaviour and depends on what the hosting allows.
 
