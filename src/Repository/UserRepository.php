@@ -140,16 +140,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    public function findByRole($role): User|int
+    /** First user (by first name) whose roles contain $role, or null if there is none. */
+    public function findByRole(string $role): ?User
     {
         $qb = $this->createQueryBuilder('u');
 
         $qb
             ->andWhere($qb->expr()->like('u.roles', ':role'))
             ->setParameter('role', '%' . $role . '%')
-            ->orderBy('u.firstName', 'ASC');
+            ->orderBy('u.firstName', 'ASC')
+            ->setMaxResults(1);
 
-        return $qb->getQuery()->getResult()[0];
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**

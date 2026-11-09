@@ -477,7 +477,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::ME,
             ContextGroup::FOUND_PET,
-            ContextGroup::SHOW_PET
+            ContextGroup::SHOW_PET,
+            ContextGroup::CREATE_PET
         ]
     )]
     public function getPhone(): ?string

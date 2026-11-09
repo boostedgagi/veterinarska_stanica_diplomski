@@ -14,7 +14,7 @@ class ContextGroup
     public const SHOW_HEALTH_RECORD = 'show_health_record';
 
     public const CREATE_PET = 'create_pet';
-    public const SHOW_PET = 'create_pet';
+    public const SHOW_PET = 'show_pet';
     public const FOUND_PET = 'found_pet';
     public const SHOW_MY_PETS = 'show_user_pets';
 

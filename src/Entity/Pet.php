@@ -59,6 +59,7 @@ class Pet
             ContextGroup::CREATE_HEALTH_RECORD,
             ContextGroup::SHOW_HEALTH_RECORD,
             ContextGroup::CREATE_PET,
+            ContextGroup::SHOW_PET,
             ContextGroup::SHOW_MY_PETS,
             ContextGroup::SHOW_VET
         ]

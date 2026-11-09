@@ -2,7 +2,10 @@
 
 namespace App\Tests\Unit\Controller;
 
+use App\Entity\HealthRecord;
 use App\Entity\User;
+use App\Factory\ExaminationFactory;
+use App\Repository\UserRepository;
 use App\Factory\PetFactory;
 use App\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * Requests that used to answer 500 (or 200 with an error message) get a proper status,
@@ -94,5 +98,28 @@ class ApiErrorResponsesTest extends WebTestCase
         $reloaded = static::getContainer()->get(EntityManagerInterface::class)->find(User::class, $user->getId());
         self::assertTrue($reloaded->isVerified());
         self::assertSame($email, $reloaded->getEmail());
+    }
+
+    public function testHealthRecordStillLoadsAfterItsVetIsDeleted(): void
+    {
+        $owner = UserFactory::createOne(['typeOfUser' => User::TYPE_USER, 'allowed' => true, 'verified' => true]);
+        $vet = UserFactory::createOne(['typeOfUser' => User::TYPE_VET, 'allowed' => true, 'verified' => true]);
+        $record = persistent_factory(HealthRecord::class)->create([
+            'vet' => $vet, 'pet' => PetFactory::createOne(['owner' => $owner]), 'examination' => ExaminationFactory::createOne(),
+            'startedAt' => new \DateTime('2027-03-01 10:00'), 'finishedAt' => new \DateTime('2027-03-01 11:00'),
+            'status' => 'waiting', 'madeByVet' => false,
+        ]);
+
+        self::assertSame(204, $this->call($this->admin, 'DELETE', '/user/' . $vet->getId()));
+        // vet_id is now NULL (ON DELETE SET NULL); the non-nullable property made loading it a TypeError
+        self::assertSame(200, $this->call($owner, 'GET', '/health_record/' . $record->getId()));
+    }
+
+    public function testFindByRoleReturnsNullWhenNobodyHasTheRole(): void
+    {
+        $repo = static::getContainer()->get(UserRepository::class);
+
+        self::assertNull($repo->findByRole('ROLE_NOBODY_HAS_THIS'), 'was an undefined index / TypeError');
+        self::assertSame($this->admin->getId(), $repo->findByRole('ROLE_ADMIN')?->getId());
     }
 }

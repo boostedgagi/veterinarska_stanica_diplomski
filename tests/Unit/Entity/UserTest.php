@@ -20,7 +20,7 @@ class UserTest extends BaseTestCase
         $this->mockUserWithVet = $this->makeMockUser('mockuser@gmail.com',$this->mockVet);
     }
 
-    protected function testCreatedUser():void
+    public function testCreatedUser():void
     {
         $this->assertEquals('Marko',$this->mockUser->getFirstName());
         $this->assertEquals('Patarcic',$this->mockUser->getLastName());
@@ -31,7 +31,7 @@ class UserTest extends BaseTestCase
         $this->assertNull($this->mockUser->getVet());
     }
 
-    protected function testCreatedUserWithVet():void
+    public function testCreatedUserWithVet():void
     {
         $userWithVet = $this->mockUserWithVet;
         $hisVet = $userWithVet->getVet();
