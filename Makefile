@@ -56,3 +56,6 @@ rector-check: warmup ## Rector dry run (fails if anything would change)
 	$(COMPOSER) rector:check
 
 check: lint phpstan rector-check test ## Everything CI runs
+
+scheduler: ## Run the scheduler worker (reminder mails, monthly export, token cleanup)
+	$(CONSOLE) messenger:consume scheduler_default -vv

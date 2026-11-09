@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use App\Repository\HealthRecordRepository;
 use App\Service\TemplatedEmailService;
 use App\Service\ExportService;
@@ -11,6 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
+// first day of the month, 06:00: last 30 days of appointments as CSV to the admin
+#[AsCronTask('0 6 1 * *')]
 #[AsCommand(
     name: 'MonthlyHealthRecordExport',
     description: 'Export the last 30 days of health records to CSV and e-mail it',

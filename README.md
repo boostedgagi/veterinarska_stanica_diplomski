@@ -52,6 +52,22 @@ Projekt je izgrađen korišćenjem sledećih tehnologija i Symfony komponenti:
 Swagger UI (NelmioApiDocBundle) je dostupan na `GET /doc`, a OpenAPI specifikacija u JSON formatu na `GET /doc.json`.
 Rute označene katancem zahtevaju JWT: token se dobija preko `POST /login_check` i šalje kao `Authorization: Bearer <token>`.
 
+# ⏰ Zakazani poslovi
+
+Ponavljajući poslovi se pokreću iz same aplikacije (Symfony Scheduler, `#[AsCronTask]` na komandama), dovoljan je jedan worker:
+
+```bash
+php bin/console messenger:consume scheduler_default   # ili: make scheduler
+php bin/console debug:scheduler                       # pregled rasporeda
+```
+
+| Kada | Posao |
+|---|---|
+| svakog sata | podsetnik za termine u narednih 24 h (`NotifyExaminationByEmail --time-range=today`) |
+| svakog dana u 08:00 | podsetnik za termine u narednih 7 dana (`--time-range=next_week`) |
+| 1. u mesecu u 06:00 | CSV izveštaj poslednjih 30 dana administratoru (`MonthlyHealthRecordExport`) |
+| svake noći u 03:30 | brisanje isteklih tokena (`delete-expired-tokens`) |
+
 # 💡 Napomena
 
 Ovaj repozitorijum predstavlja demonstraciju backend arhitekture i logike korišćene u okviru diplomskog rada.

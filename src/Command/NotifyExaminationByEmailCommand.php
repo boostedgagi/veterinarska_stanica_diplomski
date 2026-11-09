@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use App\Entity\HealthRecord;
 use App\Enum\NotifyingTimeRange;
 use App\Repository\HealthRecordRepository;
@@ -14,6 +15,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
+// every hour: appointments in the next 24 h that got no reminder yet (once each)
+#[AsCronTask('0 * * * *', arguments: '--time-range=today')]
+// every morning: appointments in the next 7 days that got no week reminder yet
+#[AsCronTask('0 8 * * *', arguments: '--time-range=next_week')]
 #[AsCommand(
     name: 'NotifyExaminationByEmail',
     description: 'E-mail owners about upcoming appointments (--time-range=today|next_week)',

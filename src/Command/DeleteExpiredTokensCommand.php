@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// every night: verification / password tokens expire after 30 min
+#[AsCronTask('30 3 * * *')]
 #[AsCommand(
     name: 'delete-expired-tokens',
     description: 'Delete all expired tokens that are not used neither once.',
