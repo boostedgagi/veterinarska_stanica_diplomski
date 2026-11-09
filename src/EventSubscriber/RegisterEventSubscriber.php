@@ -23,7 +23,7 @@ class RegisterEventSubscriber implements EventSubscriberInterface
     public function onUserRegistration(UserRegisterEvent $event): void
     {
         $tokenFactory = new TokenFactory($event->em);
-        $token = $tokenFactory->save();
+        $token = $tokenFactory->save($event->user);
 
         $email = new TemplatedEmailService($event->mailer);
         $email->sendWelcomeEmail($event->user, $token);

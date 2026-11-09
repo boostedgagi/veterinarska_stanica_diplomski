@@ -19,8 +19,30 @@ class Token
     #[ORM\Column(length: 255)]
     private ?string $expires = null;
 
+    /** The account this token was issued for (verification / password reset). */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
     public function __construct()
     {
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function isExpired(): bool
+    {
+        return (int) $this->expires <= time();
     }
 
     public function getId(): ?int

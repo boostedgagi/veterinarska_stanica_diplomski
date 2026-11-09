@@ -5,7 +5,6 @@ namespace App\Controller;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Model\VerifyAccount;
-use App\Repository\UserRepository;
 use App\Repository\TokenEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,23 +20,25 @@ class VerifyAccountController extends AbstractController
 
     #[Security(name: null)] // public route, see security.yaml
     #[Route('/verify_account', methods: 'GET')]
-    public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo, UserRepository $userRepo): Response
+    public function verifyAccount(Request $request, TokenEntityRepository $verifyRepo): Response
     {
         $queryParams = new VerifyAccount($request->query->all());
+        if (!$queryParams->getToken() || !$queryParams->getUserId()) {
+            return $this->json("Missing token or user_id.", Response::HTTP_BAD_REQUEST);
+        }
 
         $savedToken = $verifyRepo->findOneByValue($queryParams->getToken());
         if(!$savedToken){
             return $this->json("Account already verified",Response::HTTP_OK);
         }
 
-        if ($savedToken['token'] && ($savedToken['expires'] > strtotime(date('Y-m-d h:i:s'))))
+        // the token only verifies the account it was issued for
+        $user = $savedToken->getUser();
+        if ($user && $user->getId() === $queryParams->getUserId() && !$savedToken->isExpired())
         {
-            $user = $userRepo->find($queryParams->getUserId());
-//            dd($queryParams,$savedToken);
             $user->setVerified(true);
 
-            $token = $verifyRepo->find($queryParams->getTokenId());
-            $this->em->remove($token);
+            $this->em->remove($savedToken);
             $this->em->flush();
 
             return $this->json("Account verified.", Response::HTTP_OK);

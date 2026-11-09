@@ -37,7 +37,6 @@ class ForgottenPasswordController extends AbstractController
     /**
      * @param Request $request
      * @param TokenEntityRepository $verifyRepo
-     * @param UserRepository $userRepo
      * @param UserPasswordHasherInterface $passwordHasher
      * @return Response
      *
@@ -49,7 +48,6 @@ class ForgottenPasswordController extends AbstractController
     public function renewForgottenPassword(
         Request                     $request,
         TokenEntityRepository       $verifyRepo,
-        UserRepository              $userRepo,
         UserPasswordHasherInterface $passwordHasher
     ): Response
     {
@@ -57,25 +55,21 @@ class ForgottenPasswordController extends AbstractController
         $this->handleJSONForm($request, $newPasswordEnvelope, NewPasswordEnvelopeType::class);
 
         $token = $verifyRepo->findOneByValue($newPasswordEnvelope->token);
-        if (!$token) {
+        // the token only resets the password of the account it was issued for
+        if (!$token || !$token->getUser()
+            || strcasecmp((string) $token->getUser()->getEmail(), $newPasswordEnvelope->email) !== 0) {
             return $this->json('Token is not valid.', Response::HTTP_OK);
         }
+        $user = $token->getUser();
 
-        $user = $userRepo->findOneBy(['email' => $newPasswordEnvelope->email]);
-        if (!$user) {
-            return $this->json('User not found.', Response::HTTP_OK);
-        }
-
-        if ($token["token"] && ($token["expires"] > strtotime(date('Y-m-d h:i:s')))) {
-            $tokenObj = $verifyRepo->find($newPasswordEnvelope->token_id);
-
+        if (!$token->isExpired()) {
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
                 $newPasswordEnvelope->password
             );
             $user->setPassword($hashedPassword);
 
-            $this->em->remove($tokenObj);
+            $this->em->remove($token);
             $this->em->flush();
             return $this->json([], Response::HTTP_OK);
         }
@@ -92,13 +86,13 @@ class ForgottenPasswordController extends AbstractController
         $requestNewPassword = new RequestNewPassword();
         $this->handleJSONForm($request, $requestNewPassword, RequestNewPasswordType::class);
 
-        $user = $userRepo->findBy(['email' => $requestNewPassword->email]);
+        $user = $userRepo->findOneBy(['email' => $requestNewPassword->email]);
         if (!$user) {
             return $this->json('User not found.', Response::HTTP_OK);
         }
 
         $tokenFactory = new TokenFactory($this->em);
-        $token = $tokenFactory->save();
+        $token = $tokenFactory->save($user);
 
         $this->em->persist($token);
         $this->em->flush();
