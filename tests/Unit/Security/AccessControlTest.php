@@ -18,7 +18,7 @@ class AccessControlTest extends WebTestCase
     use Factories;
 
     /** "METHOD path" of every route that works without logging in. */
-    private const PUBLIC_ROUTES = [
+    private const array PUBLIC_ROUTES = [
         'POST /login_check',
         'POST /user',
         'GET /verify_account',
