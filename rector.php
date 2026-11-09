@@ -56,8 +56,7 @@ return RectorConfig::configure()
         'MobileDetectBundle\DeviceDetector\MobileDetectorInterface' => 'Detection\MobileDetect',
     ])
     // Enabled last, each in its own commit:
-    ->withPreparedSets(symfonyCodeQuality: true)
-    // ->withPreparedSets(symfonyConfigs: true)
+    ->withPreparedSets(symfonyCodeQuality: true, symfonyConfigs: true)
     // ->withPhpSets(php84: true)
     ->withImportNames(importShortClasses: false, removeUnusedImports: true)
     ->withParallel()
