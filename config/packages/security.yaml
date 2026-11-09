@@ -43,7 +43,12 @@ security:
          - { path: ^/login_check, roles: PUBLIC_ACCESS }
          - { path: ^/password/, roles: PUBLIC_ACCESS }
          - { path: ^/engage_vet, roles: ROLE_USER }
-         - { path: ^/health_records, roles: [ROLE_USER,ROLE_ADMIN] }
+         # Health records (appointments): every route that reads or changes them needs a logged-in user.
+         # The old rule '^/health_records' (plural) matched none of the actual routes.
+         - { path: ^/health_record(/|$), roles: [ROLE_USER,ROLE_ADMIN] }
+         - { path: ^/(pet|vet)/[^/]+/health_record$, roles: [ROLE_USER,ROLE_ADMIN] }
+         - { path: ^/user/[^/]+/health_records$, roles: [ROLE_USER,ROLE_ADMIN] }
+         - { path: ^/search/health_record, roles: [ROLE_USER,ROLE_ADMIN] }
 when@test:
     security:
         password_hashers:

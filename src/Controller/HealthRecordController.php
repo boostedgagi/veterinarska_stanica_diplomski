@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Symfony\Component\Routing\Attribute\Route;
 use App\ContextGroup;
@@ -74,6 +75,7 @@ class HealthRecordController extends AbstractController
     /*
      * todo refactor creation to factory
      */
+    #[Security(name: 'Bearer')]
     #[Route('/health_record', methods: 'POST')]
     public function create(Request $request, MailerInterface $mailer): Response
     {
@@ -129,6 +131,7 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
+    #[Security(name: 'Bearer')]
     #[Route('/health_record/{id}', methods: 'PUT')]
     public function edit(Request $request, ?HealthRecord $healthRecord, MailerInterface $mailer): Response
     {
@@ -174,6 +177,7 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
+    #[Security(name: 'Bearer')]
     #[Route('/health_record/{id}', methods: 'GET')]
     public function showOne(?HealthRecord $healthRecord): Response
     {
@@ -205,6 +209,7 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
+    #[Security(name: 'Bearer')]
     #[Route('/health_record/{id}', methods: 'DELETE')]
     public function delete(?HealthRecord $healthRecord): Response
     {
@@ -256,6 +261,7 @@ class HealthRecordController extends AbstractController
             )
         ]
     )]
+    #[Security(name: 'Bearer')]
     #[Route('/pet/{id}/health_record', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function petHealthRecords(Request $request, ?Pet $pet, PaginatorInterface $paginator): Response
     {
@@ -275,6 +281,7 @@ class HealthRecordController extends AbstractController
         return $this->json($paginatedResult, Response::HTTP_OK, [], ['groups' => ContextGroup::SHOW_HEALTH_RECORD]);
     }
 
+    #[Security(name: 'Bearer')]
     #[Route('/user/{id}/health_records', requirements: ['id' => Requirements::NUMERIC], methods: 'GET')]
     public function ownerHealthRecords(?User $user, HealthRecordRepository $healthRecordRepo): Response
     {

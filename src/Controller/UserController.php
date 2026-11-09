@@ -677,6 +677,7 @@ class UserController extends AbstractController
             )
         ]
     )]
+    #[Security(name: 'Bearer')]
     #[Route('/vet/{id}/health_record', methods: 'GET')]
     public function getVetHealthRecords(?User $vet, PaginatorInterface $paginator, Request $request, #[CurrentUser] User $currentUser): Response
     {
