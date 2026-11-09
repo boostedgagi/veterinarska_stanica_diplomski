@@ -467,7 +467,7 @@ The app is not hosted anywhere, so after the merge (PRs #1, #2) work continues d
 | API | 500s: `/found_pet` unknown/missing id, `/verify_account` without params, paginated lists without `?page=`, partial `PATCH /user[/{id}]` | 404 / 400 / defaults page 1, limit 10 / partial updates (`5440cd6`, `1407419`) |
 | API | "Not found" answered 200 with an error message | 404 (`5440cd6`) |
 | Security | `PATCH /user` stored a sent password unhashed (and broke the login) | Password ignored there; `POST /password/make_new_authenticated` changes it (`5440cd6`) |
-| Security | Spoofable request bodies and open chats: `POST /message` took the sender from the body, `POST /on_call` the vet; any user could read any chat, mark any message seen, finish any on-call session, mail any pet's QR code, list all pets with owners | Sender must be you; `OnCallVoter`, `ContactMessageVoter`; QR = pet owner; `GET /pet` admins only (`HEAD`) |
+| Security | Spoofable request bodies and open chats: `POST /message` took the sender from the body, `POST /on_call` the vet; any user could read any chat, mark any message seen, finish any on-call session, mail any pet's QR code, list all pets with owners | Sender must be you; `OnCallVoter`, `ContactMessageVoter`; QR = pet owner; `GET /pet` admins only (`e2e3053`) |
 | Model | `HealthRecord::$vet` non-nullable but `ON DELETE SET NULL` → 500 after deleting a vet | `?User` (`0da4a80`) |
 | Model | `findByRole()` `getResult()[0]` / wrong return type | `?User` (`0da4a80`) |
 | Model | `ContextGroup::SHOW_PET` = `CREATE_PET` | Separate value, responses byte-identical (`0da4a80`) |
