@@ -1,6 +1,6 @@
 # Symfony upgrade plan: 6.4 → 7.4 LTS (with Rector)
 
-Status: **Phase 4 in progress** (approved 2026-11-02). Branch `upgrade/symfony-7.4`. S0–S4 done (S4 gate passed 2026-11-09); next: S5.
+Status: **S0–S5 done** (2026-11-09). Branch `upgrade/symfony-7.4` is on Symfony 7.4 / PHP 8.4 / Doctrine ORM 3, CI green with the Rector gate. Next: review/merge, deploy (see S5 deployment notes), then the 8.x decision (D1).
 Audit date: 2026-11-02. Target decided with owner: **7.4 LTS first**, then a separate decision about 8.x.
 
 ---
@@ -393,15 +393,28 @@ Each item is one commit on `upgrade/symfony-7.4`. After every item: tests (once 
 5. Not taken from recipes: flex's empty `.env.dev` (env files stay out of git), Foundry's empty `src/Story/AppStory.php` placeholder (`AppFixtures` stays the entry point), Foundry's `reset.mode: auto` (ours: `schema`, D6). Taken: `FoundryExtension` in `phpunit.xml.dist` (suite 7.7 s → 2.3 s) and apache-pack's `/index.php/…` redirect 301 → **308** (keeps method and body).
 6. `debug:container --deprecations` after S4: 2 left. `App\Security\UserChecker::checkPostAuth()` needs the `?TokenInterface $token` argument (**ours → S5**); `Nelmio\ApiDocBundle\Attribute\Security` extends a swagger-php class deprecated for 8.0 (vendor).
 
-### S5: 7.x deprecations / tooling gate
-- [ ] fix: remaining 7.x deprecations in our code (8.0 preparation)
-- [ ] rector: `symfonyCodeQuality` (own commit)
-- [ ] rector: `symfonyConfigs` (own commit)
-- [ ] rector: `withPhpSets(php84: true)` (own commit, D5)
-- [ ] ci: enable the `vendor/bin/rector process --dry-run` gate (D8)
-- [ ] docs: README "Symfony 6.4" → 7.4; deployment notes
+### S5: 7.x deprecations / tooling gate ✅ (2026-11-09)
+- [x] fix: `UserChecker::checkPostAuth()` takes `?TokenInterface $token` (8.0 signature); `debug:container --deprecations` from `App\` = 0 (`efad76e`). PHPUnit `failOnDeprecation` (scoped to `src/`) green. The one remaining entry is vendor (Nelmio `Attribute\Security` extends a swagger-php class deprecated for 8.0)
+- [x] rector: `symfonyCodeQuality`: 2 unused `Request` controller arguments removed; routes identical (`7b72209`)
+- [x] rector: `symfonyConfigs`: no-op, kept enabled as a guard (`38f4a60`)
+- [x] rector: `withPhpSets(php84: true)`, 18 files (`dcc6d54`), see deviation 1
+- [x] ci: `rector process --dry-run` gate after PHPStan, with a dev `cache:warmup` first (`5add1bc`); CI simulation 13/13
+- [x] docs: README → Symfony 7.4; deployment notes below
 
----
+**S5 deviations / findings**
+1. `ClassPropertyAssignToConstructorPromotionRector` is skipped for `src/Entity` and `src/Model`: promoting e.g. `ContactMessage`/`PaginatedResult` properties reorders their declarations, which changes the **JSON key order** of API responses and moves ORM mapping into constructors. With the skip, the 48-request smoke test is byte-identical (`var/upgrade/smoke-php84`).
+2. `fputcsv()` got an explicit `escape: '\\'` (PHP 8.4 deprecates relying on the default). Output verified identical on quotes, backslashes, commas, newlines.
+3. `MonthlyHealthRecordExportCommand` called `getLastMonthHealthRecords(7)`, but the method takes no argument (always last 30 days). Rector dropped the ignored `7`; behaviour unchanged. If a configurable range was intended, that's a feature for later.
+4. PHPStan baseline: 4 entries removed (now fixed), nothing added.
+
+**Deployment notes (production: PHP 8.4, MySQL 8.4, Apache)**
+1. Host: PHP **8.4** with `ctype`, `iconv`, `intl`, `gd` (QR PNG), `pdo_mysql`. MySQL **8.4** (an in-place 8.0 → 8.4 data-dir upgrade worked locally with this schema, S3 deviation 5). Back up the DB first.
+2. Read-only check first: `bin/console doctrine:migrations:status` (Q2b).
+3. `composer install --no-dev --optimize-autoloader`, `APP_ENV=prod`, `DATABASE_URL=…?serverVersion=8.4&charset=utf8mb4`.
+4. `bin/console doctrine:migrations:migrate`: one new migration, `Version20261102205151` (DBAL 4 type comments + messenger index; schema only, no data change). Migration namespace unchanged (`DoctrineMigrations`).
+5. `bin/console cache:clear` (prod). JWT keys / passphrase are unchanged (Lexik 3 reads the same files).
+6. Remove anything that runs `bin/chat-server.php` / `bin/push-server.php` (supervisor, cron), they are gone (D2). Cron command names are unchanged.
+7. **API changes for the Angular frontend:** `POST /api/token/refresh` no longer exists (D7). Everything else is byte-identical in the smoke test. Apache now redirects `/index.php/…` with **308** instead of 301.
 
 ## 6. Verification strategy
 
