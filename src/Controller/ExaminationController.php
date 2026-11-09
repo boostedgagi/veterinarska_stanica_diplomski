@@ -46,7 +46,7 @@ class ExaminationController extends AbstractController
         ]
     )]
     #[Route('/examination', methods: 'GET')]
-    public function showAllExaminations(ExaminationRepository $examinationRepo, Request $request): Response
+    public function showAllExaminations(ExaminationRepository $examinationRepo): Response
     {
         $allExaminations = $examinationRepo->findAll();
 

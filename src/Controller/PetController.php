@@ -252,7 +252,7 @@ class PetController extends AbstractController
         ]
     )]
     #[Route('/pet', methods: 'GET')]
-    public function showAllPets(Request $request, PetRepository $repo): Response
+    public function showAllPets(PetRepository $repo): Response
     {
         $pets = $repo->findAll();// Todo paginate this
 
