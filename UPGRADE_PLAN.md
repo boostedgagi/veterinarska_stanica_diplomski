@@ -548,5 +548,5 @@ Asked for on 2026-11-02 ("fix the queue system for messaging … or write somewh
 | 8.1 | 05/2026 | 01/2027 |
 | 8.2 | late 11/2026 | 07/2027 |
 | 8.3 | 05/2027 | 01/2028 |
-| 8.4 LTS | 11/2027 | 11/2030 (security) |
+| 8.4 LTS | 11/2027 | 11/2030 (bugs), 11/2031 (security) |
 
